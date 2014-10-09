@@ -6,7 +6,7 @@
   */
 
 
-#line 1 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 1 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Bob Corbett and Richard Stallman
@@ -80,7 +80,7 @@ void *alloca ();
 #include <stdio.h>
 #define YYBISON 1  
 
-/* #line 73 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 73 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 85 "OdlGenParser.cpp"
 #define YY_OdlParserBase_LSP_NEEDED 
 #define YY_OdlParserBase_ERROR_BODY  = 0
@@ -112,7 +112,7 @@ typedef union
 } yy_OdlParserBase_stype;
 #define YY_OdlParserBase_STYPE yy_OdlParserBase_stype
 
-#line 73 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 73 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
 /* %{ and %header{ and %union, during decl */
 #define YY_OdlParserBase_BISON 1
 #ifndef YY_OdlParserBase_COMPATIBILITY
@@ -158,36 +158,36 @@ typedef union
 
 #ifndef YY_OdlParserBase_PURE
 
-/* #line 117 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 117 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 163 "OdlGenParser.cpp"
 
-#line 117 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 117 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
 /*  YY_OdlParserBase_PURE */
 #endif
 
 /* section apres lecture def, avant lecture grammaire S2 */
 
-/* #line 121 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 121 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 172 "OdlGenParser.cpp"
 
-#line 121 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 121 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
 /* prefix */
 #ifndef YY_OdlParserBase_DEBUG
 
-/* #line 123 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 123 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 179 "OdlGenParser.cpp"
 
-#line 123 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 123 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
 /* YY_OdlParserBase_DEBUG */
 #endif
 
 
 #ifndef YY_OdlParserBase_LSP_NEEDED
 
-/* #line 128 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 128 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 189 "OdlGenParser.cpp"
 
-#line 128 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 128 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
  /* YY_OdlParserBase_LSP_NEEDED*/
 #endif
 
@@ -297,7 +297,7 @@ typedef
 #ifndef YY_USE_CLASS
 /* TOKEN C */
 
-/* #line 236 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 236 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 302 "OdlGenParser.cpp"
 #define	UNKNOWN	258
 #define	TOKEN_IS	259
@@ -323,7 +323,7 @@ typedef
 #define	IDENTIFIER	279
 
 
-#line 236 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 236 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
  /* #defines tokens */
 #else
 /* CLASS */
@@ -369,7 +369,7 @@ public:
 #if YY_OdlParserBase_USE_CONST_TOKEN != 0
 /* static const int token ... */
 
-/* #line 280 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 280 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 374 "OdlGenParser.cpp"
 static const int UNKNOWN;
 static const int TOKEN_IS;
@@ -395,12 +395,12 @@ static const int VALUE_STRING;
 static const int IDENTIFIER;
 
 
-#line 280 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 280 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
  /* decl const */
 #else
 enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 
-/* #line 283 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 283 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 405 "OdlGenParser.cpp"
 	,UNKNOWN=258
 	,TOKEN_IS=259
@@ -426,7 +426,7 @@ enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 	,IDENTIFIER=279
 
 
-#line 283 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 283 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
  /* enum token */
      }; /* end of enum declaration */
 #endif
@@ -459,7 +459,7 @@ public:
 /* other declare folow */
 #if YY_OdlParserBase_USE_CONST_TOKEN != 0
 
-/* #line 314 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 314 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 464 "OdlGenParser.cpp"
 const int YY_OdlParserBase_CLASS::UNKNOWN=258;
 const int YY_OdlParserBase_CLASS::TOKEN_IS=259;
@@ -485,7 +485,7 @@ const int YY_OdlParserBase_CLASS::VALUE_STRING=278;
 const int YY_OdlParserBase_CLASS::IDENTIFIER=279;
 
 
-#line 314 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 314 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
  /* const YY_OdlParserBase_CLASS::token */
 #endif
 /*apres const  */
@@ -498,7 +498,7 @@ YY_OdlParserBase_CONSTRUCTOR_CODE;
 };
 #endif
 
-/* #line 325 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 325 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 503 "OdlGenParser.cpp"
 
 
@@ -654,7 +654,7 @@ static const short yycheck[] = {     8,
      0,     9,    58,    61,    64,    38
 };
 
-#line 325 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 325 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
  /* fattrs + tables */
 
 /* parser code folow  */
@@ -1142,7 +1142,7 @@ YYLABEL(yyreduce)
 #endif
 
 
-/* #line 811 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 811 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 1147 "OdlGenParser.cpp"
 
   switch (yyn) {
@@ -1172,17 +1172,17 @@ case 3:
 case 4:
 #line 90 "OdlParser.y"
 {
-	odl::TOdlAstNode* namedDeclaration = yyvsp[0].FAstNode;
-	namedDeclaration->SetIdentifierPointer(yyvsp[-2].FAstNode);
+	odl::TOdlAstNode* namedDeclaration = new odl::TOdlAstNode();
+	namedDeclaration->SetAsNamedDeclaration(yyvsp[-2].FAstNode, yyvsp[0].FAstNode);
 	yyval.FAstNode = namedDeclaration;
 ;
     break;}
 case 5:
 #line 96 "OdlParser.y"
 {
-	odl::TOdlAstNode* namedDeclaration = yyvsp[-1].FAstNode;
-	namedDeclaration->SetIdentifierPointer(yyvsp[-3].FAstNode);
-	yyval.FAstNode = namedDeclaration;
+	odl::TOdlAstNode* theNamespace = yyvsp[-1].FAstNode;
+	theNamespace->SetIdentifierPointer(yyvsp[-3].FAstNode);
+	yyval.FAstNode = theNamespace;
 ;
     break;}
 case 6:
@@ -1446,7 +1446,7 @@ case 38:
     break;}
 }
 
-#line 811 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc"
+#line 811 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
    /* the action file gets copied in in place of this dollarsign  */
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1647,7 +1647,7 @@ YYLABEL(yyerrhandle)
 
 /* END */
 
-/* #line 1010 "D:\\testcode\\Odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 1010 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
 #line 1652 "OdlGenParser.cpp"
 #line 335 "OdlParser.y"
 

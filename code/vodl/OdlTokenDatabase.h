@@ -70,6 +70,8 @@ public:
 		return parLeft.FToken != parRight.FToken;
 	}
 
+	unsigned int ToInt() const { return FToken; }
+
 private:
     unsigned int FToken;
 };
@@ -101,10 +103,16 @@ public:
         return TToken< TTokenDomain >(tokenValue);
     }
 
+	std::string const& ToString(TToken< TTokenDomain > const& parToken)
+	{
+		return FTokenValues[parToken.ToInt()];
+	}
+
 private:
     std::hash_map< std::string, unsigned int > FTokenGenerator;
     std::vector< std::string > FTokenValues;
 };
+
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
@@ -165,15 +173,20 @@ public:
 
 	TTokenType operator[] (size_t parIndex) const { return FTokens[parIndex]; }
 
-	std::string ToString()
+	std::string ToString() const
 	{
-		std::stringstream ss;
-		for (size_t i = 0; i < FTokens.size(); ++i)
-		{
-			ss << FTokens[i].ToString() << std::endl;
-		}
+		std::ostringstream oss;
 
-		return ss.str();
+		for (int i = 0; i < (int) FTokens.size(); ++i)
+		{
+			TTokenType const& token = FTokens[i];
+			std::string tokenAsString = TTokenDatabase< TTokenDomain >::Instance().ToString(token);
+			oss << tokenAsString;
+			if (i + 1 < FTokens.size())
+				oss << '/';
+		}
+	
+		return oss.str();
 	}
 
 	friend inline bool operator < (TTokenPath const& parLeft, TTokenPath const& parRight)
@@ -266,6 +279,7 @@ void CreateTokenDatabases();
 void DestroyTokenDatabases();
 
 } // namespace odl
+
 
 #endif
 

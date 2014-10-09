@@ -111,6 +111,16 @@ void TOdlAstNode::SetAsTemplateInstanciation()
 
 }
 //-------------------------------------------------------------------------------
+void TOdlAstNode::SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression)
+{
+	FAstNodeType = TOdlAstNodeType::NAMED_DECLARATION;
+	
+	assert(parExpression != nullptr);
+	assert(parNameIdentifier != nullptr);
+
+	FIdentifierPointer = parNameIdentifier;
+	FExpressionPointer = parExpression;
+}
 void TOdlAstNode::SetAsObjectDeclaration(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList)
 {
     FAstNodeType = TOdlAstNodeType::OBJECT_DECLARATION;

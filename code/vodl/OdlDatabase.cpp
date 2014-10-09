@@ -32,11 +32,14 @@ void TOdlObjectDatabase::StoreObject(TOdlDatabasePath const& parDatabasePath, TO
 {
     assert(parMetaClassBase != nullptr);
     
+	std::string forDebug = parDatabasePath.ToString();
+
     TObjectsByPaths::iterator it = FObjectsByPaths.lower_bound(parDatabasePath);
     if (it != FObjectsByPaths.end())
     {
         if (it->first == parDatabasePath)
         {
+			// object doublon in database !! ??
             assert(false);
         }
     }

@@ -88,15 +88,15 @@ named_declaration_list
 named_declaration
 : IDENTIFIER TOKEN_IS expression
 {
-	odl::TOdlAstNode* namedDeclaration = $3;
-	namedDeclaration->SetIdentifierPointer($1);
+	odl::TOdlAstNode* namedDeclaration = new odl::TOdlAstNode();
+	namedDeclaration->SetAsNamedDeclaration($1, $3);
 	$$ = namedDeclaration;
 }
 | TOKEN_NAMESPACE IDENTIFIER TOKEN_OPEN_BRACE named_declaration_list TOKEN_CLOSE_BRACE
 {
-	odl::TOdlAstNode* namedDeclaration = $4;
-	namedDeclaration->SetIdentifierPointer($2);
-	$$ = namedDeclaration;
+	odl::TOdlAstNode* theNamespace = $4;
+	theNamespace->SetIdentifierPointer($2);
+	$$ = theNamespace;
 }
 | TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS typed_identifier_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {

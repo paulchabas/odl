@@ -95,6 +95,17 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
             }
         }
         break ;
+	case TOdlAstNodeType::NAMED_DECLARATION:
+		{
+			#ifdef _DEBUG
+			TOdlAstNode* name = parAstNode->IdentifierPointer();
+			assert(name != nullptr);
+			#endif
+
+			TOdlAstNode* expression = parAstNode->ExpressionPointer();
+			(*parCallback)(expression, parContext);
+		}
+		break ;
     case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
         {
             // todo.
@@ -120,7 +131,7 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
     {
     case TOdlAstNodeType::NAMESPACE:
         {
-            TOdlAstNode const* identifier = parAstNode->IdentifierPointer_IFP();;
+            TOdlAstNode const* identifier = parAstNode->IdentifierPointer_IFP();
             if (identifier != nullptr)
             {
                 std::string const& namespaceName = identifier->Identifier();
@@ -133,19 +144,32 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
             }
         };
         break ;
+	case TOdlAstNodeType::NAMED_DECLARATION:
+		{
+			TOdlAstNode const* identifier = parAstNode->IdentifierPointer();
+			std::string const& namespaceName = identifier->Identifier();
+            parContext.EnterNamespace(namespaceName);
+            VisitAst(parAstNode, parContext, InstanciateObjects);
+			parContext.LeaveNamespace();
+		}
+		break;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
-            std::string const& objectName = parAstNode->IdentifierPointer()->Identifier();
+			std::string autonamedObjectOrEmptyString = parAstNode->IdentifierPointer() ? parAstNode->IdentifierPointer()->Identifier() : "";
 			std::string const& objectType = parAstNode->TypeIdentifierPointer()->Identifier();
 			TMetaClassBase const* objectMetaClass = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 			TOdlObject* odlObject = objectMetaClass->CreateObject();
             
-            parContext.EnterNamespace(objectName);
+			if (!autonamedObjectOrEmptyString.empty())
+				parContext.EnterNamespace(autonamedObjectOrEmptyString);
             TOdlDatabasePath const& objectNamespaceAndName = parContext.DatabasePath();
+			#ifdef _DEBUG
+			std::string fordebug = objectNamespaceAndName.ToString();
+			#endif
 			TOdlDatabase::Instance().StoreObject(objectNamespaceAndName, odlObject, objectMetaClass);
             VisitAst(parAstNode, parContext, InstanciateObjects);
-
-            parContext.LeaveNamespace();
+			if (!autonamedObjectOrEmptyString.empty())
+				parContext.LeaveNamespace();
         }
         break ;
     default:
@@ -223,6 +247,17 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
             }
         }
         break ;
+    case TOdlAstNodeType::NAMED_DECLARATION:
+        {
+            TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
+            TOdlAstNode const* identifier = parAstNode->IdentifierPointer_IFP();;
+            assert(identifier != nullptr);
+            std::string const& namespaceName = identifier->Identifier();
+            context.EnterNamespace(namespaceName);
+            VisitAst(parAstNode, parContext, FillObjectsProperties);
+			context.LeaveNamespace();
+        }
+        break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
             TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
@@ -231,6 +266,9 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
             
             context.EnterNamespace(objectName);
             TOdlDatabasePath& objectDatabasePath = context.DatabasePath();
+			#ifdef _DEBUG
+			std::string forDebug = objectDatabasePath.ToString();
+			#endif
             TOdlObject* object = TOdlDatabase::Instance().GetObject(objectDatabasePath);
             TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
             TFillObjectPropertiesInterpretContext newContext(objectDatabasePath, object, metaClassBase);
@@ -264,6 +302,11 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
     TOdlAstNodeType::TType nodeType = parAstNode->AstNodeType();
     switch (nodeType)
     {
+	case TOdlAstNodeType::NAMED_DECLARATION:
+		{
+			int a = 0;
+		}
+		break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
             TOdlAstNode* identifierPointer = parAstNode->IdentifierPointer_IFP();

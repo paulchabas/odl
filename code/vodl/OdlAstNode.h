@@ -28,10 +28,11 @@ namespace TOdlAstNodeType
         PROPERTY_DECLARATION_LIST   = 7,
         OBJECT_DECLARATION          = 8 | EXPRESSION_MASK | VALUE_MASK,
         NAMESPACE                   = 9,
-        EXPRESSION                  = 10 | EXPRESSION_MASK,
-		VALUE_VECTOR				= 11 | EXPRESSION_MASK | VALUE_MASK,
-        OBJECT_TEMPLATE_DECLARATION = 12 | TEMPLATE_MASK,
-        OBJECT_TEMPLATE_INSTANCIATION = 13 | TEMPLATE_MASK,
+		NAMED_DECLARATION			= 10,
+        EXPRESSION                  = 11 | EXPRESSION_MASK,
+		VALUE_VECTOR				= 12 | EXPRESSION_MASK | VALUE_MASK,
+        OBJECT_TEMPLATE_DECLARATION = 13 | TEMPLATE_MASK,
+        OBJECT_TEMPLATE_INSTANCIATION = 14 | TEMPLATE_MASK,
 	};
 }
 
@@ -73,6 +74,7 @@ public:
 	void Vector_AppendItem(TOdlAstNode* parVectorItem);
 
     void SetAsObjectDeclaration(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList);
+	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
 
     void SetAsTemplateDeclaration();
     void SetAsTemplateInstanciation();
@@ -118,7 +120,7 @@ public:
     void SetAsReferenceToResolve() { FReferenceToResolve = true; }
     bool IsValueReference() const { return FIsValueReference; }
     void ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference) { FResolvedReferenceWeak = parNodeReference; FIsValueReference = parIsValueReference; }
-    TOdlAstNode* ResolvedReference() const { return FResolvedReferenceWeak; }
+    TOdlAstNode* ResolvedReference_ReturnNamedDeclaration() const { return FResolvedReferenceWeak; }
 
 private:
     void PrettyPrintWithIndentLevel(std::ostringstream& parOss, int parIndentLevel) const;

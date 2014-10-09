@@ -194,6 +194,10 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                 TOdlDatabasePath workingDatabasePath(parDatabasePath);
                 workingDatabasePath.push_back(TOdlDatabaseToken(objectName));
 
+				#ifdef _DEBUG
+				std::string forDebug = workingDatabasePath.ToString();
+				#endif
+
                 TOdlObject* object = TOdlDatabase::Instance().GetObject(workingDatabasePath);
                 TMetaClassBase const* objectMetaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
                 return TOdlExpression(object, objectMetaClassBase);
@@ -255,8 +259,9 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                 }
                 else // value reference
                 {
-                    TOdlAstNode* resolvedReference = parExpression->ResolvedReference();
-                    return EvalExpression(resolvedReference, parDatabasePath);
+					TOdlAstNode* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
+                    TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
+                    return EvalExpression(namedDeclarationExpression, parDatabasePath);
                 }
 			}
 			break ;
