@@ -245,12 +245,11 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     {
 	case TOdlAstNodeType::EXPRESSION:
         {
-            
             bool anonymous = FIdentifierPointer == nullptr;
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
-                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+                parOss << FIdentifierPointer->Identifier();
                 parOss << " is ";
                 int const propertyLengthPlusSpacePlusIsPlusSpace = (int) FIdentifierPointer->Identifier().length() + 4;
                 parIndentLevel += propertyLengthPlusSpacePlusIsPlusSpace;
@@ -309,7 +308,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 		break ;
     case TOdlAstNodeType::IDENTIFIER:
         {
-            parOss << FValueIdentifier;
+            parOss << FValueIdentifier << std::endl;
         }
         break ;
     case TOdlAstNodeType::VALUE_STRING:
@@ -318,7 +317,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
-                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+                parOss << FIdentifierPointer->Identifier();
                 parOss << " is ";
             }
 
@@ -338,7 +337,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
-                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+                parOss << FIdentifierPointer->Identifier();
                 parOss << " is ";
             }
 
@@ -356,7 +355,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
-                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+				parOss << FIdentifierPointer->Identifier();
                 parOss << " is ";
             }
 
@@ -374,7 +373,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
-                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+                parOss << FIdentifierPointer->Identifier();
                 parOss << " is ";
             }
 
@@ -400,7 +399,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     case TOdlAstNodeType::PROPERTY_DECLARATION:
         {
             Indent(parOss, parIndentLevel);
-            FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+			parOss << FIdentifierPointer->Identifier();
             parOss << " = ";
 
             int const propertyLengthPlusSpacePlusEqualPlusSpace = (int) FIdentifierPointer->Identifier().length() + 3;
@@ -423,24 +422,19 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
-            bool const anonymous = FAnonymousDeclaration;
-            if (!anonymous)
-            {
-                Indent(parOss, parIndentLevel);
-            }
-
 			if (FIdentifierPointer != nullptr)
-				FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
-            parOss << " is ";
+			{
+				parOss << "[";
+				parOss << FIdentifierPointer->Identifier();
+				parOss << "] ";
+			}
+
             parOss << FTypeIdentifierPointer->Identifier() << std::endl;
+
             Indent(parOss, parIndentLevel) << "{" << std::endl;
             FPropertyDeclarationListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
             Indent(parOss, parIndentLevel) << "}";
-
-            if (!anonymous)
-            {
-                parOss << std::endl;
-            }
+			parOss << std::endl;
         }
         break ;
     case TOdlAstNodeType::NAMESPACE:
@@ -448,7 +442,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             Indent(parOss, parIndentLevel) << "namespace ";
             if (FIdentifierPointer != nullptr)
             {
-                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+				parOss << FIdentifierPointer->Identifier();
             }
             parOss << std::endl;
             Indent(parOss, parIndentLevel) << "{" << std::endl;
@@ -458,17 +452,17 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
                 child->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
             }
             Indent(parOss, parIndentLevel) << "}" << std::endl;
+			parOss << std::endl;
         }
         break ;
     case TOdlAstNodeType::NAMED_DECLARATION:
         {
             Indent(parOss, parIndentLevel);
-            if (FIdentifierPointer != nullptr)
-            {
-                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
-            }
+			parOss << FIdentifierPointer->Identifier();
 			parOss << " is ";
-			FExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+			int const identifierLengthPlusSpaceIsSpace = (int) FIdentifierPointer->Identifier().length() + 4;
+			FExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + identifierLengthPlusSpaceIsSpace);
+			parOss << std::endl;
         }
         break ;
     };
