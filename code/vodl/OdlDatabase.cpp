@@ -146,6 +146,9 @@ void TOdlDatabase::StoreObject(TOdlDatabasePath const& parDatabasePath, TOdlObje
 //-------------------------------------------------------------------------------
 TOdlObject* TOdlDatabase::GetObject(TOdlDatabasePath const& parDatabasePath) const
 {
+	#if ODL_ENABLE_VERBOSE_DEBUG
+	std::string databasePath = parDatabasePath.ToString();
+	#endif
     TOdlObject* object = FObjectsDatabase.GetObject_IFP(parDatabasePath);
     assert(object != nullptr);
     return object;

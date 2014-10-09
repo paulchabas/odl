@@ -25,7 +25,7 @@ static odl::TOdlAstNode* AutoGenerateObjectIdentifier()
 TOdlAstNode::TOdlAstNode() :
     FAstNodeType(TOdlAstNodeType::UNKNOWN),
     FOperatorType(TOdlAstNodeOperatorType::OPERATOR_NONE),
-    FIdentifier(),
+    FValueIdentifier(),
     FValueString(),
     FValueInteger(0),
     FValueFloat(0.0f),
@@ -38,7 +38,7 @@ TOdlAstNode::TOdlAstNode() :
     FOperatorExpressionPointer(nullptr),
     FRightExpressionPointer(nullptr),
     FResolvedReferenceWeak(nullptr),
-    FAnonymousObjectDeclaration(false),
+    FAnonymousDeclaration(true), // value reset by named declarations.
     FReferenceToResolve(false),
     FIsValueReference(false)
 {
@@ -86,7 +86,7 @@ void TOdlAstNode::AutoGenerateIdentifier()
 {
     assert(FIdentifierPointer == nullptr);
     FIdentifierPointer = AutoGenerateObjectIdentifier();
-    FAnonymousObjectDeclaration = true;
+    FAnonymousDeclaration = true;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsNamespace()
@@ -163,7 +163,7 @@ void TOdlAstNode::SetAsPropertyDeclaration(TOdlAstNode* parIdentifier, TOdlAstNo
 void TOdlAstNode::SetAsIdentifier(std::string const& parIdentifier)
 {
     FAstNodeType = TOdlAstNodeType::IDENTIFIER;
-    FIdentifier = parIdentifier;
+    FValueIdentifier = parIdentifier;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsStringValue(std::string const& parStringValue)
@@ -309,7 +309,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 		break ;
     case TOdlAstNodeType::IDENTIFIER:
         {
-            parOss << FIdentifier;
+            parOss << FValueIdentifier;
         }
         break ;
     case TOdlAstNodeType::VALUE_STRING:
@@ -423,13 +423,14 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
-            bool const anonymous = FAnonymousObjectDeclaration;
+            bool const anonymous = FAnonymousDeclaration;
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
             }
 
-            FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+			if (FIdentifierPointer != nullptr)
+				FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
             parOss << " is ";
             parOss << FTypeIdentifierPointer->Identifier() << std::endl;
             Indent(parOss, parIndentLevel) << "{" << std::endl;
@@ -459,7 +460,29 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             Indent(parOss, parIndentLevel) << "}" << std::endl;
         }
         break ;
+    case TOdlAstNodeType::NAMED_DECLARATION:
+        {
+            Indent(parOss, parIndentLevel);
+            if (FIdentifierPointer != nullptr)
+            {
+                FIdentifierPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+            }
+			parOss << " is ";
+			FExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+        }
+        break ;
     };
+}
+//-------------------------------------------------------------------------------
+void TOdlAstNode::ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference)
+{
+	FResolvedReferenceWeak = parNodeReference; 
+	FIsValueReference = parIsValueReference;
+}
+//-------------------------------------------------------------------------------
+void TOdlAstNode::SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)
+{
+	FFullDatabasePath = parFullDatabasePath;
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************

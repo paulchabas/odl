@@ -182,7 +182,7 @@ public:
 			TTokenType const& token = FTokens[i];
 			std::string tokenAsString = TTokenDatabase< TTokenDomain >::Instance().ToString(token);
 			oss << tokenAsString;
-			if (i + 1 < FTokens.size())
+			if (i + 1 < (int) FTokens.size())
 				oss << '/';
 		}
 	

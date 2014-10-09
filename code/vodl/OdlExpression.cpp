@@ -186,19 +186,16 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
             }
             break ;
         case TOdlAstNodeType::OBJECT_DECLARATION:
-            {
-                std::string const& objectName = parExpression->IdentifierPointer()->Identifier();
+			{
+				// PAUL(27/05/14 17:57:57) yuk.
+                TOdlDatabasePath const& databasePath = parExpression->FullDatabasePath();
                 std::string const& objectType = parExpression->TypeIdentifierPointer()->Identifier();
 
-                // PAUL(27/05/14 17:57:57) yuk.
-                TOdlDatabasePath workingDatabasePath(parDatabasePath);
-                workingDatabasePath.push_back(TOdlDatabaseToken(objectName));
-
-				#ifdef _DEBUG
-				std::string forDebug = workingDatabasePath.ToString();
+				#ifdef ODL_ENABLE_VERBOSE_DEBUG
+				std::string forDebug1 = databasePath.ToString();
 				#endif
 
-                TOdlObject* object = TOdlDatabase::Instance().GetObject(workingDatabasePath);
+                TOdlObject* object = TOdlDatabase::Instance().GetObject(databasePath);
                 TMetaClassBase const* objectMetaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
                 return TOdlExpression(object, objectMetaClassBase);
             }

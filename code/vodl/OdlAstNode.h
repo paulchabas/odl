@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 
+#include "OdlTokenDatabase.h"
+
 namespace odl
 {
 //-------------------------------------------------------------------------------
@@ -84,12 +86,14 @@ public:
     void SetAsPropertyDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parExpression);
 
     void SetAsIdentifier(std::string const& parIdentifier);
-    std::string const& Identifier() const { return FIdentifier; }
+    std::string const& Identifier() const { return FValueIdentifier; }
     void SetAsStringValue(std::string const& parStringValue);
     void SetAsIntegerValue(int parIntegerValue);
     void SetAsFloatValue(float parFloatValue);
 
     void SetAsOperator(TOdlAstNodeOperatorType::TType parOperatorType);
+
+	void SetAnonymousDeclaration(bool parState) { FAnonymousDeclaration = parState; }
 
     void PrettyPrint(std::ostringstream& parOss) const;
 
@@ -115,12 +119,16 @@ public:
     char const* ValueString() const { return FValueString.c_str(); }
 
     bool IsReferenceToResolve() const { return FReferenceToResolve; }
+	bool IsAnonymousDeclaration() const { return FAnonymousDeclaration; }
 
     // post processing
     void SetAsReferenceToResolve() { FReferenceToResolve = true; }
     bool IsValueReference() const { return FIsValueReference; }
-    void ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference) { FResolvedReferenceWeak = parNodeReference; FIsValueReference = parIsValueReference; }
+    void ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference);
     TOdlAstNode* ResolvedReference_ReturnNamedDeclaration() const { return FResolvedReferenceWeak; }
+
+	void SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath);
+	TOdlDatabasePath const& FullDatabasePath() const { return FFullDatabasePath; }
 
 private:
     void PrettyPrintWithIndentLevel(std::ostringstream& parOss, int parIndentLevel) const;
@@ -128,7 +136,7 @@ private:
 private:
     TOdlAstNodeType::TType          FAstNodeType;
     TOdlAstNodeOperatorType::TType  FOperatorType;
-    std::string                     FIdentifier;
+    std::string                     FValueIdentifier;
     std::string                     FValueString;
     int                             FValueInteger;
     float                           FValueFloat;
@@ -148,9 +156,10 @@ private:
 
     TOdlAstNode*                    FResolvedReferenceWeak;
 
-    bool                            FAnonymousObjectDeclaration;
+    bool                            FAnonymousDeclaration;
     bool                            FReferenceToResolve;
     bool                            FIsValueReference;
+	TOdlDatabasePath				FFullDatabasePath;
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
