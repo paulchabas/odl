@@ -52,21 +52,22 @@ void TMetaClassBase::PrintContent(std::ostringstream& parOss) const
 		{
 			TPropertyBase const* property = FClassProperties[i];
 			parOss << "    " << property->Name() << ": ";
+			parOss << property->TypeName();
 			parOss << std::endl;
 		}
 		parOss << ")" << std::endl;
 	}
 	else if (FMetaClassType == TMetaClassType::Value)
 	{
-		parOss << "value " << Name() << std::endl;
+		parOss << "value: " << Name() << std::endl;
 	}
 	else if (FMetaClassType == TMetaClassType::Vector)
 	{
-		parOss << "vector " << Name() << std::endl;
+		parOss << "vector: " << Name() << std::endl;
 	}
 	else if (FMetaClassType == TMetaClassType::Map)
 	{
-		parOss << "map " << Name() << std::endl;
+		parOss << "map: " << Name() << std::endl;
 	}
 }
 //--------------------------------------------------------

@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
+#include "Windows.h"
+#undef max
+#undef min
+
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
@@ -87,6 +91,12 @@ END_METACLASS_CPP()
 
 void TrueMain()
 {
+	{
+		char path[MAX_PATH] = { 0 };
+		GetCurrentDirectory(MAX_PATH, path);
+		std::cout << "current path: " << path << std::endl;
+	}
+
     std::cout << "START PROGRAM" << std::endl;
     
 	odl::CreateTokenDatabases();
@@ -98,27 +108,23 @@ void TrueMain()
 
     {
 	    std::ostringstream oss;
-	    odl::TOdlDatabase::Instance().PrintContent(oss);
+	    odl::TOdlDatabase::Instance().PrintRegisteredTypes(oss);
 	    std::cout << oss.str() << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
     }
 
 
-	TTestClass2 testClass2;
-
-	std::cout << "FFloat: " << testClass2.FFloat << std::endl;
-
-	odl::TMetaClassBase const* metaClassBase = TTestClass2::GetMetaClassInstance();
-	odl::TPropertyBase const* propertyBase = metaClassBase->PropertyByName("FInteger");
-
-    odl::TMetaClassBase const* intMetaClassBase = odl::TMetaClassTraits< int >::GetMetaClassInstance();
-
-	odl::TProperty< i32 > const* propertyFloat = propertyBase->TypedPropertyIfTypeCompatible< i32 >(intMetaClassBase);
-	int* integerPointer = propertyFloat->TypedPointer(&testClass2);
-	*integerPointer = 2;
-	std::cout << "FInteger: " << testClass2.FInteger << std::endl;
+	//TTestClass2 testClass2;
+	//std::cout << "FFloat: " << testClass2.FFloat << std::endl;
+	//odl::TMetaClassBase const* metaClassBase = TTestClass2::GetMetaClassInstance();
+	//odl::TPropertyBase const* propertyBase = metaClassBase->PropertyByName("FInteger");
+ //   odl::TMetaClassBase const* intMetaClassBase = odl::TMetaClassTraits< int >::GetMetaClassInstance();
+	//odl::TProperty< i32 > const* propertyFloat = propertyBase->TypedPropertyIfTypeCompatible< i32 >(intMetaClassBase);
+	//int* integerPointer = propertyFloat->TypedPointer(&testClass2);
+	//*integerPointer = 2;
+	//std::cout << "FInteger: " << testClass2.FInteger << std::endl;
 
 	std::cout << "PARSING" << std::endl;
-
     
     odl::TOdlAstNode const* odlAst = NULL;
 	odl::TOdlParser odlParser;

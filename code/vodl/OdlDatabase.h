@@ -51,7 +51,7 @@ public:
     void RegisterMetaClass(TMetaClassBase const* parMetaClass);
 	TMetaClassBase const* FindRegisteredMetaClassByName_IFP(char const* parMetaClassName) const;
 
-	void PrintContent(std::ostringstream& parOss) const;
+	void PrintRegisteredTypes(std::ostringstream& parOss) const;
     
     void StoreObject(TOdlDatabasePath const& parDatabasePath, TOdlObject* parObject, TMetaClassBase const* parMetaClassBase);
     TOdlObject* GetObject(TOdlDatabasePath const& parDatabasePath) const;

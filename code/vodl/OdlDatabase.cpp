@@ -118,13 +118,22 @@ void TOdlDatabase::RegisterMetaClass(TMetaClassBase const* parMetaClass)
     FMetaClassByName[parMetaClass->Name()] = parMetaClass;
 }
 //--------------------------------------------------------
-void TOdlDatabase::PrintContent(std::ostringstream& parOss) const
+void TOdlDatabase::PrintRegisteredTypes(std::ostringstream& parOss) const
 {
+	parOss << "|----------------------------------------------------" << std::endl;
+	parOss << "| **        ODL DATABASE REGISTERED TYPES          **" << std::endl;
+	parOss << "|----------------------------------------------------" << std::endl;
 	for (TOdlMetaClassByName::const_iterator it = FMetaClassByName.begin(); it != FMetaClassByName.end(); ++it)
 	{
 		TMetaClassBase const* metaClass = it->second;
+		parOss << "|";
 		metaClass->PrintContent(parOss);
+		if (std::next(it) != FMetaClassByName.end())
+			parOss << "|----------------------------------------------------" << std::endl;
 	}
+	parOss << "|----------------------------------------------------" << std::endl;
+	parOss << "|****************************************************" << std::endl;
+	parOss << "|----------------------------------------------------" << std::endl;
 }
 //--------------------------------------------------------
 void TOdlDatabase::StoreObject(TOdlDatabasePath const& parDatabasePath, TOdlObject* parObject, TMetaClassBase const* parMetaClassBase)
