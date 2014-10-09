@@ -1,0 +1,9 @@
+*.opensdf
+*.sdf
+*.suo
+
+VS2013/Win32/
+VS2013/vodl/
+VS2013/vodlparserlexer/
+VS2013/vodltest/
+VS2013/x64/

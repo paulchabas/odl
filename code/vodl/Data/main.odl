@@ -1,0 +1,134 @@
+
+template TemplateTest is TTestClass2()
+{
+}
+
+template TemplateTest is TTestClass2(ta a)
+{
+}
+
+template TemplateTest is TTestClass2(ta a, tb b)
+{
+}
+
+namespace toto { }
+namespace toto 
+{
+	namespace tata
+	{
+		namespace chlobo { }
+		
+		template TemplateTest is TTestClass2(a a, b b,c c)
+		{
+		}
+		
+		template TemplateTest2 is TTestClass2(a a, b b,c c)
+		{
+		}
+		
+		tab0 is [ 0, 1, 5 ] + [] + [ 0 ]
+		tabtab is tab0
+	
+		object0 is TTestClass2
+		{
+		}
+	
+		sum1 is TTestClass2
+		{
+			FVector = tabtab
+			FInteger = 5 + 4 + 2
+			FString = "toto"
+			FObjectPointer = object0
+		}
+	}
+}
+
+tab is [ 4, 1, 5 ] + [] + [ 0 ]
+
+sum is TTestClass2
+{
+	FInteger = 5 + 4 + 2
+	FString = "toto"
+	
+}
+
+
+asignVector0 is TTestClass2
+{
+	FVector = [ 4, 5, 6 ]
+	FString = "toto" + "tata"
+}
+
+object0 is TTestClass2
+{
+	FObjectInPlace = object0
+	FObjectPointer = object0
+	FObjectPointer = TTestClass2
+					 {
+						FObjectPointer = object0
+					 }
+}
+
+
+// object1 is TTestClass2
+// {
+// 	FInteger = 1 + 2
+// 	FObjectPointer = TTestClass2
+// 					 {
+//						FObjectPointer = object + TTestClass2{ FInteger = 6 + 4 + TTestClass2{ FInteger = 3 } }
+//					 }
+//}
+
+// object2 is TTestClass2
+// {
+//	FInteger = 2
+//	FObjectPointer = TTestClass2
+//					 {
+//						FObjectPointer = object
+//					 } + TTestClass2
+//					 {
+//						FObjectPointer = object
+//					 }
+//}
+
+// object3 is TTestClass2
+// {
+//	FInteger = 3
+//	FObjectPointer = TTestClass2{ FObjectPointer = object)
+// }
+
+
+// object is TObject ( )
+// {
+//	v4 = [ 3 ]
+// }
+
+// object is TObject(bla)
+// {
+//	p0 = "test"
+//	p1 = "toto"
+// }
+
+
+//object2 is TObject(bla, bla, bla)
+//{
+//	p0Integer = -1234 + 5
+//	p1Integer = 1234564657841216
+//
+//	va = [ ]
+//	vb = [ 5 ]
+//	vc = [ 5, 2 ]
+//	vd = [ 5, 2, 3 ]
+//	ve = [ 5, 2, ]
+//	vf = [ 5, ]
+//
+//    v0 = [ 5 + 2, "toto" ]
+//	vb = 6
+//    v1 = [ 5 + 2, "tata", ] + (5 - 3) * 2 + 4 * -5 
+//	v3 = [ ]
+//
+//
+//    propertyObject = object2
+//}
+//
+//
