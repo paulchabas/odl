@@ -448,7 +448,8 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 								#if ODL_ENABLE_VERBOSE_DEBUG
 								std::string pathDebug = context.DatabasePath().ToString();
 								#endif
-								bool const isValueReference = candidateNode->AstNodeType() != TOdlAstNodeType::OBJECT_DECLARATION;
+								bool const isValueReference = false;
+								assert(false); calculer is value reference...
 								parAstNode->ResolveReference(candidateNode, isValueReference);
 								foundReference = candidateNode;
 								break ;
@@ -462,45 +463,34 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 					// 1) search root namespace
 					std::string const rootNamespaceToFind = searchedNameSpaceDatabasePath[0].ToString();
 					TOdlAstNode const* rootNamespace = nullptr;
-					for (size_t i = 0; i < parentNamespaceCount; ++i)
 					{
-						size_t const invI = parentNamespaceCount - i - 1;
-						TOdlAstNode const* rootNamespaceCandidate = parentNamespaces[invI];
-
-						std::vector< TOdlAstNode* > const& rootNamespaceContent =  childNamespace->NamespaceContent();
-						for (int j = 0; j < rootNamespaceContent.size(); ++j)
+						for (size_t i = 0; i < parentNamespaceCount; ++i)
 						{
-							TOdlAstNode* namedDeclarationNode = rootNamespaceContent[j];
-							std::string const& namedDeclarationName = namedDeclarationNode->IdentifierPointer()->Identifier();
+							size_t const invI = parentNamespaceCount - i - 1;
+							TOdlAstNode const* rootNamespaceCandidate = parentNamespaces[invI];
 
-						}
-
-						TOdlAstNode const* rootNamespaceIdentifier = rootNamespaceCandidate->IdentifierPointer_IFP();
-						if (rootNamespaceIdentifier == nullptr)
-						{
-							assert(invI == 0); // global namespace.
-							rootNamespace = rootNamespaceCandidate;
-							break ;
-						}
-						else
-						{
-							std::string const& rootNamespaceIdentifierValue = rootNamespaceIdentifier->Identifier();
-							if (rootNamespaceIdentifierValue == rootNamespaceToFind)
+							std::vector< TOdlAstNode* > const& rootNamespaceContent = rootNamespaceCandidate->NamespaceContent();
+							for (int j = 0; j < rootNamespaceContent.size(); ++j)
 							{
-								rootNamespace = rootNamespaceCandidate;
-								break ;
+								TOdlAstNode* namedDeclarationNode = rootNamespaceContent[j];
+								std::string const& namedDeclarationName = namedDeclarationNode->IdentifierPointer()->Identifier();
+
+								if (namedDeclarationName == rootNamespaceToFind)
+								{
+									rootNamespace = rootNamespaceCandidate;
+									goto done;
+								}
 							}
 						}
+					done:
+						int a = 0;
 					}
-					
+															
 					if (rootNamespace != nullptr)
 					{
-						// specialCaseGlobalNamespace: i.e we have found the first namespace, else no -> start index 0 or 1.
-						bool const specialCaseGlobalNamespace = rootNamespace->IsGlobalNamespace();
-
 						// 2) search childs namespace of root namespace.
 						TOdlAstNode const* childNamespace = rootNamespace;
-						for (int i = (specialCaseGlobalNamespace ? 0 : 1); i < searchedNameSpaceDatabasePath.size() - 1; ++i)
+						for (int i = 0; i < searchedNameSpaceDatabasePath.size() - 1; ++i)
 						{
 							std::string const& searchedChildNamespace = searchedNameSpaceDatabasePath[i].ToString();
 
@@ -530,15 +520,16 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 							for (size_t j = 0; j < namespaceContent.size(); ++j)
 							{
 								TOdlAstNode* candidateNode = namespaceContent[j];
+								std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
 								if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
 								{
-									std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
 									if (identifierToResolve == declarationIdentifier)
 									{
 										#if ODL_ENABLE_VERBOSE_DEBUG
 										std::string pathDebug = context.DatabasePath().ToString();
 										#endif
-										bool const isValueReference = candidateNode->AstNodeType() != TOdlAstNodeType::OBJECT_DECLARATION;
+										bool const isValueReference = false;
+										assert(false); calculer is value reference...
 										parAstNode->ResolveReference(candidateNode, isValueReference);
 										foundReference = candidateNode;
 										break ;
