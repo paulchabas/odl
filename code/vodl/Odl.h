@@ -428,6 +428,8 @@ inline bool SetValue(std::string& outString, TOdlExpression const& parExpression
 template < typename TUserClass >
 inline bool SetValue(TUserClass*& parUserClassPointer, TOdlExpression const& parExpression)
 {
+	parUserClassPointer = nullptr;
+
     if (parExpression.Type() == TOdlExpression::OBJECT)
     {
         TMetaClassBase const* userMetaClassBase = TMetaClassTraits< TUserClass >::GetMetaClassInstance();

@@ -32,6 +32,11 @@ namespace toto
 		object0 is TTestClass2
 		{
 		}
+
+		object1 is TTestClass
+		{
+
+		}
 	
 		sum1 is TTestClass2
 		{
@@ -39,6 +44,8 @@ namespace toto
 			FInteger = 5 + 4 + 2
 			FString = "toto"
 			FObjectPointer = object0
+			FTestClassBasePointer = object0
+			// FTestClass2BasePointer = object1
 		}
 	}
 }

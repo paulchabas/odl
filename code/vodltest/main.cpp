@@ -64,6 +64,8 @@ public:
 
     TTestClass FObjectInPlace;
     TTestClass2* FObjectPointer;
+	TTestClass* FTestClassBasePointer;
+	TTestClass2* FTestClass2BasePointer;
 };
 
 BEGIN_METACLASS_CPP(TTestClass)
@@ -86,6 +88,8 @@ BEGIN_METACLASS_CPP(TTestClass2)
     PROPERTYFIELD(FObjectInPlace);
     PROPERTYFIELD(FVectorOfObjectPointers);
     PROPERTYFIELD(FVectorOfObjectInPlace);
+	PROPERTYFIELD(FTestClassBasePointer);
+	PROPERTYFIELD(FTestClass2BasePointer);
 }
 END_METACLASS_CPP()
 
