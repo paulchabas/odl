@@ -199,7 +199,7 @@ int read();
 #define INITIAL 0
 #define YY_OdlScanner_FLEX_SCANNER
 #include "OdlGenLexer.h"
-#line 30 "OdlLexer.l"
+#line 34 "OdlLexer.l"
 #line 196 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\flexskel.cc"
 
 #define yy___stderr YY_OdlScanner_ERRFILE
@@ -382,16 +382,17 @@ YY_OdlScanner_CLASS::~YY_OdlScanner_CLASS()
 #endif
 
 /* % data tables for the DFA go here */ 
-#define YY_END_OF_BUFFER 29
+#define YY_END_OF_BUFFER 30
 typedef int yy_state_type;
-static const short int yy_accept[55] =
+static const short int yy_accept[63] =
     {   0,
-        0,    0,   29,   27,    4,    3,   27,    1,   27,   11,
-       20,   21,    9,    7,   22,    8,   10,   24,   24,    6,
-       12,   25,   18,   19,   25,   25,   25,   16,   17,    2,
-        0,   23,    0,   24,   25,   13,   25,   25,    0,    5,
-       25,   25,   25,   25,   25,   25,   25,   25,   25,   25,
-       25,   15,   14,    0
+        0,    0,   30,   28,    4,    3,   28,    1,   28,   15,
+       21,   22,   13,   11,   23,   12,   14,   25,   25,   10,
+       16,   26,   19,   20,   26,   26,   26,   17,   18,    2,
+        0,   24,    0,   25,    0,   26,    6,   26,   26,   26,
+        0,    5,   26,   26,   26,   26,   26,   26,   26,   26,
+       26,   26,   26,   26,   26,   26,    9,   26,   26,    8,
+        7,    0
     } ;
 
 static const YY_CHAR yy_ec[128] =
@@ -405,80 +406,92 @@ static const YY_CHAR yy_ec[128] =
        18,    1,    1,    1,   19,   19,   19,   19,   19,   19,
        19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
        19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
-       20,    1,   21,    1,    1,    1,   22,   19,   23,   19,
+       20,    1,   21,    1,   19,    1,   22,   19,   23,   19,
 
        24,   19,   19,   19,   25,   19,   19,   26,   27,   28,
-       19,   29,   19,   19,   30,   31,   19,   19,   19,   19,
-       19,   19,   32,    1,   33,    1,    1
+       19,   29,   19,   30,   31,   32,   33,   19,   19,   19,
+       19,   19,   34,    1,   35,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[34] =
+static const YY_CHAR yy_meta[36] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    2,    2,    1,    1,    2,    1,
-        1,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    1,    1
+        1,    1,    1,    2,    2,    2,    1,    1,    3,    1,
+        1,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        3,    3,    3,    1,    1
     } ;
 
-static const short int yy_base[58] =
+static const short int yy_base[67] =
     {   0,
-        0,    0,   65,   66,   66,   66,   61,   66,   57,   66,
-       66,   66,   66,   66,   66,   66,   48,   66,   19,   66,
-       66,    0,   66,   66,   31,   38,   35,   66,   66,   66,
-       52,   66,   54,   21,    0,    0,   29,   28,   51,   66,
-       29,   23,   21,   24,   20,   26,   25,   15,   22,   20,
-       19,    0,    0,   66,   37,   40,   39
+        0,    0,  105,  106,  106,  106,  101,  106,   97,  106,
+      106,  106,  106,  106,  106,  106,   88,  106,   21,  106,
+      106,   87,  106,  106,   24,   25,   26,  106,  106,  106,
+       94,  106,   96,   26,    0,   84,   83,   29,   31,   32,
+       83,  106,   70,   30,   34,   35,   37,   38,   39,   47,
+       48,   49,   52,   55,   56,   58,   68,   59,   63,   65,
+       64,  106,   88,   90,   93,   72
     } ;
 
-static const short int yy_def[58] =
+static const short int yy_def[67] =
     {   0,
-       54,    1,   54,   54,   54,   54,   54,   54,   55,   54,
-       54,   54,   54,   54,   54,   54,   54,   54,   54,   54,
-       54,   56,   54,   54,   56,   56,   56,   54,   54,   54,
-       55,   54,   57,   54,   56,   56,   56,   56,   57,   54,
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,    0,   54,   54,   54
+       62,    1,   62,   62,   62,   62,   62,   62,   63,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62,   64,   62,   62,   64,   64,   64,   62,   62,   62,
+       63,   62,   65,   62,   66,   64,   64,   64,   64,   64,
+       65,   62,   64,   64,   64,   64,   64,   64,   64,   64,
+       64,   64,   64,   64,   64,   64,   64,   64,   64,   64,
+       64,    0,   62,   62,   62,   62
     } ;
 
-static const short int yy_nxt[100] =
+static const short int yy_nxt[142] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
        14,   15,   16,   17,   18,   19,   20,   21,   22,   23,
        24,   22,   22,   22,   25,   22,   22,   26,   22,   22,
-       27,   28,   29,   34,   34,   34,   34,   31,   31,   39,
-       39,   35,   53,   52,   51,   50,   49,   48,   47,   46,
-       45,   44,   43,   40,   42,   41,   40,   32,   38,   37,
-       36,   33,   32,   30,   54,    3,   54,   54,   54,   54,
-       54,   54,   54,   54,   54,   54,   54,   54,   54,   54,
-       54,   54,   54,   54,   54,   54,   54,   54,   54,   54,
-       54,   54,   54,   54,   54,   54,   54,   54,   54
+       22,   27,   22,   28,   29,   34,   34,   35,   35,   35,
+       34,   34,   35,   35,   35,   35,   38,   35,   35,   40,
+       35,   35,   35,   47,   37,   44,   45,   39,   46,   48,
+       35,   35,   35,   49,   52,   35,   51,   50,   35,   35,
+       55,   35,   35,   56,   43,   53,   35,   35,   35,   54,
+       59,   35,   60,   35,   57,   42,   61,   58,   31,   31,
+       31,   36,   36,   41,   41,   41,   35,   35,   42,   32,
 
+       35,   33,   32,   30,   62,    3,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62
     } ;
 
-static const short int yy_chk[100] =
+static const short int yy_chk[142] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,   19,   19,   34,   34,   55,   55,   57,
-       57,   56,   51,   50,   49,   48,   47,   46,   45,   44,
-       43,   42,   41,   39,   38,   37,   33,   31,   27,   26,
-       25,   17,    9,    7,    3,   54,   54,   54,   54,   54,
-       54,   54,   54,   54,   54,   54,   54,   54,   54,   54,
-       54,   54,   54,   54,   54,   54,   54,   54,   54,   54,
-       54,   54,   54,   54,   54,   54,   54,   54,   54
+        1,    1,    1,    1,    1,   19,   19,   25,   26,   27,
+       34,   34,   38,   44,   39,   40,   26,   45,   46,   27,
+       47,   48,   49,   44,   25,   38,   39,   26,   40,   45,
+       50,   51,   52,   46,   49,   53,   48,   47,   54,   55,
+       52,   56,   58,   53,   66,   50,   59,   61,   60,   51,
+       56,   57,   58,   43,   54,   41,   59,   55,   63,   63,
+       63,   64,   64,   65,   65,   65,   37,   36,   33,   31,
 
+       22,   17,    9,    7,    3,   62,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62,   62,   62,   62,   62,   62,   62,   62,   62,   62,
+       62
     } ;
 
 static yy_state_type yy_last_accepting_state;
 static YY_CHAR *yy_last_accepting_cpos;
 
 #if YY_OdlScanner_DEBUG != 0
-static const short int yy_rule_linenum[28] =
+static const short int yy_rule_linenum[29] =
     {   0,
-       32,   35,   39,   43,   46,   50,   54,   60,   66,   72,
-       78,   85,   89,   93,   97,  102,  106,  110,  114,  118,
-      122,  126,  131,  141,  149,  149,  161
+       36,   39,   43,   47,   50,   54,   58,   62,   66,   70,
+       74,   80,   86,   92,   98,  105,  109,  113,  117,  121,
+      125,  129,  133,  138,  148,  157,  157,  189
     } ;
 
 #endif
@@ -571,13 +584,13 @@ yy_match:
 	    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = yy_def[yy_current_state];
-		if ( yy_current_state >= 55 )
+		if ( yy_current_state >= 63 )
 		    yy_c = yy_meta[yy_c];
 		}
 	    yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	    ++yy_cp;
 	    }
-	while ( yy_current_state != 54 );
+	while ( yy_current_state != 62 );
 	yy_cp = yy_last_accepting_cpos;
 	yy_current_state = yy_last_accepting_state;
 #line 440 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\flexskel.cc"
@@ -644,47 +657,75 @@ do_action:      /* this label is used only to access EOF actions */
 	    goto yy_find_action;
 
 case 1:
-#line 32 "OdlLexer.l"
+#line 36 "OdlLexer.l"
 {
                     ++column;
                   }
 	YY_BREAK
 case 2:
-#line 35 "OdlLexer.l"
-{
-					line +=1;
-					column = 1;
-				  }
-	YY_BREAK
-case 3:
 #line 39 "OdlLexer.l"
 {
 					line +=1;
 					column = 1;
 				  }
 	YY_BREAK
-case 4:
+case 3:
 #line 43 "OdlLexer.l"
+{
+					line +=1;
+					column = 1;
+				  }
+	YY_BREAK
+case 4:
+#line 47 "OdlLexer.l"
 {
                     column += 4;
                   }
 	YY_BREAK
 case 5:
-#line 46 "OdlLexer.l"
+#line 50 "OdlLexer.l"
 {
 					 line +=1;
 					 column = 1;					
 				  }
 	YY_BREAK
 case 6:
-#line 50 "OdlLexer.l"
+#line 54 "OdlLexer.l"
+{
+					column += 2;
+					return OdlParserBase::TOKEN_IS;
+				  }
+	YY_BREAK
+case 7:
+#line 58 "OdlLexer.l"
+{
+						column += 9;
+						return OdlParserBase::TOKEN_NAMESPACE;						
+					}
+	YY_BREAK
+case 8:
+#line 62 "OdlLexer.l"
+{
+						column += 8;
+						return OdlParserBase::TOKEN_TEMPLATE;
+					}
+	YY_BREAK
+case 9:
+#line 66 "OdlLexer.l"
+{
+						column += 7;
+						return OdlParserBase::TOKEN_NULLPTR;
+					}
+	YY_BREAK
+case 10:
+#line 70 "OdlLexer.l"
 {
 					column += 1;
 					return OdlParserBase::TOKEN_COLON;
 				  }
 	YY_BREAK
-case 7:
-#line 54 "OdlLexer.l"
+case 11:
+#line 74 "OdlLexer.l"
 {
                     ++column;
 					val->FAstNode = new odl::TOdlAstNode();
@@ -692,8 +733,8 @@ case 7:
                     return OdlParserBase::OPERATOR_PLUS;
                   }
 	YY_BREAK
-case 8:
-#line 60 "OdlLexer.l"
+case 12:
+#line 80 "OdlLexer.l"
 {
                     ++column;
 					val->FAstNode = new odl::TOdlAstNode();
@@ -701,8 +742,8 @@ case 8:
                     return OdlParserBase::OPERATOR_MINUS;
                   }
 	YY_BREAK
-case 9:
-#line 66 "OdlLexer.l"
+case 13:
+#line 86 "OdlLexer.l"
 {
                     ++column;
 					val->FAstNode = new odl::TOdlAstNode();
@@ -710,8 +751,8 @@ case 9:
                     return OdlParserBase::OPERATOR_MULTIPLY;
                   }
 	YY_BREAK
-case 10:
-#line 72 "OdlLexer.l"
+case 14:
+#line 92 "OdlLexer.l"
 {
                     ++column;
 					val->FAstNode = new odl::TOdlAstNode();
@@ -719,8 +760,8 @@ case 10:
                     return OdlParserBase::OPERATOR_DIVIDE;
                   }
 	YY_BREAK
-case 11:
-#line 78 "OdlLexer.l"
+case 15:
+#line 98 "OdlLexer.l"
 {
                     ++column;
 					val->FAstNode = new odl::TOdlAstNode();
@@ -728,85 +769,64 @@ case 11:
                     return OdlParserBase::OPERATOR_MODULO;						
 				  }
 	YY_BREAK
-case 12:
-#line 85 "OdlLexer.l"
+case 16:
+#line 105 "OdlLexer.l"
 {
                     ++column;
                     return OdlParserBase::TOKEN_EQUALS;
                   }
 	YY_BREAK
-case 13:
-#line 89 "OdlLexer.l"
-{
-					column += 2;
-					return OdlParserBase::TOKEN_IS;
-				  }
-	YY_BREAK
-case 14:
-#line 93 "OdlLexer.l"
-{
-						column += 9;
-						return OdlParserBase::TOKEN_NAMESPACE;						
-					}
-	YY_BREAK
-case 15:
-#line 97 "OdlLexer.l"
-{
-						column += 8;
-						return OdlParserBase::TOKEN_TEMPLATE;
-					}
-	YY_BREAK
-case 16:
-#line 102 "OdlLexer.l"
+case 17:
+#line 109 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_OPEN_BRACE;
 					}
 	YY_BREAK
-case 17:
-#line 106 "OdlLexer.l"
+case 18:
+#line 113 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_CLOSE_BRACE;
 					}
 	YY_BREAK
-case 18:
-#line 110 "OdlLexer.l"
+case 19:
+#line 117 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_OPEN_BRACKET;
 					}
 	YY_BREAK
-case 19:
-#line 114 "OdlLexer.l"
+case 20:
+#line 121 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_CLOSE_BRACKET;
 					}
 	YY_BREAK
-case 20:
-#line 118 "OdlLexer.l"
+case 21:
+#line 125 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_OPEN_PARENTHESIS;
 					}
 	YY_BREAK
-case 21:
-#line 122 "OdlLexer.l"
+case 22:
+#line 129 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_CLOSE_PARENTHESIS;
 					}
 	YY_BREAK
-case 22:
-#line 126 "OdlLexer.l"
+case 23:
+#line 133 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_COMMA;
 					}
 	YY_BREAK
-case 23:
-#line 131 "OdlLexer.l"
+case 24:
+#line 138 "OdlLexer.l"
 {
 						int const textLength = strlen(yytext);
 						column += textLength;
@@ -818,8 +838,8 @@ case 23:
 						return OdlParserBase::VALUE_STRING;
 					}
 	YY_BREAK
-case 24:
-#line 141 "OdlLexer.l"
+case 25:
+#line 148 "OdlLexer.l"
 {
                     column += strlen(yytext);
 					int integerValue = atoi(yytext);
@@ -829,33 +849,53 @@ case 24:
                     return OdlParserBase::VALUE_INTEGER;
                   }
 	YY_BREAK
-case 25:
-#line 149 "OdlLexer.l"
+case 26:
+#line 157 "OdlLexer.l"
 {
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						val->FAstNode = new odl::TOdlAstNode();
-						val->FAstNode->SetAsIdentifier(std::string(yytext));
-						return OdlParserBase::IDENTIFIER;
+						bool isOdlAddressLink = false;
+						for (int i = 0; i < textLength; ++i)
+						{
+							if (yytext[i] == '/')
+							{
+								isOdlAddressLink = true;
+								break;
+							}
+						}
+
+						if (isOdlAddressLink)
+						{
+							val->FAstNode = new odl::TOdlAstNode();
+							val->FAstNode->SetAsIdentifier(std::string(yytext));
+							val->FAstNode->SetAsReferenceToResolve();							
+							return OdlParserBase::IDENTIFIER;
+						}
+						else
+						{
+							val->FAstNode = new odl::TOdlAstNode();
+							val->FAstNode->SetAsIdentifier(std::string(yytext));
+							return OdlParserBase::IDENTIFIER;
+						}
 				  }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 157 "OdlLexer.l"
+#line 185 "OdlLexer.l"
 {
                     yyterminate();
                   }
 	YY_BREAK
-case 27:
-#line 161 "OdlLexer.l"
+case 28:
+#line 189 "OdlLexer.l"
 {
 					 int const textLength = strlen(yytext);
 					 ++column;
 					 yyterminate();
 				  }
 	YY_BREAK
-case 28:
-#line 167 "OdlLexer.l"
+case 29:
+#line 195 "OdlLexer.l"
 ECHO;
 	YY_BREAK
 #line 493 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\flexskel.cc"
@@ -1101,7 +1141,7 @@ long YY_OdlScanner_CLASS::yy_get_previous_state_()
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	    {
 	    yy_current_state = yy_def[yy_current_state];
-	    if ( yy_current_state >= 55 )
+	    if ( yy_current_state >= 63 )
 		yy_c = yy_meta[yy_c];
 	    }
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1151,11 +1191,11 @@ long YY_OdlScanner_CLASS::yy_try_NUL_trans_(long yy_current_state_)
     while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 	{
 	yy_current_state = yy_def[yy_current_state];
-	if ( yy_current_state >= 55 )
+	if ( yy_current_state >= 63 )
 	    yy_c = yy_meta[yy_c];
 	}
     yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-    yy_is_jam = (yy_current_state == 54);
+    yy_is_jam = (yy_current_state == 62);
 #line 755 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\flexskel.cc"
 
 #ifndef YY_USE_CLASS
@@ -1450,4 +1490,4 @@ void YY_OdlScanner_CLASS::YY_OdlScanner_INIT_BUFFER( YY_BUFFER_STATE b, YY_OdlSc
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 167 "OdlLexer.l"
+#line 195 "OdlLexer.l"

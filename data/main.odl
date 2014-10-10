@@ -12,7 +12,7 @@ template TemplateTest is TTestClass2(ta a, tb b)
 }
 
 namespace toto { }
-namespace toto 
+namespace toto
 {
 	namespace tata
 	{
@@ -28,7 +28,10 @@ namespace toto
 		
 		tab0 is [ 0, 1, 5 ] + [] + [ 0 ]
 		tabtab is tab0
-	
+
+		circular_reference is circular_reference2
+		circular_reference2 is circular_reference
+
 		object0 is TTestClass2
 		{
 		}
@@ -40,12 +43,13 @@ namespace toto
 	
 		sum1 is TTestClass2
 		{
-			FVector = tabtab
+			FVector = tabtab + [9]
 			FInteger = 5 + 4 + 2
 			FString = "toto"
 			FObjectPointer = object0
 			FTestClassBasePointer = object0
-			// FTestClass2BasePointer = object1
+
+			FTestClass2BasePointer = nullptr
 
 			FIntStringPair = [ 5, "string"]
 			FFloatFloatPairVector = [ [ 4, 3 ], [ 3, 2 ], [ 2, 1 ] ]

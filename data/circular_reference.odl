@@ -1,0 +1,21 @@
+
+namespace tata
+{
+	namespace toto
+	{
+		circular_reference3 is circular_reference3
+	}
+
+	// circular_reference is circular_reference2
+	circular_reference is toto/circular_reference3
+
+	object is TTestClass
+	{
+
+	}
+
+}
+
+circular_reference2 is tata/circular_reference
+
+

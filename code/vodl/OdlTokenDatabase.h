@@ -71,6 +71,11 @@ public:
 	}
 
 	unsigned int ToInt() const { return FToken; }
+	
+	std::string const& ToString() const
+	{
+		return TRelatedTokenDatabase::Instance().ToString(*this);
+	}
 
 private:
     unsigned int FToken;
@@ -157,6 +162,11 @@ public:
         }
     }
 
+	TTokenType back() const 
+	{ 
+		assert(!FTokens.empty());
+		return FTokens.back(); 
+	}
 
 	void push_back(TTokenType parToken)
 	{

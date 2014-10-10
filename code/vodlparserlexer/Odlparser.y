@@ -43,6 +43,7 @@
 %token TOKEN_COMMA
 %token TOKEN_NAMESPACE
 %token TOKEN_TEMPLATE
+%token TOKEN_NULLPTR
 %token TOKEN_COLON // {TODO} unused
 
 %token <FAstNode> OPERATOR_PLUS OPERATOR_MINUS OPERATOR_MULTIPLY OPERATOR_DIVIDE OPERATOR_MODULO
@@ -50,6 +51,7 @@
 %token <FAstNode> VALUE_FLOAT
 %token <FAstNode> VALUE_STRING
 %token <FAstNode> IDENTIFIER
+%token< FAstNode> TOKEN_NULLPTR
 
 // rules types
 %type <FAstNode> named_declaration_list named_declaration
@@ -116,7 +118,12 @@ named_declaration
 ;
 
 anomymous_object_declaration_or_reference
-: IDENTIFIER TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
+: IDENTIFIER
+{
+	odl::TOdlAstNode* reference = $1;
+	$$ = reference;
+}
+| IDENTIFIER TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
 	odl::TOdlAstNode* objectDeclaration = new odl::TOdlAstNode();
 	objectDeclaration->SetAsObjectDeclaration($1, $3);
@@ -133,11 +140,11 @@ anomymous_object_declaration_or_reference
 	templateDeclaration->SetAsTemplateInstanciation();
 	$$ = templateDeclaration;
 }
-| IDENTIFIER 
+| TOKEN_NULLPTR
 {
-	odl::TOdlAstNode* reference = $1;
-	reference->SetAsReferenceToResolve();
-	$$ = reference;
+	odl::TOdlAstNode* theNullptr = new odl::TOdlAstNode();
+	theNullptr->SetAsNullPtr();
+	$$ = theNullptr;
 }
 ;
 

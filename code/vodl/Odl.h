@@ -537,7 +537,12 @@ inline bool SetValue(TUserClass*& parUserClassPointer, TOdlExpression const& par
 {
 	parUserClassPointer = nullptr;
 
-    if (parExpression.Type() == TOdlExpression::OBJECT)
+	if (parExpression.Type() == TOdlExpression::NULLEXP)
+	{
+		parUserClassPointer = nullptr;
+		return true;
+	}
+	else if (parExpression.Type() == TOdlExpression::OBJECT)
     {
         TMetaClassBase const* userMetaClassBase = TMetaClassTraits< TUserClass >::GetMetaClassInstance();
         if (userMetaClassBase->IsGivenTypeCompatible(parExpression.MetaClassBase()))
@@ -559,7 +564,13 @@ inline bool SetValue(TUserClass*& parUserClassPointer, TOdlExpression const& par
 template < typename TUserClass >
 inline bool SetValue(TUserClass& parUserClassInPlace, TOdlExpression const& parExpression)
 {
-    if (parExpression.Type() == TOdlExpression::OBJECT)
+	if (parExpression.Type() == TOdlExpression::NULLEXP)
+	{
+		// complicated choice.
+		parUserClassInPlace = TUserClass();
+		return true;
+	}
+	else if (parExpression.Type() == TOdlExpression::OBJECT)
     {
         TMetaClassBase const* userMetaClassBase = TMetaClassTraits< TUserClass >::GetMetaClassInstance();
         if (userMetaClassBase->IsGivenTypeCompatible(parExpression.MetaClassBase()))

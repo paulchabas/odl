@@ -15,6 +15,8 @@ class TOdlDatabasePath;
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+struct TOdlExpressionNullTag {};
+//-------------------------------------------------------------------------------
 class TOdlExpression
 {
 public:
@@ -25,6 +27,7 @@ public:
         FLOAT,
         STRING,
         OBJECT,
+		NULLEXP,
         VECTOR,
     };
 
@@ -48,6 +51,7 @@ private:
 public:
 
     TOdlExpression();
+	TOdlExpression(TOdlExpressionNullTag const&);
 	TOdlExpression(int parValueInteger);
     TOdlExpression(float parFloatValue);
     TOdlExpression(char const* parString);
@@ -99,7 +103,7 @@ public:
     }
 
 private:
-    TOdlExpression::TType    FType;
+    TOdlExpression::TType		FType;
     TValueUnion                 FValueUnion;
     TMetaClassBase const*       FMetaClassBase;
 };

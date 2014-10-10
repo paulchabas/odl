@@ -141,7 +141,8 @@ void TrueMain()
     
     odl::TOdlAstNode const* odlAst = NULL;
 	odl::TOdlParser odlParser;
-	odlAst = odlParser.ParseFile("Data/main.odl");
+	// odlAst = odlParser.ParseFile("Data/main.odl");
+	odlAst = odlParser.ParseFile("Data/circular_reference.odl");
    
     {
 		std::cout << "-----------------------------" << std::endl;

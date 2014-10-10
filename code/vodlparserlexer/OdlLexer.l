@@ -23,7 +23,11 @@
 DIGIT   [0-9]
 DIGIT1  [1-9]
 
-IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
+SLASH "/"
+PURE_IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
+LINK_NAMESPACE {PURE_IDENTIFIER}{SLASH}
+IDENTIFIER {LINK_NAMESPACE}*{PURE_IDENTIFIER}
+
 VALUE_STRING ["][^"]*["]
 VALUE_INTEGER {DIGIT1}{DIGIT}*|[0]
 LINE_COMMENT "//".*\n
@@ -47,6 +51,22 @@ LINE_COMMENT "//".*\n
 					 line +=1;
 					 column = 1;					
 				  }
+"is"			  {
+					column += 2;
+					return OdlParserBase::TOKEN_IS;
+				  }
+"namespace"			{
+						column += 9;
+						return OdlParserBase::TOKEN_NAMESPACE;						
+					}
+"template"			{
+						column += 8;
+						return OdlParserBase::TOKEN_TEMPLATE;
+					}
+"nullptr"			{
+						column += 7;
+						return OdlParserBase::TOKEN_NULLPTR;
+					}
 ":"				  {
 					column += 1;
 					return OdlParserBase::TOKEN_COLON;
@@ -86,19 +106,6 @@ LINE_COMMENT "//".*\n
                     ++column;
                     return OdlParserBase::TOKEN_EQUALS;
                   }
-"is"			  {
-					column += 2;
-					return OdlParserBase::TOKEN_IS;
-				  }
-"namespace"			{
-						column += 9;
-						return OdlParserBase::TOKEN_NAMESPACE;						
-					}
-"template"			{
-						column += 8;
-						return OdlParserBase::TOKEN_TEMPLATE;
-					}
-
 "{"					{
 						++column;
 						return OdlParserBase::TOKEN_OPEN_BRACE;
@@ -146,13 +153,34 @@ LINE_COMMENT "//".*\n
 
                     return OdlParserBase::VALUE_INTEGER;
                   }
+
 {IDENTIFIER}	  {
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						val->FAstNode = new odl::TOdlAstNode();
-						val->FAstNode->SetAsIdentifier(std::string(yytext));
-						return OdlParserBase::IDENTIFIER;
+						bool isOdlAddressLink = false;
+						for (int i = 0; i < textLength; ++i)
+						{
+							if (yytext[i] == '/')
+							{
+								isOdlAddressLink = true;
+								break;
+							}
+						}
+
+						if (isOdlAddressLink)
+						{
+							val->FAstNode = new odl::TOdlAstNode();
+							val->FAstNode->SetAsIdentifier(std::string(yytext));
+							val->FAstNode->SetAsReferenceToResolve();							
+							return OdlParserBase::IDENTIFIER;
+						}
+						else
+						{
+							val->FAstNode = new odl::TOdlAstNode();
+							val->FAstNode->SetAsIdentifier(std::string(yytext));
+							return OdlParserBase::IDENTIFIER;
+						}
 				  }
 <<EOF>>           {
                     yyterminate();

@@ -14,6 +14,13 @@ TOdlExpression::TOdlExpression()
     memset(&FValueUnion, 0, sizeof(TValueUnion));
 }
 //-------------------------------------------------------------------------------
+TOdlExpression::TOdlExpression(TOdlExpressionNullTag const&) :
+    FType(TOdlExpression::NULLEXP),
+    FMetaClassBase(nullptr)
+{
+
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
 TOdlExpression::TOdlExpression(int parValueInteger) :
     FType(TOdlExpression::INTEGER),
     FMetaClassBase(TMetaClassTraits< int >::GetMetaClassInstance())
@@ -187,17 +194,25 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
             break ;
         case TOdlAstNodeType::OBJECT_DECLARATION:
 			{
-				// PAUL(27/05/14 17:57:57) yuk.
-                TOdlDatabasePath const& databasePath = parExpression->FullDatabasePath();
-                std::string const& objectType = parExpression->TypeIdentifierPointer()->Identifier();
+				// search nullptr
+				if (!parExpression->IsNullPtr())
+				{
+					// PAUL(27/05/14 17:57:57) yuk.
+					TOdlDatabasePath const& databasePath = parExpression->FullDatabasePath();
+					std::string const& objectType = parExpression->TypeIdentifierPointer()->Identifier();
 
-				#ifdef ODL_ENABLE_VERBOSE_DEBUG
-				std::string forDebug1 = databasePath.ToString();
-				#endif
+					#ifdef ODL_ENABLE_VERBOSE_DEBUG
+					std::string forDebug1 = databasePath.ToString();
+					#endif
 
-                TOdlObject* object = TOdlDatabase::Instance().GetObject(databasePath);
-                TMetaClassBase const* objectMetaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
-                return TOdlExpression(object, objectMetaClassBase);
+					TOdlObject* object = TOdlDatabase::Instance().GetObject(databasePath);
+					TMetaClassBase const* objectMetaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
+					return TOdlExpression(object, objectMetaClassBase);
+				}
+				else
+				{
+					return TOdlExpression(TOdlExpressionNullTag());
+				}
             }
             break ;
         case TOdlAstNodeType::VALUE_VECTOR:

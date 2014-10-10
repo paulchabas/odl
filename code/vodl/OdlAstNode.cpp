@@ -121,6 +121,7 @@ void TOdlAstNode::SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstN
 	FIdentifierPointer = parNameIdentifier;
 	FExpressionPointer = parExpression;
 }
+//-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsObjectDeclaration(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList)
 {
     FAstNodeType = TOdlAstNodeType::OBJECT_DECLARATION;
@@ -133,6 +134,31 @@ void TOdlAstNode::SetAsObjectDeclaration(TOdlAstNode* parTypeIdentifier, TOdlAst
 
     FTypeIdentifierPointer = parTypeIdentifier;
     FPropertyDeclarationListPointer = parPropertyList;
+}
+//-------------------------------------------------------------------------------
+void TOdlAstNode::SetAsNullPtr()
+{
+	FAstNodeType = TOdlAstNodeType::OBJECT_DECLARATION;	
+
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool TOdlAstNode::IsNullPtr() const
+{
+	if (FAstNodeType == TOdlAstNodeType::OBJECT_DECLARATION)
+	{
+		if (FTypeIdentifierPointer == nullptr)
+		{
+			if (FPropertyDeclarationListPointer == nullptr)
+				return true;
+			assert(false); // non typed object.
+		}
+
+		return false;
+	}
+
+	assert(false); // IsNullPtr valid on object type only.
+
+	return false;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsPropertyDeclarationList()
@@ -422,19 +448,26 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
-			if (FIdentifierPointer != nullptr)
+			if (IsNullPtr())
 			{
-				parOss << "[";
-				parOss << FIdentifierPointer->Identifier();
-				parOss << "] ";
+				parOss << "<nullptr>" << std::endl;
 			}
+			else
+			{
+				if (FIdentifierPointer != nullptr)
+				{
+					parOss << "[";
+					parOss << FIdentifierPointer->Identifier();
+					parOss << "] ";
+				}
 
-            parOss << FTypeIdentifierPointer->Identifier() << std::endl;
+				parOss << FTypeIdentifierPointer->Identifier() << std::endl;
 
-            Indent(parOss, parIndentLevel) << "{" << std::endl;
-            FPropertyDeclarationListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
-            Indent(parOss, parIndentLevel) << "}";
-			parOss << std::endl;
+				Indent(parOss, parIndentLevel) << "{" << std::endl;
+				FPropertyDeclarationListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+				Indent(parOss, parIndentLevel) << "}";
+				parOss << std::endl;
+			}
         }
         break ;
     case TOdlAstNodeType::NAMESPACE:
@@ -468,6 +501,11 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     };
 }
 //-------------------------------------------------------------------------------
+void TOdlAstNode::SetAsReferenceToResolve()
+{
+	FReferenceToResolve = true;
+}
+//-------------------------------------------------------------------------------
 void TOdlAstNode::ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference)
 {
 	FResolvedReferenceWeak = parNodeReference; 
@@ -477,6 +515,12 @@ void TOdlAstNode::ResolveReference(TOdlAstNode* parNodeReference, bool parIsValu
 void TOdlAstNode::SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)
 {
 	FFullDatabasePath = parFullDatabasePath;
+}
+//-------------------------------------------------------------------------------
+bool TOdlAstNode::IsGlobalNamespace() const
+{
+	assert(FAstNodeType == TOdlAstNodeType::NAMESPACE);
+	return FIdentifierPointer == nullptr;
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************

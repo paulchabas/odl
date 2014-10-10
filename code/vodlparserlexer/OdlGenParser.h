@@ -213,16 +213,17 @@ extern YY_OdlParserBase_STYPE YY_OdlParserBase_LVAL;
 #define	TOKEN_COMMA	267
 #define	TOKEN_NAMESPACE	268
 #define	TOKEN_TEMPLATE	269
-#define	TOKEN_COLON	270
-#define	OPERATOR_PLUS	271
-#define	OPERATOR_MINUS	272
-#define	OPERATOR_MULTIPLY	273
-#define	OPERATOR_DIVIDE	274
-#define	OPERATOR_MODULO	275
-#define	VALUE_INTEGER	276
-#define	VALUE_FLOAT	277
-#define	VALUE_STRING	278
-#define	IDENTIFIER	279
+#define	TOKEN_NULLPTR	270
+#define	TOKEN_COLON	271
+#define	OPERATOR_PLUS	272
+#define	OPERATOR_MINUS	273
+#define	OPERATOR_MULTIPLY	274
+#define	OPERATOR_DIVIDE	275
+#define	OPERATOR_MODULO	276
+#define	VALUE_INTEGER	277
+#define	VALUE_FLOAT	278
+#define	VALUE_STRING	279
+#define	IDENTIFIER	280
 
 
 #line 143 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.h"
@@ -267,7 +268,7 @@ public:
 /* static const int token ... */
 
 /* #line 182 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.h" */
-#line 271 "OdlGenParser.h"
+#line 272 "OdlGenParser.h"
 static const int UNKNOWN;
 static const int TOKEN_IS;
 static const int TOKEN_OPEN_BRACE;
@@ -280,6 +281,7 @@ static const int TOKEN_EQUALS;
 static const int TOKEN_COMMA;
 static const int TOKEN_NAMESPACE;
 static const int TOKEN_TEMPLATE;
+static const int TOKEN_NULLPTR;
 static const int TOKEN_COLON;
 static const int OPERATOR_PLUS;
 static const int OPERATOR_MINUS;
@@ -298,7 +300,7 @@ static const int IDENTIFIER;
 enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 
 /* #line 185 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.h" */
-#line 302 "OdlGenParser.h"
+#line 304 "OdlGenParser.h"
 	,UNKNOWN=258
 	,TOKEN_IS=259
 	,TOKEN_OPEN_BRACE=260
@@ -311,16 +313,17 @@ enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 	,TOKEN_COMMA=267
 	,TOKEN_NAMESPACE=268
 	,TOKEN_TEMPLATE=269
-	,TOKEN_COLON=270
-	,OPERATOR_PLUS=271
-	,OPERATOR_MINUS=272
-	,OPERATOR_MULTIPLY=273
-	,OPERATOR_DIVIDE=274
-	,OPERATOR_MODULO=275
-	,VALUE_INTEGER=276
-	,VALUE_FLOAT=277
-	,VALUE_STRING=278
-	,IDENTIFIER=279
+	,TOKEN_NULLPTR=270
+	,TOKEN_COLON=271
+	,OPERATOR_PLUS=272
+	,OPERATOR_MINUS=273
+	,OPERATOR_MULTIPLY=274
+	,OPERATOR_DIVIDE=275
+	,OPERATOR_MODULO=276
+	,VALUE_INTEGER=277
+	,VALUE_FLOAT=278
+	,VALUE_STRING=279
+	,IDENTIFIER=280
 
 
 #line 185 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.h"
@@ -377,5 +380,5 @@ public:
 /* END */
 
 /* #line 236 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.h" */
-#line 381 "OdlGenParser.h"
+#line 384 "OdlGenParser.h"
 #endif

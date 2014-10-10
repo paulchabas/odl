@@ -76,6 +76,7 @@ public:
 	void Vector_AppendItem(TOdlAstNode* parVectorItem);
 
     void SetAsObjectDeclaration(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList);
+	void SetAsNullPtr();
 	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
 
     void SetAsTemplateDeclaration();
@@ -117,12 +118,14 @@ public:
     int ValueInteger() const { return FValueInteger; }
     float ValueFloat() const { return FValueFloat; }
     char const* ValueString() const { return FValueString.c_str(); }
+	bool IsNullPtr() const;
 
     bool IsReferenceToResolve() const { return FReferenceToResolve; }
 	bool IsAnonymousDeclaration() const { return FAnonymousDeclaration; }
+	bool IsGlobalNamespace() const;
 
     // post processing
-    void SetAsReferenceToResolve() { FReferenceToResolve = true; }
+    void SetAsReferenceToResolve();
     bool IsValueReference() const { return FIsValueReference; }
     void ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference);
     TOdlAstNode* ResolvedReference_ReturnNamedDeclaration() const { return FResolvedReferenceWeak; }
