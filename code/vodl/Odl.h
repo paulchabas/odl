@@ -36,7 +36,8 @@ namespace TMetaClassType
 		Class,
 		Value,
 		Vector,
-		Map
+		Map,
+		Pair,
 	};
 
 } // TMetaClassType
@@ -324,6 +325,58 @@ struct TMetaClassTraits< std::map< TKey, TValue, TCompare, TAllocator > >
 		return TMetaClassTraits< TValueNoPointer >::GetMetaClassInstance(); 
 	}
 };
+//--------------------------------------------------------
+template< typename TFirst, typename TSecond >
+struct TMetaClassTraits< std::pair< TFirst, TSecond > >
+{ 
+	typedef typename odl::TRemovePointerForObjectTypeIFN< TFirst >::TType TFirstNoPointer;
+    typedef typename odl::TRemovePointerForObjectTypeIFN< TSecond >::TType TSecondNoPointer;
+
+	static void ClassName(std::ostringstream& parOss)
+	{
+		parOss << "pair<";
+		TMetaClassTraits< TFirstNoPointer >::ClassName(parOss);
+		parOss << ",";
+		TMetaClassTraits< TSecondNoPointer >::ClassName(parOss);
+		parOss << ">";
+	}
+
+	static TMetaClassBase const* GetMetaClassInstance()
+	{
+		TMetaClassBase const* keyMetaClassInstance = TMetaClassTraits< TFirstNoPointer >::GetMetaClassInstance();
+		assert(keyMetaClassInstance != nullptr);
+
+		TMetaClassBase const* valueMetaClassInstance = TMetaClassTraits< TSecondNoPointer >::GetMetaClassInstance();
+		assert(valueMetaClassInstance != nullptr);
+
+		std::ostringstream oss;
+		ClassName(oss);
+		std::string className = oss.str();
+		TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(className.c_str());
+		if (metaClassBase == nullptr)
+		{
+			TMetaClassBase* newMetaClassBase = CreateMetaClassInstance(className.c_str());
+			// pair is like a map containing 1 key/value.
+			newMetaClassBase->SetContainerKeyMetaClass(keyMetaClassInstance);
+			newMetaClassBase->SetContainerValueMetaClass(keyMetaClassInstance);
+			TOdlDatabase::Instance().RegisterMetaClass(newMetaClassBase);
+			metaClassBase = newMetaClassBase;
+		}
+		
+		return metaClassBase;
+	}
+
+	static TMetaClassBase* CreateMetaClassInstance(char const* parMetaClassName)
+	{
+		TMetaClassBase* metaClassBase = new TMetaClass< std::pair< TFirst, TSecond > >(parMetaClassName, TMetaClassType::Pair);
+		return metaClassBase;
+	}
+
+	static TMetaClassBase const* ContainerValueMetaClass_IFP() 
+	{ 
+		return TMetaClassTraits< TValueNoPointer >::GetMetaClassInstance(); 
+	}
+};
 //-------------------------------------------------------------------------------
 template<> struct TMetaClassTraits< TOdlNull >
 {
@@ -377,7 +430,15 @@ bool SetValue(std::map< TKey, TValue, TCompare, TAllocator >& outMap, TOdlExpres
                 {
                     outMap[key] = value;
                 }
+				else
+				{
+					assert(false); // invalid type
+				}
             }
+			else
+			{
+				assert(false); // invalid type
+			}
         }
         else
         {
@@ -392,6 +453,46 @@ bool SetValue(std::map< TKey, TValue, TCompare, TAllocator >& outMap, TOdlExpres
     return false;
 }
 //-------------------------------------------------------------------------------
+template < typename TFirst, typename TSecond >
+bool SetValue(std::pair< TFirst, TSecond >& outPair, TOdlExpression const& parExpression)
+{
+    if (parExpression.Type() == TOdlExpression::VECTOR)
+    {
+        if (parExpression.ValueUnion().FValueArray.FVectorCount == 2)
+        {
+            TFirst first;
+            TSecond second;
+            if (SetValue(first, parExpression.ValueUnion().FValueArray.FVectorValues[0]))
+            {
+                if (SetValue(second, parExpression.ValueUnion().FValueArray.FVectorValues[1]))
+                {
+                    outPair.first = first;
+					outPair.second = second;
+					return true;
+                }
+				else
+				{
+					assert(false); // invalid type
+				}
+            }
+			else
+			{
+				assert(false); // invalid type
+			}
+        }
+        else
+        {
+            assert(false); // not a pair.
+        }
+    }
+    else
+    {
+        assert(false); // not a pair.
+    }
+
+    return false;
+}
+//-------------------------------------------------------------------------------
 inline bool SetValue(float& outFloat, TOdlExpression const& parExpression)
 {
     if (parExpression.Type() == TOdlExpression::FLOAT)
@@ -399,6 +500,12 @@ inline bool SetValue(float& outFloat, TOdlExpression const& parExpression)
         outFloat = parExpression.ValueUnion().FFloat;
         return true;
     }
+	else if (parExpression.Type() == TOdlExpression::INTEGER) // auto cast
+	{
+		outFloat = (float) parExpression.ValueUnion().FInteger;
+		return true;
+	}
+
     assert(false); // {TODO} invalid type
     return false;
 }
@@ -703,6 +810,30 @@ public:
         TMapType* mapType = TypedPointer(parObject);
         if (SetValue(*mapType, parExpression))
             return true;
+        return false;
+    };
+};
+//-------------------------------------------------------------------------------
+template < typename TFirst, typename TSecond >
+class TProperty< std::pair< TFirst, TSecond > > : public TTypedProperty< std::pair< TFirst, TSecond > >
+{
+    typedef std::pair< TFirst, TSecond > TPairType;
+	typedef TTypedProperty< std::pair< TFirst, TSecond > > parent_type;
+public:
+    TProperty(char const* parName,
+		      TMetaClassBase const* parMetaClassBase,
+			  size_t parPropertyOffset) :
+		parent_type(parName, parMetaClassBase, parPropertyOffset)
+	{
+	}
+
+
+    virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
+	{
+        TPairType* pairPointer = TypedPointer(parObject);
+        if (SetValue(*pairPointer, parExpression))
+            return true;
+        assert(false); // set pair failed.
         return false;
     };
 };

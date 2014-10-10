@@ -46,7 +46,9 @@ class TTestClass2 : public TTestClass
 public:
 	TTestClass2() :
         FInteger(-4),
-        FObjectPointer(nullptr)
+        FObjectPointer(nullptr),
+		FTestClassBasePointer(nullptr),
+		FTestClass2BasePointer(nullptr)
 	{
 	}
 
@@ -61,6 +63,9 @@ public:
 
     std::vector< TTestClass* > FVectorOfObjectPointers;
     std::vector< TTestClass > FVectorOfObjectInPlace;
+	std::pair< int, std::string > FIntStringPair;
+	std::vector< std::pair< float, float > > FFloatFloatPairVector;
+	std::pair< std::vector< float >, std::vector< int > > FFloatVectorIntVectorPair;
 
     TTestClass FObjectInPlace;
     TTestClass2* FObjectPointer;
@@ -90,6 +95,10 @@ BEGIN_METACLASS_CPP(TTestClass2)
     PROPERTYFIELD(FVectorOfObjectInPlace);
 	PROPERTYFIELD(FTestClassBasePointer);
 	PROPERTYFIELD(FTestClass2BasePointer);
+
+	PROPERTYFIELD(FIntStringPair);
+	PROPERTYFIELD(FFloatFloatPairVector);
+	PROPERTYFIELD(FFloatVectorIntVectorPair);
 }
 END_METACLASS_CPP()
 
@@ -149,8 +158,8 @@ void TrueMain()
     }
 
     {
-        TTestClass2* object = odl::TOdlDatabase::Instance().GetObject_IFP<TTestClass2>("object0");
-        if (object)
+        TTestClass2* sum1 = odl::TOdlDatabase::Instance().GetObject_IFP<TTestClass2>("toto/tata/sum1");
+        if (sum1)
         {
             int a = 0;
         }

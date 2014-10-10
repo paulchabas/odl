@@ -46,6 +46,10 @@ namespace toto
 			FObjectPointer = object0
 			FTestClassBasePointer = object0
 			// FTestClass2BasePointer = object1
+
+			FIntStringPair = [ 5, "string"]
+			FFloatFloatPairVector = [ [ 4, 3 ], [ 3, 2 ], [ 2, 1 ] ]
+			FFloatVectorIntVectorPair = [ [0, 1, 2, 3], [3, 2, 1, 0] ]
 		}
 	}
 }

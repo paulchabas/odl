@@ -69,6 +69,10 @@ void TMetaClassBase::PrintContent(std::ostringstream& parOss) const
 	{
 		parOss << "map: " << Name() << std::endl;
 	}
+	else if (FMetaClassType == TMetaClassType::Pair)
+	{
+		parOss << "pair: " << Name() << std::endl;
+	}
 }
 //--------------------------------------------------------
 void TMetaClassBase::RegisterProperty(TPropertyBase const* parUserProperty)
@@ -115,13 +119,13 @@ bool TMetaClassBase::IsGivenTypeCompatible(TMetaClassBase const* parMetaClassBas
 //--------------------------------------------------------
 void TMetaClassBase::SetContainerValueMetaClass(TMetaClassBase const* parValueMetaClass)
 {
-	assert(FMetaClassType == TMetaClassType::Vector || FMetaClassType == TMetaClassType::Map);
+	assert(FMetaClassType == TMetaClassType::Vector || FMetaClassType == TMetaClassType::Map || FMetaClassType == TMetaClassType::Pair);
 	FContainerValueMetaClass = parValueMetaClass;
 }
 //--------------------------------------------------------
 void TMetaClassBase::SetContainerKeyMetaClass(TMetaClassBase const* parKeyMetaClass)
 {
-	assert(FMetaClassType == TMetaClassType::Vector || FMetaClassType == TMetaClassType::Map);
+	assert(FMetaClassType == TMetaClassType::Vector || FMetaClassType == TMetaClassType::Map || FMetaClassType == TMetaClassType::Pair);
 	FContainerKeyMetaClass = parKeyMetaClass;
 }
 //--------------------------------------------------------
