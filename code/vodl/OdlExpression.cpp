@@ -238,43 +238,15 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
             break ;
 		case TOdlAstNodeType::IDENTIFIER:
 			{
-				// identifier: object or value constant
+				// identifier: object name of link
+				#if ODL_ENABLE_VERBOSE_DEBUG
 		        std::string const& objectName = parExpression->Identifier();
+				#endif
+               
+				TOdlAstNode* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
+                TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
+                return EvalExpression(namedDeclarationExpression, parDatabasePath);
 
-                // object reference
-                if (!parExpression->IsValueReference())
-                {
-                    // PAUL(27/05/14 17:57:57) yuk.
-                    TObjectAndMetaClass objectAndMetaClass;
-                    {
-                        TOdlDatabasePath workingDatabasePath(parDatabasePath);
-                        workingDatabasePath.push_back(objectName);
-                        objectAndMetaClass = TOdlDatabase::Instance().GetObjectAndMetaClass_IFP(workingDatabasePath);
-                        while (objectAndMetaClass.first == nullptr)
-                        {
-                            // yuk.
-                            if (!workingDatabasePath.SetCurrentNameInParentNamespace_ROK())
-                            {
-                                assert(false); // {TODO} object not found 
-                                break ;
-                            }
-                            objectAndMetaClass = TOdlDatabase::Instance().GetObjectAndMetaClass_IFP(workingDatabasePath);
-                        }
-                    }
-
-		            if (objectAndMetaClass.first != nullptr)
-					    return TOdlExpression(objectAndMetaClass.first, objectAndMetaClass.second);
-				    else
-				    {
-					    assert(false); // {TODO}  object not found.
-				    }
-                }
-                else // value reference
-                {
-					TOdlAstNode* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
-                    TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
-                    return EvalExpression(namedDeclarationExpression, parDatabasePath);
-                }
 			}
 			break ;
         default:

@@ -158,29 +158,9 @@ LINE_COMMENT "//".*\n
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						bool isOdlAddressLink = false;
-						for (int i = 0; i < textLength; ++i)
-						{
-							if (yytext[i] == '/')
-							{
-								isOdlAddressLink = true;
-								break;
-							}
-						}
-
-						if (isOdlAddressLink)
-						{
-							val->FAstNode = new odl::TOdlAstNode();
-							val->FAstNode->SetAsIdentifier(std::string(yytext));
-							val->FAstNode->SetAsReferenceToResolve();							
-							return OdlParserBase::IDENTIFIER;
-						}
-						else
-						{
-							val->FAstNode = new odl::TOdlAstNode();
-							val->FAstNode->SetAsIdentifier(std::string(yytext));
-							return OdlParserBase::IDENTIFIER;
-						}
+						val->FAstNode = new odl::TOdlAstNode();
+						val->FAstNode->SetAsIdentifier(std::string(yytext));
+						return OdlParserBase::IDENTIFIER;
 				  }
 <<EOF>>           {
                     yyterminate();

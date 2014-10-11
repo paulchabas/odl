@@ -3,19 +3,20 @@ namespace tata
 {
 	namespace toto
 	{
-		circular_reference3 is circular_reference3
+		circular_reference3 is circular_reference
+
+        just_a_value is 3
 	}
 
-	// circular_reference is circular_reference2
-	circular_reference is toto/circular_reference3
+	circular_reference is 4 + toto/just_a_value
 
-	object is TTestClass
+	object is TTestClass2
 	{
-
+        FInteger = circular_reference2
 	}
 
 }
 
-circular_reference2 is tata/circular_reference
+circular_reference2 is tata/toto/circular_reference3
 
 

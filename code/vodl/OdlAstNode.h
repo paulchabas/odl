@@ -127,7 +127,7 @@ public:
     // post processing
     void SetAsReferenceToResolve();
     bool IsValueReference() const { return FIsValueReference; }
-    void ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference);
+    void ResolveReference(TOdlAstNode* parNodeReference);
     TOdlAstNode* ResolvedReference_ReturnNamedDeclaration() const { return FResolvedReferenceWeak; }
 
 	void SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath);

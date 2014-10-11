@@ -448,9 +448,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 								#if ODL_ENABLE_VERBOSE_DEBUG
 								std::string pathDebug = context.DatabasePath().ToString();
 								#endif
-								bool const isValueReference = false;
-								assert(false); calculer is value reference...
-								parAstNode->ResolveReference(candidateNode, isValueReference);
+								parAstNode->ResolveReference(candidateNode);
 								foundReference = candidateNode;
 								break ;
 							}
@@ -470,7 +468,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 							TOdlAstNode const* rootNamespaceCandidate = parentNamespaces[invI];
 
 							std::vector< TOdlAstNode* > const& rootNamespaceContent = rootNamespaceCandidate->NamespaceContent();
-							for (int j = 0; j < rootNamespaceContent.size(); ++j)
+							for (size_t j = 0; j < rootNamespaceContent.size(); ++j)
 							{
 								TOdlAstNode* namedDeclarationNode = rootNamespaceContent[j];
 								std::string const& namedDeclarationName = namedDeclarationNode->IdentifierPointer()->Identifier();
@@ -478,11 +476,11 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 								if (namedDeclarationName == rootNamespaceToFind)
 								{
 									rootNamespace = rootNamespaceCandidate;
-									goto done;
+									goto rootNamespaceDone;
 								}
 							}
 						}
-					done:
+					rootNamespaceDone:
 						int a = 0;
 					}
 															
@@ -490,24 +488,31 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 					{
 						// 2) search childs namespace of root namespace.
 						TOdlAstNode const* childNamespace = rootNamespace;
-						for (int i = 0; i < searchedNameSpaceDatabasePath.size() - 1; ++i)
 						{
-							std::string const& searchedChildNamespace = searchedNameSpaceDatabasePath[i].ToString();
-
-							std::vector< TOdlAstNode* > const& childNamespaceContent =  childNamespace->NamespaceContent();
-							for (int j = 0; j < childNamespaceContent.size(); ++j)
+							for (int i = 0; i < (int) searchedNameSpaceDatabasePath.size() - 1; ++i)
 							{
-								TOdlAstNode* candidateNamespace = childNamespaceContent[j];
-								if (candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE ||
-									candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
+								std::string const& searchedChildNamespace = searchedNameSpaceDatabasePath[i].ToString();
+
+								bool childNamespaceFound = false;
+								std::vector< TOdlAstNode* > const& childNamespaceContent =  childNamespace->NamespaceContent();
+								for (size_t j = 0; j < childNamespaceContent.size(); ++j)
 								{
-									std::string const& namedDeclarationIdentifier = candidateNamespace->IdentifierPointer()->Identifier();
-									if (namedDeclarationIdentifier == searchedChildNamespace)
+									TOdlAstNode* candidateNamespace = childNamespaceContent[j];
+									if (candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE ||
+										candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
 									{
-										childNamespace = candidateNamespace;
-										break ;
+										std::string const& namedDeclarationIdentifier = candidateNamespace->IdentifierPointer()->Identifier();
+										if (namedDeclarationIdentifier == searchedChildNamespace)
+										{
+											childNamespace = candidateNamespace;
+											childNamespaceFound = true;
+											break ;
+										}
 									}
 								}
+
+								if (!childNamespaceFound)
+									assert(false); // cannot find tutu in namespace tata for example: toto/tata/tutu/object
 							}
 						}
 
@@ -528,9 +533,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 										#if ODL_ENABLE_VERBOSE_DEBUG
 										std::string pathDebug = context.DatabasePath().ToString();
 										#endif
-										bool const isValueReference = false;
-										assert(false); calculer is value reference...
-										parAstNode->ResolveReference(candidateNode, isValueReference);
+										parAstNode->ResolveReference(candidateNode);
 										foundReference = candidateNode;
 										break ;
 									}

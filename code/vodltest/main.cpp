@@ -30,7 +30,8 @@ class TTestClass : public odl::TOdlObject
     DECLARE_METACLASS_HEADER(TTestClass, odl::TOdlObject)
 public:
     TTestClass() :
-        FFloat(-1.0f)
+		FInteger(-7),
+        FFloat(-3.21f)
     {
 
     }
@@ -159,7 +160,7 @@ void TrueMain()
     }
 
     {
-        TTestClass2* sum1 = odl::TOdlDatabase::Instance().GetObject_IFP<TTestClass2>("toto/tata/sum1");
+        TTestClass2* sum1 = odl::TOdlDatabase::Instance().GetObject_IFP<TTestClass2>("tata/object");
         if (sum1)
         {
             int a = 0;

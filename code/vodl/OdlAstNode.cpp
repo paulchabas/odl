@@ -506,10 +506,9 @@ void TOdlAstNode::SetAsReferenceToResolve()
 	FReferenceToResolve = true;
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::ResolveReference(TOdlAstNode* parNodeReference, bool parIsValueReference)
+void TOdlAstNode::ResolveReference(TOdlAstNode* parNodeReference)
 {
 	FResolvedReferenceWeak = parNodeReference; 
-	FIsValueReference = parIsValueReference;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)

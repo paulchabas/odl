@@ -121,6 +121,7 @@ anomymous_object_declaration_or_reference
 : IDENTIFIER
 {
 	odl::TOdlAstNode* reference = $1;
+	reference->SetAsReferenceToResolve();	
 	$$ = reference;
 }
 | IDENTIFIER TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE

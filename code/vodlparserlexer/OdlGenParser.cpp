@@ -570,10 +570,10 @@ static const short yyrhs[] = {    27,
 
 #if YY_OdlParserBase_DEBUG != 0
 static const short yyrline[] = { 0,
-    69,    76,    82,    91,    97,   103,   121,   126,   132,   143,
-   153,   160,   166,   174,   178,   185,   192,   201,   210,   216,
-   225,   234,   240,   246,   253,   259,   265,   271,   278,   282,
-   288,   292,   296,   300,   304,   311,   319,   326,   333
+    69,    76,    82,    91,    97,   103,   121,   127,   133,   144,
+   154,   161,   167,   175,   179,   186,   193,   202,   211,   217,
+   226,   235,   241,   247,   254,   260,   266,   272,   279,   283,
+   289,   293,   297,   301,   305,   312,   320,   327,   334
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","UNKNOWN",
@@ -1211,11 +1211,12 @@ case 7:
 #line 122 "OdlParser.y"
 {
 	odl::TOdlAstNode* reference = yyvsp[0].FAstNode;
+	reference->SetAsReferenceToResolve();	
 	yyval.FAstNode = reference;
 ;
     break;}
 case 8:
-#line 127 "OdlParser.y"
+#line 128 "OdlParser.y"
 {
 	odl::TOdlAstNode* objectDeclaration = new odl::TOdlAstNode();
 	objectDeclaration->SetAsObjectDeclaration(yyvsp[-3].FAstNode, yyvsp[-1].FAstNode);
@@ -1223,7 +1224,7 @@ case 8:
 ;
     break;}
 case 9:
-#line 133 "OdlParser.y"
+#line 134 "OdlParser.y"
 {
 	// {TODO}
 	delete yyvsp[-3].FAstNode;
@@ -1236,7 +1237,7 @@ case 9:
 ;
     break;}
 case 10:
-#line 144 "OdlParser.y"
+#line 145 "OdlParser.y"
 {
 	odl::TOdlAstNode* theNullptr = new odl::TOdlAstNode();
 	theNullptr->SetAsNullPtr();
@@ -1244,7 +1245,7 @@ case 10:
 ;
     break;}
 case 11:
-#line 154 "OdlParser.y"
+#line 155 "OdlParser.y"
 {
 	// {TODO}
 	delete yyvsp[-2].FAstNode;
@@ -1253,7 +1254,7 @@ case 11:
 ;
     break;}
 case 12:
-#line 161 "OdlParser.y"
+#line 162 "OdlParser.y"
 {
 	// {TODO}
 	delete yyvsp[0].FAstNode;
@@ -1261,25 +1262,25 @@ case 12:
 ;
     break;}
 case 13:
-#line 167 "OdlParser.y"
+#line 168 "OdlParser.y"
 {
 	yyval.FAstNode = nullptr;
 ;
     break;}
 case 14:
-#line 175 "OdlParser.y"
+#line 176 "OdlParser.y"
 {
 	yyval.FAstNode = nullptr;
 ;
     break;}
 case 15:
-#line 179 "OdlParser.y"
+#line 180 "OdlParser.y"
 {
 	yyval.FAstNode = nullptr;
 ;
     break;}
 case 16:
-#line 186 "OdlParser.y"
+#line 187 "OdlParser.y"
 {
 	// {TODO}
 	delete yyvsp[-2].FAstNode;
@@ -1288,7 +1289,7 @@ case 16:
 ;
     break;}
 case 17:
-#line 193 "OdlParser.y"
+#line 194 "OdlParser.y"
 {
 	// {TODO}
 	delete yyvsp[0].FAstNode;
@@ -1296,7 +1297,7 @@ case 17:
 ;
     break;}
 case 18:
-#line 202 "OdlParser.y"
+#line 203 "OdlParser.y"
 {
 	delete yyvsp[-1].FAstNode;
 	delete yyvsp[0].FAstNode;
@@ -1304,7 +1305,7 @@ case 18:
 ;
     break;}
 case 19:
-#line 211 "OdlParser.y"
+#line 212 "OdlParser.y"
 {
 	odl::TOdlAstNode* propertyDeclList = yyvsp[-1].FAstNode;
 	propertyDeclList->PropertyDeclarationList_AppendPropertyDeclaration(yyvsp[0].FAstNode);
@@ -1312,7 +1313,7 @@ case 19:
 ;
     break;}
 case 20:
-#line 217 "OdlParser.y"
+#line 218 "OdlParser.y"
 {
 	odl::TOdlAstNode* propertyListNode = new odl::TOdlAstNode();
 	propertyListNode->SetAsPropertyDeclarationList();
@@ -1320,7 +1321,7 @@ case 20:
 ;
     break;}
 case 21:
-#line 226 "OdlParser.y"
+#line 227 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsPropertyDeclaration(yyvsp[-2].FAstNode, yyvsp[0].FAstNode);
@@ -1328,7 +1329,7 @@ case 21:
 ;
     break;}
 case 22:
-#line 235 "OdlParser.y"
+#line 236 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1336,7 +1337,7 @@ case 22:
 ;
     break;}
 case 23:
-#line 241 "OdlParser.y"
+#line 242 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1344,13 +1345,13 @@ case 23:
 ;
     break;}
 case 24:
-#line 247 "OdlParser.y"
+#line 248 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 25:
-#line 254 "OdlParser.y"
+#line 255 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1358,7 +1359,7 @@ case 25:
 ;
     break;}
 case 26:
-#line 260 "OdlParser.y"
+#line 261 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1366,7 +1367,7 @@ case 26:
 ;
     break;}
 case 27:
-#line 266 "OdlParser.y"
+#line 267 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1374,19 +1375,19 @@ case 27:
 ;
     break;}
 case 28:
-#line 272 "OdlParser.y"
+#line 273 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 29:
-#line 279 "OdlParser.y"
+#line 280 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[-1].FAstNode;
 ;
     break;}
 case 30:
-#line 283 "OdlParser.y"
+#line 284 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(nullptr, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1394,44 +1395,44 @@ case 30:
 ;
     break;}
 case 31:
-#line 289 "OdlParser.y"
+#line 290 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 32:
-#line 293 "OdlParser.y"
+#line 294 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 33:
-#line 297 "OdlParser.y"
+#line 298 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 34:
-#line 301 "OdlParser.y"
+#line 302 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 35:
-#line 305 "OdlParser.y"
+#line 306 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 36:
-#line 312 "OdlParser.y"
+#line 313 "OdlParser.y"
 {
 	odl::TOdlAstNode* vector = yyvsp[-1].FAstNode;
 	yyval.FAstNode = vector;
 ;
     break;}
 case 37:
-#line 320 "OdlParser.y"
+#line 321 "OdlParser.y"
 {
 	odl::TOdlAstNode* vector = yyvsp[0].FAstNode;
 	odl::TOdlAstNode* expression = yyvsp[-2].FAstNode;
@@ -1440,7 +1441,7 @@ case 37:
 ;
     break;}
 case 38:
-#line 327 "OdlParser.y"
+#line 328 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsVector();
@@ -1449,7 +1450,7 @@ case 38:
 ;
     break;}
 case 39:
-#line 334 "OdlParser.y"
+#line 335 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsVector();
@@ -1660,6 +1661,6 @@ YYLABEL(yyerrhandle)
 /* END */
 
 /* #line 1010 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 1664 "OdlGenParser.cpp"
-#line 342 "OdlParser.y"
+#line 1665 "OdlGenParser.cpp"
+#line 343 "OdlParser.y"
 

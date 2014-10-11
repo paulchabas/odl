@@ -491,7 +491,7 @@ static const short int yy_rule_linenum[29] =
     {   0,
        36,   39,   43,   47,   50,   54,   58,   62,   66,   70,
        74,   80,   86,   92,   98,  105,  109,  113,  117,  121,
-      125,  129,  133,  138,  148,  157,  157,  189
+      125,  129,  133,  138,  148,  157,  157,  169
     } ;
 
 #endif
@@ -855,39 +855,19 @@ case 26:
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						bool isOdlAddressLink = false;
-						for (int i = 0; i < textLength; ++i)
-						{
-							if (yytext[i] == '/')
-							{
-								isOdlAddressLink = true;
-								break;
-							}
-						}
-
-						if (isOdlAddressLink)
-						{
-							val->FAstNode = new odl::TOdlAstNode();
-							val->FAstNode->SetAsIdentifier(std::string(yytext));
-							val->FAstNode->SetAsReferenceToResolve();							
-							return OdlParserBase::IDENTIFIER;
-						}
-						else
-						{
-							val->FAstNode = new odl::TOdlAstNode();
-							val->FAstNode->SetAsIdentifier(std::string(yytext));
-							return OdlParserBase::IDENTIFIER;
-						}
+						val->FAstNode = new odl::TOdlAstNode();
+						val->FAstNode->SetAsIdentifier(std::string(yytext));
+						return OdlParserBase::IDENTIFIER;
 				  }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 185 "OdlLexer.l"
+#line 165 "OdlLexer.l"
 {
                     yyterminate();
                   }
 	YY_BREAK
 case 28:
-#line 189 "OdlLexer.l"
+#line 169 "OdlLexer.l"
 {
 					 int const textLength = strlen(yytext);
 					 ++column;
@@ -895,7 +875,7 @@ case 28:
 				  }
 	YY_BREAK
 case 29:
-#line 195 "OdlLexer.l"
+#line 175 "OdlLexer.l"
 ECHO;
 	YY_BREAK
 #line 493 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\flexskel.cc"
@@ -1490,4 +1470,4 @@ void YY_OdlScanner_CLASS::YY_OdlScanner_INIT_BUFFER( YY_BUFFER_STATE b, YY_OdlSc
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 195 "OdlLexer.l"
+#line 175 "OdlLexer.l"
