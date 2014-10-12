@@ -214,6 +214,108 @@ TOdlExpression EvalOperationMinus(TOdlExpression& parLeft, TOdlExpression& parRi
     return TOdlExpression();
 }
 //-------------------------------------------------------------------------------
+TOdlExpression EvalOperationMultiply(TOdlExpression& parLeft, TOdlExpression& parRight)
+{
+    assert(ExpressionTypeCompatible(parLeft, parRight));
+
+    if (parLeft.Type() == TOdlExpression::INTEGER &&
+        parRight.Type() == TOdlExpression::INTEGER)
+    {
+        return TOdlExpression(parLeft.ValueUnion().FInteger * parRight.ValueUnion().FInteger);
+    }
+
+    if (parLeft.Type() == TOdlExpression::FLOAT &&
+        parRight.Type() == TOdlExpression::FLOAT)
+    {
+        return TOdlExpression(parLeft.ValueUnion().FFloat * parRight.ValueUnion().FFloat);
+    }
+
+	if (parLeft.Type() == TOdlExpression::FLOAT && 
+		parRight.Type() == TOdlExpression::INTEGER)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FFloat * parRight.ValueUnion().FInteger);
+	}
+
+	if (parLeft.Type() == TOdlExpression::INTEGER && 
+		parRight.Type() == TOdlExpression::FLOAT)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FInteger * parRight.ValueUnion().FFloat);
+	}
+
+	assert(false); // undefined operation
+
+    return TOdlExpression();
+}
+//-------------------------------------------------------------------------------
+TOdlExpression EvalOperationDivide(TOdlExpression& parLeft, TOdlExpression& parRight)
+{
+    assert(ExpressionTypeCompatible(parLeft, parRight));
+
+    if (parLeft.Type() == TOdlExpression::INTEGER &&
+        parRight.Type() == TOdlExpression::INTEGER)
+    {
+        return TOdlExpression(parLeft.ValueUnion().FInteger / parRight.ValueUnion().FInteger);
+    }
+
+    if (parLeft.Type() == TOdlExpression::FLOAT &&
+        parRight.Type() == TOdlExpression::FLOAT)
+    {
+        return TOdlExpression(parLeft.ValueUnion().FFloat / parRight.ValueUnion().FFloat);
+    }
+
+	if (parLeft.Type() == TOdlExpression::FLOAT && 
+		parRight.Type() == TOdlExpression::INTEGER)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FFloat / parRight.ValueUnion().FInteger);
+	}
+
+	if (parLeft.Type() == TOdlExpression::INTEGER && 
+		parRight.Type() == TOdlExpression::FLOAT)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FInteger / parRight.ValueUnion().FFloat);
+	}
+
+	assert(false); // undefined operation
+
+    return TOdlExpression();
+}
+//-------------------------------------------------------------------------------
+TOdlExpression EvalOperationModulo(TOdlExpression& parLeft, TOdlExpression& parRight)
+{
+    assert(ExpressionTypeCompatible(parLeft, parRight));
+
+    if (parLeft.Type() == TOdlExpression::INTEGER &&
+        parRight.Type() == TOdlExpression::INTEGER)
+    {
+        return TOdlExpression(parLeft.ValueUnion().FInteger % parRight.ValueUnion().FInteger);
+    }
+
+    if (parLeft.Type() == TOdlExpression::FLOAT &&
+        parRight.Type() == TOdlExpression::FLOAT)
+    {
+		float const result = std::fmodf(parLeft.ValueUnion().FFloat, parRight.ValueUnion().FFloat);
+        return TOdlExpression(result);
+    }
+
+	if (parLeft.Type() == TOdlExpression::FLOAT && 
+		parRight.Type() == TOdlExpression::INTEGER)
+	{
+		float const result = std::fmodf(parLeft.ValueUnion().FFloat, (float) parRight.ValueUnion().FInteger);
+		return TOdlExpression(result);
+	}
+
+	if (parLeft.Type() == TOdlExpression::INTEGER && 
+		parRight.Type() == TOdlExpression::FLOAT)
+	{
+		float const result = std::fmodf((float) parLeft.ValueUnion().FInteger, parRight.ValueUnion().FFloat);
+		return TOdlExpression(result);
+	}
+
+	assert(false); // undefined operation
+
+    return TOdlExpression();
+}
+//-------------------------------------------------------------------------------
 TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath const& parDatabasePath)
 {
     TOdlAstNodeType::TType expressionType = parExpression->AstNodeType();
@@ -347,19 +449,46 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
 
         case TOdlAstNodeOperatorType::OPERATOR_MULTIPLY:
             {
-                int a = 0; // {TODO} operator
+                TOdlAstNode const* left = parExpression->LeftExpressionPointer();
+                TOdlAstNode const* right = parExpression->RightExpressionPointer();
+
+				TOdlExpression leftResult = EvalExpression(left, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+
+				if (ExpressionTypeCompatible(leftResult, rightResult))
+				{
+					return EvalOperationMultiply(leftResult, rightResult);
+				}
             }
             break ;
 
         case TOdlAstNodeOperatorType::OPERATOR_DIVIDE:
             {
-                int a = 0; // {TODO} operator
+                TOdlAstNode const* left = parExpression->LeftExpressionPointer();
+                TOdlAstNode const* right = parExpression->RightExpressionPointer();
+
+				TOdlExpression leftResult = EvalExpression(left, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+
+				if (ExpressionTypeCompatible(leftResult, rightResult))
+				{
+					return EvalOperationDivide(leftResult, rightResult);
+				}
             }
             break ;
 
         case TOdlAstNodeOperatorType::OPERATOR_MODULO:
             {
-                int a = 0; // {TODO} operator
+                TOdlAstNode const* left = parExpression->LeftExpressionPointer();
+                TOdlAstNode const* right = parExpression->RightExpressionPointer();
+
+				TOdlExpression leftResult = EvalExpression(left, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+
+				if (ExpressionTypeCompatible(leftResult, rightResult))
+				{
+					return EvalOperationModulo(leftResult, rightResult);
+				}
             }
             break ;
 
