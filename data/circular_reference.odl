@@ -13,7 +13,7 @@ namespace tata
 	object is TTestClass2
 	{
         FInteger = circular_reference2
-        FFloat = 4.33 + 7.22 + 1
+        FFloat = 4.33 + 7.22 + -1
 	}
 
 }

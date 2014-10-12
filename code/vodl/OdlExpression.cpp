@@ -176,6 +176,40 @@ TOdlExpression EvalOperationPlus(TOdlExpression& parLeft, TOdlExpression& parRig
         return TOdlExpression(newContent, newContentSize, nullptr);
     }
 
+	assert(false); // undefined operation
+
+    return TOdlExpression();
+}
+//-------------------------------------------------------------------------------
+TOdlExpression EvalOperationMinus(TOdlExpression& parLeft, TOdlExpression& parRight)
+{
+    assert(ExpressionTypeCompatible(parLeft, parRight));
+
+    if (parLeft.Type() == TOdlExpression::INTEGER &&
+        parRight.Type() == TOdlExpression::INTEGER)
+    {
+        return TOdlExpression(parLeft.ValueUnion().FInteger - parRight.ValueUnion().FInteger);
+    }
+
+    if (parLeft.Type() == TOdlExpression::FLOAT &&
+        parRight.Type() == TOdlExpression::FLOAT)
+    {
+        return TOdlExpression(parLeft.ValueUnion().FFloat - parRight.ValueUnion().FFloat);
+    }
+
+	if (parLeft.Type() == TOdlExpression::FLOAT && 
+		parRight.Type() == TOdlExpression::INTEGER)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FFloat - parRight.ValueUnion().FInteger);
+	}
+
+	if (parLeft.Type() == TOdlExpression::INTEGER && 
+		parRight.Type() == TOdlExpression::FLOAT)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FInteger - parRight.ValueUnion().FFloat);
+	}
+
+	assert(false); // undefined operation
 
     return TOdlExpression();
 }
@@ -296,7 +330,18 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
             break ;
         case TOdlAstNodeOperatorType::OPERATOR_MINUS:
             {
-                int a = 0; // {TODO} operator
+				TOdlAstNode const* left = parExpression->LeftExpressionPointer();
+                TOdlAstNode const* right = parExpression->RightExpressionPointer();
+
+				TOdlExpression leftResult(0);
+				if (left != nullptr)
+					leftResult = EvalExpression(left, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+
+				if (ExpressionTypeCompatible(leftResult, rightResult))
+				{
+					return EvalOperationMinus(leftResult, rightResult);
+				}
             }
             break ;
 
