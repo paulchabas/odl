@@ -1,0 +1,23 @@
+
+namespace tata
+{
+	namespace toto
+	{
+		circular_reference3 is circular_reference
+
+        just_a_value is 3
+	}
+
+	circular_reference is 4 + toto/just_a_value
+
+	object is TTestClass2
+	{
+        FInteger = circular_reference2
+        FFloat = 4.33 + 7.22 + -1
+	}
+
+}
+
+circular_reference2 is tata/toto/circular_reference3
+
+

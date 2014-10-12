@@ -148,8 +148,8 @@ void TrueMain()
     odl::TOdlAstNode const* odlAst = NULL;
 	odl::TOdlParser odlParser;
 	// odlAst = odlParser.ParseFile("Data/main.odl");
-	// odlAst = odlParser.ParseFile("Data/circular_reference.odl");
-	odlAst = odlParser.ParseFile("Data/float.odl");
+	odlAst = odlParser.ParseFile("Data/circular_reference.odl");
+	// odlAst = odlParser.ParseFile("Data/float.odl");
    
     {
 		std::cout << "-----------------------------" << std::endl;
