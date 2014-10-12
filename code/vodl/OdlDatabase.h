@@ -24,6 +24,8 @@ public:
     TOdlObject* GetObject_IFP(TOdlDatabasePath const& parDatabasePath) const;
 	TObjectAndMetaClass TOdlObjectDatabase::GetObjectAndMetaClass_IFP(TOdlDatabasePath const& parDatabasePath) const;
 
+	void DestroyContent();
+
 private:
     typedef std::map< TOdlDatabasePath, TObjectAndMetaClass > TObjectsByPaths;
     TObjectsByPaths FObjectsByPaths;

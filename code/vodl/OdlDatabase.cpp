@@ -15,6 +15,11 @@ TOdlObjectDatabase::TOdlObjectDatabase()
 //--------------------------------------------------------
 TOdlObjectDatabase::~TOdlObjectDatabase()
 {
+	assert(FObjectsByPaths.empty());
+}
+//--------------------------------------------------------
+void TOdlObjectDatabase::DestroyContent()
+{
 	for (TObjectsByPaths::iterator it = FObjectsByPaths.begin();
 		 it != FObjectsByPaths.end();
 		 ++it)
@@ -77,14 +82,7 @@ TObjectAndMetaClass TOdlObjectDatabase::GetObjectAndMetaClass_IFP(TOdlDatabasePa
 //-------------------------------------------------------------------------------
 TOdlMetaClassByName::~TOdlMetaClassByName()
 {
-    for (iterator it = begin();
-		 it != end();
-		 ++it)
-	{
-		TMetaClassBase const* metaClass = it->second;
-		delete metaClass;
-	}
-	clear();
+
 }
 //--------------------------------------------------------
 //********************************************************
@@ -99,7 +97,13 @@ TOdlDatabase::TOdlDatabase() :
 //--------------------------------------------------------
 TOdlDatabase::~TOdlDatabase()
 {
+	FObjectsDatabase.DestroyContent();
 
+	for (auto it : FMetaClassByName)
+	{
+		TMetaClassBase const* metaClass = it.second;
+		delete metaClass;
+	}
 }
 //--------------------------------------------------------
 TMetaClassBase const* TOdlDatabase::FindRegisteredMetaClassByName_IFP(char const* parMetaClassName) const
