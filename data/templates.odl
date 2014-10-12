@@ -1,0 +1,19 @@
+
+
+
+
+template TemplateTest is TTestClas2(a,b,c,d)
+{
+    
+
+}
+
+
+toto is TemplateTest(5, 12.2, "bla")
+
+
+
+
+
+
+

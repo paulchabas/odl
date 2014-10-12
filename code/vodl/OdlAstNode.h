@@ -31,6 +31,7 @@ namespace TOdlAstNodeType
 		VALUE_VECTOR				= 12 | EXPRESSION_MASK | VALUE_MASK,
         OBJECT_TEMPLATE_DECLARATION = 13 | TEMPLATE_MASK,
         OBJECT_TEMPLATE_INSTANCIATION = 14 | TEMPLATE_MASK,
+		TEMPLATE_PARAMETER_LIST		= 15
 	};
 }
 
@@ -75,8 +76,10 @@ public:
 	void SetAsNullPtr();
 	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
 
-    void SetAsTemplateDeclaration();
+    void SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList);
     void SetAsTemplateInstanciation();
+	void SetAsTemplateParameterList();
+	void TemplateParameterList_AppendParameter(TOdlAstNode* parIdentifier);
 
     void SetAsPropertyDeclarationList();
     void PropertyDeclarationList_AppendPropertyDeclaration(TOdlAstNode* parPropertyDeclarationNode);
@@ -143,6 +146,7 @@ private:
     std::vector< TOdlAstNode* >     FPropertyList;
     std::vector< TOdlAstNode* >     FNamedDeclarationList;
 	std::vector< TOdlAstNode* >     FVectorContent;
+	std::vector< TOdlAstNode* >     FTemplateParameterList;
 
     TOdlAstNode*                    FIdentifierPointer;
     TOdlAstNode*                    FTypeIdentifierPointer;

@@ -69,10 +69,6 @@ LINE_COMMENT "//".*\n
 						column += 7;
 						return OdlParserBase::TOKEN_NULLPTR;
 					}
-":"				  {
-					column += 1;
-					return OdlParserBase::TOKEN_COLON;
-				  }
 "+"               {
                     ++column;
 					val->FAstNode = new odl::TOdlAstNode();

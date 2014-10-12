@@ -44,7 +44,6 @@
 %token TOKEN_NAMESPACE
 %token TOKEN_TEMPLATE
 %token TOKEN_NULLPTR
-%token TOKEN_COLON // {TODO} unused
 
 %token <FAstNode> OPERATOR_PLUS OPERATOR_MINUS OPERATOR_MULTIPLY OPERATOR_DIVIDE OPERATOR_MODULO
 %token <FAstNode> VALUE_INTEGER
@@ -59,7 +58,7 @@
 %type <FAstNode> property_declaration_list property_declaration
 %type <FAstNode> expression term factor
 %type <FAstNode> vector_value_list vector_value
-%type <FAstNode> identifier_list typed_identifier_list typed_identifier_list_rec typed_identifier
+%type <FAstNode> template_parameter_list
 
 %start odl_ast
  
@@ -100,19 +99,10 @@ named_declaration
 	theNamespace->SetIdentifierPointer($2);
 	$$ = theNamespace;
 }
-| TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS typed_identifier_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
+| TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
-	// {TODO}
-	// not a good idea to put template declaration here.
-	// it avoid the shift-reduce conflict but need a semantical analysis after.
-//	delete $1;
-//	delete $3;
-//	delete $6;
-
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
-	templateDeclaration->SetAsTemplateDeclaration();
-	templateDeclaration->SetIdentifierPointer($2);
-
+	templateDeclaration->SetAsTemplateDeclaration($2, $4, $6);
 	$$ = templateDeclaration;
 }
 ;
@@ -130,12 +120,8 @@ anomymous_object_declaration_or_reference
 	objectDeclaration->SetAsObjectDeclaration($1, $3);
 	$$ = objectDeclaration;
 }
-| IDENTIFIER TOKEN_OPEN_PARENTHESIS identifier_list TOKEN_CLOSE_PARENTHESIS
+| IDENTIFIER TOKEN_OPEN_PARENTHESIS template_parameter_list TOKEN_CLOSE_PARENTHESIS
 {
-	// {TODO}
-	delete $1;
-	delete $3;
-
 	// template instanciation.
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
 	templateDeclaration->SetAsTemplateInstanciation();
@@ -149,61 +135,41 @@ anomymous_object_declaration_or_reference
 }
 ;
 
-
-identifier_list
-: expression TOKEN_COMMA identifier_list
+template_identifier_list
+: IDENTIFIER TOKEN_COMMA template_identifier_list
 {
-	// {TODO}
-	delete $1;
-	delete $3;
-	$$ = nullptr;
+	odl::TOdlAstNode* templateParameterList = $3;
+	templateParameterList->TemplateParameterList_AppendParameter($1);
+	$$ = templateParameterList;
 }
-| expression
+| IDENTIFIER
 {
-	// {TODO}
-	delete $1;
-	$$ = nullptr;
+	$$ = $1;
 }
 |
 {
-	$$ = nullptr;
+	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
+	templateParameterList->SetAsTemplateParameterList();
+	$$ = templateParameterList;
 }
 ;
 
-
-typed_identifier_list
-: typed_identifier_list_rec
+template_parameter_list
+: expression TOKEN_COMMA template_parameter_list
 {
-	$$ = nullptr;
+	odl::TOdlAstNode* templateParameterList = $3;
+	templateParameterList->TemplateParameterList_AppendParameter($1);
+	$$ = templateParameterList;
 }
-| 
+| expression
 {
-	$$ = nullptr;
+	$$ = $1;
 }
-;
-
-typed_identifier_list_rec
-: typed_identifier_list_rec TOKEN_COMMA typed_identifier 
+|
 {
-	// {TODO}
-	delete $1;
-	delete $3;
-	$$ = nullptr;
-}
-| typed_identifier
-{
-	// {TODO}
-	delete $1;
-	$$ = nullptr;
-}
-;
-
-typed_identifier
-: IDENTIFIER IDENTIFIER
-{
-	delete $1;
-	delete $2;
-	$$ = nullptr;
+	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
+	templateParameterList->SetAsTemplateParameterList();
+	$$ = templateParameterList;
 }
 ;
 

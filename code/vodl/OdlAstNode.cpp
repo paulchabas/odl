@@ -100,9 +100,32 @@ void TOdlAstNode::Namespace_AppendNamedDeclaration(TOdlAstNode* parDeclaration)
     FNamedDeclarationList.push_back(parDeclaration);
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateDeclaration()
+void TOdlAstNode::SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList)
 {
     FAstNodeType = TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION;
+
+	assert(parIdentifier != nullptr);
+	assert(parTypeIdentifier != nullptr);
+    assert(parPropertyList != nullptr);
+
+	assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
+    assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
+    assert(parPropertyList->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
+
+	FIdentifierPointer = parIdentifier;
+	FTypeIdentifierPointer = parTypeIdentifier;
+	FPropertyDeclarationListPointer = parPropertyList;
+}
+//-------------------------------------------------------------------------------
+void TOdlAstNode::SetAsTemplateParameterList()
+{
+	FAstNodeType = TOdlAstNodeType::TEMPLATE_PARAMETER_LIST;
+}
+//-------------------------------------------------------------------------------
+void TOdlAstNode::TemplateParameterList_AppendParameter(TOdlAstNode* parIdentifier)
+{
+	assert(FAstNodeType == TOdlAstNodeType::TEMPLATE_PARAMETER_LIST);
+	FTemplateParameterList.push_back(parIdentifier);
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsTemplateInstanciation()
