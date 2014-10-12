@@ -316,8 +316,13 @@ TOdlExpression EvalOperationModulo(TOdlExpression& parLeft, TOdlExpression& parR
     return TOdlExpression();
 }
 //-------------------------------------------------------------------------------
-TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath const& parDatabasePath)
+TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode const* parExpression, TOdlDatabasePath const& parDatabasePath)
 {
+	TScopedCheckCircularReferenceCheck scopedCheck(parContext, parExpression);
+
+	if (scopedCheck.CheckFailed())
+		return TOdlExpression();
+
     TOdlAstNodeType::TType expressionType = parExpression->AstNodeType();
     assert(expressionType & TOdlAstNodeType::EXPRESSION_MASK);
     if (expressionType & TOdlAstNodeType::VALUE_MASK)
@@ -384,7 +389,7 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                         size_t invI = childCount - i - 1;
                         TOdlAstNode const* child = childs[invI];
                     
-                        vectorContent[i] = EvalExpression(child, parDatabasePath);
+                        vectorContent[i] = EvalExpression(parContext, child, parDatabasePath);
                     }
                 }
 
@@ -400,7 +405,7 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                
 				TOdlAstNode* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
                 TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
-                return EvalExpression(namedDeclarationExpression, parDatabasePath);
+                return EvalExpression(parContext, namedDeclarationExpression, parDatabasePath);
 
 			}
 			break ;
@@ -420,8 +425,12 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-                TOdlExpression leftResult = EvalExpression(left, parDatabasePath);
-                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+                TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+				if (leftResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
+                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+				if (rightResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
 
                 if (ExpressionTypeCompatible(leftResult, rightResult))
                 {
@@ -437,8 +446,14 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
 
 				TOdlExpression leftResult(0);
 				if (left != nullptr)
-					leftResult = EvalExpression(left, parDatabasePath);
-                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+				{
+					leftResult = EvalExpression(parContext, left, parDatabasePath);
+					if (leftResult.Type() == TOdlExpression::UNTYPED)
+						return TOdlExpression();
+				}
+                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+				if (rightResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
 
 				if (ExpressionTypeCompatible(leftResult, rightResult))
 				{
@@ -452,8 +467,12 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-				TOdlExpression leftResult = EvalExpression(left, parDatabasePath);
-                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+				TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+				if (leftResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
+                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+				if (rightResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
 
 				if (ExpressionTypeCompatible(leftResult, rightResult))
 				{
@@ -467,8 +486,12 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-				TOdlExpression leftResult = EvalExpression(left, parDatabasePath);
-                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
+				TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+				if (leftResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
+                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+				if (rightResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
 
 				if (ExpressionTypeCompatible(leftResult, rightResult))
 				{
@@ -482,9 +505,12 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-				TOdlExpression leftResult = EvalExpression(left, parDatabasePath);
-                TOdlExpression rightResult = EvalExpression(right, parDatabasePath);
-
+				TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+				if (leftResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
+                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+				if (rightResult.Type() == TOdlExpression::UNTYPED)
+					return TOdlExpression();
 				if (ExpressionTypeCompatible(leftResult, rightResult))
 				{
 					return EvalOperationModulo(leftResult, rightResult);
@@ -499,6 +525,29 @@ TOdlExpression EvalExpression(TOdlAstNode const* parExpression, TOdlDatabasePath
     }
     
     return TOdlExpression();
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+bool TEvalExpressionContext::AddToCircularReferenceCheck(TOdlAstNode const* parAstNode)
+{
+	auto it = std::find(FCircularReferenceCheck.begin(), FCircularReferenceCheck.end(), parAstNode);
+	bool const checkSucceeded = it == FCircularReferenceCheck.end();
+	FCircularReferenceCheck.push_back(parAstNode);
+	if (checkSucceeded)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+//-------------------------------------------------------------------------------
+void TEvalExpressionContext::RemoveToCircularReferenceCheck(TOdlAstNode const* parAstNode)
+{
+	assert(FCircularReferenceCheck.back() == parAstNode);
+	FCircularReferenceCheck.pop_back();
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************

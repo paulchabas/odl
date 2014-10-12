@@ -1,6 +1,7 @@
 #ifndef ODL_DATABASE_H
 #define ODL_DATABASE_H
 
+#include "BasicTypes.h"
 #include "OdlSingleton.h"
 
 namespace odl

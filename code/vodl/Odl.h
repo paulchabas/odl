@@ -2,11 +2,6 @@
 #ifndef ODL_H
 #define ODL_H
 
-#include <array>
-#include <vector>
-#include <string>
-#include <sstream>
-
 #include "BasicTypes.h"
 #include "OdlDatabase.h"
 #include "OdlExpression.h"

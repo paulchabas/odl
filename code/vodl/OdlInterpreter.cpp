@@ -194,12 +194,21 @@ static void EvalExpressionAndStoreProperty(TOdlObject* parObject,
 {
     TMetaClassBase const* propertyMetaClassBase = parPropertyBase->Type();
 
-    TOdlExpression const result = EvalExpression(parExpression, parDatabasePath);
-    bool const propertySet = parPropertyBase->SetObjectPropertyByExpression_ROK(parObject, result);
-    if (!propertySet)
-    {
-        assert(false);
-    }
+	TEvalExpressionContext evalExpressionContext;
+    TOdlExpression const result = EvalExpression(evalExpressionContext, parExpression, parDatabasePath);
+
+	if (result.Type() != TOdlExpression::UNTYPED)
+	{
+		bool const propertySet = parPropertyBase->SetObjectPropertyByExpression_ROK(parObject, result);
+		if (!propertySet)
+		{
+			assert(false); // error property affectation.
+		}
+	}
+	else
+	{
+		assert(false); // error expression cannot be evaluated -> circular reference ?
+	}
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************
@@ -404,27 +413,8 @@ public:
 
     std::vector< TOdlAstNode* > const& Parents() const { return FParents; }
 	
-	bool AddToCircularReferenceCheck(TOdlAstNode* parAstNode)
-	{
-		size_t sizeBefore = FCircularReferenceCheck.size();
-		FCircularReferenceCheck.insert(parAstNode);
-		size_t sizeAfter = FCircularReferenceCheck.size();
-		if (sizeBefore == sizeAfter)
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-	void RemoveToCircularReferenceCheck(TOdlAstNode* parAstNode)
-	{
-		// FCircularReferenceCheck.
-	}
-
 private:
     std::vector< TOdlAstNode* > FParents;
-	std::set< TOdlAstNode* > FCircularReferenceCheck;
 };
 //-------------------------------------------------------------------------------
 void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parContext)
