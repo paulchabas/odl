@@ -72,7 +72,7 @@
 #include<sstream>
 #include <cassert>
 #include "OdlGenParser.h"
-#line 34 "OdlLexer.l"
+#line 36 "OdlLexer.l"
 #line 52 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\flexskel.h"
 
 #ifdef YY_USE_CLASS
@@ -397,7 +397,7 @@ class YY_OdlScanner_CLASS YY_OdlScanner_INHERIT
 /* declaration of externs for public use of yylex scanner */
 
 /* % here is the declaration from section2 %header{ */ 
-#line 175 "OdlLexer.l"
+#line 197 "OdlLexer.l"
 #endif
 #line 375 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\flexskel.h"
 

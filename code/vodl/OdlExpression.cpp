@@ -74,10 +74,7 @@ bool ExpressionTypeCompatible(TOdlExpression const& parLeft, TOdlExpression cons
     {
         if (parLeft.Type() == TOdlExpression::OBJECT)
         {
-            if (parLeft.MetaClassBase() == parRight.MetaClassBase())
-            {
-                return true;
-            }
+			return false;
         }
         else if (parLeft.Type() == TOdlExpression::VECTOR)
         {
@@ -89,6 +86,16 @@ bool ExpressionTypeCompatible(TOdlExpression const& parLeft, TOdlExpression cons
 
         return true;
     }
+	else if (parLeft.Type() == TOdlExpression::FLOAT)
+	{
+		if (parRight.Type() == TOdlExpression::INTEGER)
+			return true;
+	}
+	else if (parLeft.Type() == TOdlExpression::INTEGER)
+	{
+		if (parRight.Type() == TOdlExpression::FLOAT)
+			return true;
+	}
 
     return false;
 }
@@ -108,6 +115,18 @@ TOdlExpression EvalOperationPlus(TOdlExpression& parLeft, TOdlExpression& parRig
     {
         return TOdlExpression(parLeft.ValueUnion().FFloat + parRight.ValueUnion().FFloat);
     }
+
+	if (parLeft.Type() == TOdlExpression::FLOAT && 
+		parRight.Type() == TOdlExpression::INTEGER)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FFloat + parRight.ValueUnion().FInteger);
+	}
+
+	if (parLeft.Type() == TOdlExpression::INTEGER && 
+		parRight.Type() == TOdlExpression::FLOAT)
+	{
+		return TOdlExpression(parLeft.ValueUnion().FInteger + parRight.ValueUnion().FFloat);
+	}
 
     if (parLeft.Type() == TOdlExpression::STRING &&
         parRight.Type() == TOdlExpression::STRING)

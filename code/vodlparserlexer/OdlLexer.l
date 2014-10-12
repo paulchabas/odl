@@ -29,7 +29,9 @@ LINK_NAMESPACE {PURE_IDENTIFIER}{SLASH}
 IDENTIFIER {LINK_NAMESPACE}*{PURE_IDENTIFIER}
 
 VALUE_STRING ["][^"]*["]
-VALUE_INTEGER {DIGIT1}{DIGIT}*|[0]
+VALUE_PURE_INTEGER {DIGIT1}{DIGIT}*|[0]
+VALUE_DECIMAL [.]{VALUE_PURE_INTEGER}
+VALUE_FLOAT_OR_INTEGER {VALUE_PURE_INTEGER}{VALUE_DECIMAL}?
 LINE_COMMENT "//".*\n
 %%
  
@@ -145,14 +147,34 @@ LINE_COMMENT "//".*\n
 						val->FAstNode->SetAsStringValue(std::string(yytext + 1, yytext + textLength - 1));
 						return OdlParserBase::VALUE_STRING;
 					}
-{VALUE_INTEGER}   {
-                    column += strlen(yytext);
-					int integerValue = atoi(yytext);
-                    val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsIntegerValue(integerValue);
+{VALUE_FLOAT_OR_INTEGER}	{
+								int const characterCount = strlen(yytext);
+								column += characterCount;
 
-                    return OdlParserBase::VALUE_INTEGER;
-                  }
+								bool isFloat = false;
+								for (int i = 0; i < characterCount; ++i)
+								{
+									if (yytext[i] == '.')
+									{
+										isFloat = true;
+										break ;
+									}
+								}
+								if (isFloat)
+								{
+									float const floatValue = atof(yytext);
+									val->FAstNode = new odl::TOdlAstNode();
+									val->FAstNode->SetAsFloatValue(floatValue);
+									return OdlParserBase::VALUE_FLOAT;
+								}
+								else
+								{
+									int integerValue = atoi(yytext);
+									val->FAstNode = new odl::TOdlAstNode();
+									val->FAstNode->SetAsIntegerValue(integerValue);
+									return OdlParserBase::VALUE_INTEGER;
+								}
+							}
 
 {IDENTIFIER}	  {
 						int const textLength = strlen(yytext);

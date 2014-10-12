@@ -92,6 +92,11 @@ TPropertyBase const* TMetaClassBase::PropertyByName(std::string const& parProper
 		}
 	}
 
+	if (FParentType != nullptr)
+	{
+		return FParentType->PropertyByName(parPropertyName);
+	}
+
 	return nullptr;
 }
 //-------------------------------------------------------------------------------
