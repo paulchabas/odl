@@ -30,7 +30,7 @@ IDENTIFIER {LINK_NAMESPACE}*{PURE_IDENTIFIER}
 
 VALUE_STRING ["][^"]*["]
 VALUE_PURE_INTEGER {DIGIT1}{DIGIT}*|[0]
-VALUE_DECIMAL [.]{VALUE_PURE_INTEGER}
+VALUE_DECIMAL [.]{DIGIT}*
 VALUE_FLOAT_OR_INTEGER {VALUE_PURE_INTEGER}{VALUE_DECIMAL}?
 LINE_COMMENT "//".*\n
 %%
@@ -162,7 +162,7 @@ LINE_COMMENT "//".*\n
 								}
 								if (isFloat)
 								{
-									float const floatValue = atof(yytext);
+									float const floatValue = (float) atof(yytext);
 									val->FAstNode = new odl::TOdlAstNode();
 									val->FAstNode->SetAsFloatValue(floatValue);
 									return OdlParserBase::VALUE_FLOAT;

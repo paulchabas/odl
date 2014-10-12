@@ -1,0 +1,18 @@
+
+
+
+
+root is TTestClass2
+{
+    FFloatVector = [ 2.5, 1.1 ]
+    FFloatFloatPair = [ 2.5, 2.5 ]
+
+    FFloatFloatPairVector = [ [ 1.58, 20.05 ], [ 3.14, 4.75 ] ]
+
+}
+
+
+
+
+
+

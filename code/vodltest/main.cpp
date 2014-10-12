@@ -62,6 +62,9 @@ public:
 
 	std::map< i32, std::vector< std::string > > FMapI32ToVectorString;
 
+	std::vector< float > FFloatVector;
+	std::pair< float, float > FFloatFloatPair;
+
     std::vector< TTestClass* > FVectorOfObjectPointers;
     std::vector< TTestClass > FVectorOfObjectInPlace;
 	std::pair< int, std::string > FIntStringPair;
@@ -89,6 +92,8 @@ BEGIN_METACLASS_CPP(TTestClass2)
 	PROPERTYFIELD(FVector)
 	PROPERTYFIELD(FMapI32ToVectorFloat);
 	PROPERTYFIELD(FMapI32ToVectorString);
+	PROPERTYFIELD(FFloatVector);
+	PROPERTYFIELD(FFloatFloatPair);
 
     PROPERTYFIELD(FObjectPointer);
     PROPERTYFIELD(FObjectInPlace);
@@ -143,7 +148,8 @@ void TrueMain()
     odl::TOdlAstNode const* odlAst = NULL;
 	odl::TOdlParser odlParser;
 	// odlAst = odlParser.ParseFile("Data/main.odl");
-	odlAst = odlParser.ParseFile("Data/circular_reference.odl");
+	// odlAst = odlParser.ParseFile("Data/circular_reference.odl");
+	odlAst = odlParser.ParseFile("Data/float.odl");
    
     {
 		std::cout << "-----------------------------" << std::endl;
@@ -160,7 +166,8 @@ void TrueMain()
     }
 
     {
-        TTestClass2* sum1 = odl::TOdlDatabase::Instance().GetObject_IFP<TTestClass2>("tata/object");
+        // TTestClass2* sum1 = odl::TOdlDatabase::Instance().GetObject_IFP<TTestClass2>("tata/object");
+		TTestClass2* sum1 = odl::TOdlDatabase::Instance().GetObject_IFP<TTestClass2>("root");
         if (sum1)
         {
             int a = 0;
