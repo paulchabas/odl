@@ -17,9 +17,7 @@
 #include <map>
 #include <string>
 
-#include "vOdl/odl.h"
-#include "vOdl/OdlValueDeclaration.h"
-
+#include "vOdl/Odl.h"
 #include "vOdl/OdlParser.h"
 #include "vOdl/OdlInterpreter.h"
 

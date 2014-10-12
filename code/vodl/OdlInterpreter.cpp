@@ -403,9 +403,28 @@ public:
     }
 
     std::vector< TOdlAstNode* > const& Parents() const { return FParents; }
+	
+	bool AddToCircularReferenceCheck(TOdlAstNode* parAstNode)
+	{
+		size_t sizeBefore = FCircularReferenceCheck.size();
+		FCircularReferenceCheck.insert(parAstNode);
+		size_t sizeAfter = FCircularReferenceCheck.size();
+		if (sizeBefore == sizeAfter)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	void RemoveToCircularReferenceCheck(TOdlAstNode* parAstNode)
+	{
+		// FCircularReferenceCheck.
+	}
 
 private:
     std::vector< TOdlAstNode* > FParents;
+	std::set< TOdlAstNode* > FCircularReferenceCheck;
 };
 //-------------------------------------------------------------------------------
 void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parContext)

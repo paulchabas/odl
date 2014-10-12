@@ -855,7 +855,7 @@ case 25:
 								}
 								if (isFloat)
 								{
-									float const floatValue = atof(yytext);
+									float const floatValue = (float) atof(yytext);
 									val->FAstNode = new odl::TOdlAstNode();
 									val->FAstNode->SetAsFloatValue(floatValue);
 									return OdlParserBase::VALUE_FLOAT;

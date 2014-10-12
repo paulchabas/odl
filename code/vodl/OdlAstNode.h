@@ -1,10 +1,6 @@
 #ifndef ODL_AST_NODE_H
 # define ODL_AST_NODE_H
 
-#include <cassert>
-#include <sstream>
-#include <vector>
-
 #include "OdlTokenDatabase.h"
 
 namespace odl

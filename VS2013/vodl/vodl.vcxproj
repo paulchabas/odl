@@ -142,7 +142,6 @@
     <ClInclude Include="..\..\code\vodl\OdlParser.h" />
     <ClInclude Include="..\..\code\vodl\OdlSingleton.h" />
     <ClInclude Include="..\..\code\vodl\OdlTokenDatabase.h" />
-    <ClInclude Include="..\..\code\vodl\OdlValueDeclaration.h" />
     <ClInclude Include="..\..\code\vodl\OldLexer.h" />
     <ClInclude Include="..\..\code\vodl\stdafx.h" />
   </ItemGroup>
@@ -154,7 +153,9 @@
     <ClCompile Include="..\..\code\vodl\OdlInterpreter.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlParser.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlTokenDatabase.cpp" />
-    <ClCompile Include="..\..\code\vodl\OdlValueDeclaration.cpp" />
+    <ClCompile Include="..\..\code\vodl\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

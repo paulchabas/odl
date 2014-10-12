@@ -3,13 +3,6 @@
 
 #include "OdlSingleton.h"
 
-#include <map>
-#include <sstream>
-#include <string>
-#include <hash_map>
-
-
-
 namespace odl
 {
 //--------------------------------------------------------
