@@ -281,8 +281,6 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 
 				std::string autonamedObjectOrEmptyString = parAstNode->IdentifierPointer_IFP() ? parAstNode->IdentifierPointer_IFP()->Identifier() : "";
 				std::string const& objectType = parAstNode->TypeIdentifierPointer()->Identifier();
-				TMetaClassBase const* objectMetaClass = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
-				TOdlObject* odlObject = objectMetaClass->CreateObject();
             
 				if (!autonamedObjectOrEmptyString.empty())
 					parContext.EnterNamespace(autonamedObjectOrEmptyString);
