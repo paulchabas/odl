@@ -82,6 +82,20 @@ BEGIN_METACLASS_CPP(TTestClass)
 }
 END_METACLASS_CPP()
 
+//odl::TMetaClassBase const* TTestClass2::FMetaClassInstance = nullptr;
+//void TTestClass2::RegisterMetaClass()
+//{
+//	TTestClass::RegisterMetaClass();
+//	// odl::TMetaClassBase const* parentMetaClassIfn = odl::TMetaClassTraits< TTestClass >::GetOrCreateMetaClassInstance("TTestClass");
+//
+//	odl::TMetaClassBase* userClassMetaClassBase = odl::TMetaClassTraits< TTestClass2 >::CreateMetaClassInstance("TTestClass2");
+//    odl::TMetaClassBase const* parentTypeMetaClassBase = odl::TMetaClassTraits< parent_type >::GetMetaClassInstance();
+//    userClassMetaClassBase->SetParentType(parentTypeMetaClassBase);
+//    FMetaClassInstance = userClassMetaClassBase;
+//	typedef TTestClass2 TCurrentRegisterClassUserClass;
+//	TTestClass2* dummyObjectPointer = nullptr;
+//	dummyObjectPointer = dummyObjectPointer; // remove warning.
+//
 BEGIN_METACLASS_CPP(TTestClass2)
 {
     PROPERTYFIELD(FString)
@@ -120,8 +134,10 @@ void TrueMain()
     new odl::TOdlDatabase();
 
 	odl::RegisterOdlMetaClasses();
+
+	TTestClass2::RegisterMetaClass();
     TTestClass::RegisterMetaClass();
-    TTestClass2::RegisterMetaClass();
+
 
     {
 	    std::ostringstream oss;

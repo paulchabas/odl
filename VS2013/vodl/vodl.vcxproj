@@ -142,7 +142,6 @@
     <ClInclude Include="..\..\code\vodl\OdlParser.h" />
     <ClInclude Include="..\..\code\vodl\OdlSingleton.h" />
     <ClInclude Include="..\..\code\vodl\OdlTokenDatabase.h" />
-    <ClInclude Include="..\..\code\vodl\OldLexer.h" />
     <ClInclude Include="..\..\code\vodl\stdafx.h" />
   </ItemGroup>
   <ItemGroup>

@@ -129,7 +129,10 @@ struct TRemovePointerForObjectTypeIFN< T* >
 //--------------------------------------------------------
 // TMetaClassTraits
 //--------------------------------------------------------
-struct TOdlNull {};
+struct TOdlNull
+{
+	static void RegisterMetaClass() {}
+};
 // user objects types
 template < typename TUserClass >
 struct TMetaClassTraits
@@ -147,6 +150,17 @@ struct TMetaClassTraits
 		assert(metaClassBase != nullptr);
 		return metaClassBase;
 	}
+
+	//static TMetaClassBase const* GetOrCreateMetaClassInstance(char const* parMetaClassName)
+	//{
+	//	TMetaClassBase const* metaClassBase = TUserClassNoPointer::GetMetaClassInstance();
+	//	if (metaClassBase == nullptr)
+	//	{
+	//		return CreateMetaClassInstance(parMetaClassName);
+	//	}
+
+	//	return metaClassBase;
+	//}
 
 	static TMetaClassBase const* GetMetaClassInstance()
 	{
@@ -687,7 +701,6 @@ public:
 	{
 	}
 
-
     virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
 	{
         TPropertyType** objectPointer = TypedPointer(parObject);
@@ -696,7 +709,6 @@ public:
         assert(false); // failed set object pointer
         return false;
     };
-
 };
 //--------------------------------------------------------
 template < >
@@ -711,7 +723,6 @@ public:
 	{
 	}
 
-
     virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
 	{
         int* intPointer = TypedPointer(parObject);
@@ -720,7 +731,6 @@ public:
         assert(false); // failed set object pointer
         return false;
     };
-
 };
 //--------------------------------------------------------
 template < >
@@ -735,7 +745,6 @@ public:
 	{
 	}
 
-
     virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
 	{
         float* floatPointer = TypedPointer(parObject);
@@ -744,7 +753,6 @@ public:
         assert(false); // failed set float
         return false;
     };
-
 };
 //-------------------------------------------------------------------------------
 template < >
@@ -759,7 +767,6 @@ public:
 	{
 	}
 
-
     virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
 	{
         std::string* stringPointer = TypedPointer(parObject);
@@ -768,7 +775,6 @@ public:
         assert(false); // failed set string
         return false;
     };
-
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
@@ -785,7 +791,6 @@ public:
 		parent_type(parName, parMetaClassBase, parPropertyOffset)
 	{
 	}
-
 
     virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
 	{
@@ -810,7 +815,6 @@ public:
 	{
 	}
 
-
     virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
 	{
         TMapType* mapType = TypedPointer(parObject);
@@ -832,7 +836,6 @@ public:
 		parent_type(parName, parMetaClassBase, parPropertyOffset)
 	{
 	}
-
 
     virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const override
 	{
@@ -860,16 +863,30 @@ public:
 	odl::TMetaClassBase const* TUserClass::FMetaClassInstance = nullptr;																	\
 	void TUserClass::RegisterMetaClass()																									\
 	{																																		\
-		odl::TMetaClassBase* userClassMetaClassBase = odl::TMetaClassTraits< TUserClass >::CreateMetaClassInstance(#TUserClass);			\
-        odl::TMetaClassBase const* parentTypeMetaClassBase = odl::TMetaClassTraits< parent_type >::GetMetaClassInstance();                  \
-        userClassMetaClassBase->SetParentType(parentTypeMetaClassBase);                                                                     \
-        FMetaClassInstance = userClassMetaClassBase;																						\
 		typedef TUserClass TCurrentRegisterClassUserClass;																					\
 		TUserClass* dummyObjectPointer = nullptr;																							\
-		dummyObjectPointer = dummyObjectPointer; // remove warning.
+		dummyObjectPointer = dummyObjectPointer; /* remove warning.	*/																		\
+																																			\
+		parent_type::RegisterMetaClass();																									\
+		odl::TMetaClassBase* userClassMetaClassBase = nullptr;																				\
+		bool registerWasAllreadyDone = true;																								\
+		if (FMetaClassInstance == nullptr)																									\
+		{																																	\
+			registerWasAllreadyDone = false;																								\
+			odl::TMetaClassBase const* parentMetaClassIfn = odl::TMetaClassTraits< parent_type >::GetMetaClassInstance();					\
+			userClassMetaClassBase = odl::TMetaClassTraits< TUserClass >::CreateMetaClassInstance(#TUserClass);								\
+			odl::TMetaClassBase const* parentTypeMetaClassBase = odl::TMetaClassTraits< parent_type >::GetMetaClassInstance();              \
+			userClassMetaClassBase->SetParentType(parentTypeMetaClassBase);                                                                 \
+			FMetaClassInstance = userClassMetaClassBase;																					\
+		}																																	\
+																																			\
+		if (!registerWasAllreadyDone)																										\
+		{																																	\
 
 #define END_METACLASS_CPP()																													\
-		odl::TOdlDatabase::Instance().RegisterMetaClass(userClassMetaClassBase);															\
+		}																																	\
+		if (!registerWasAllreadyDone)																										\
+			odl::TOdlDatabase::Instance().RegisterMetaClass(userClassMetaClassBase);														\
 	}
 
 #define DECLARE_VALUE_METACLASS(TValueType)																						\
