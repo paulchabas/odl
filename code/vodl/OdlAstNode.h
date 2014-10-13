@@ -59,6 +59,8 @@ public:
     TOdlAstNodeType::TType AstNodeType() const { return FAstNodeType; }
 	TOdlAstNodeOperatorType::TType OperatorType() const { return FOperatorType; }
 
+	void BreakPoint();
+
     void SetIdentifierPointer(TOdlAstNode* parIdentifierPointer);
     void AutoGenerateIdentifier();
 

@@ -100,21 +100,21 @@ void TOdlAstNode::Namespace_AppendNamedDeclaration(TOdlAstNode* parDeclaration)
     FNamedDeclarationList.push_back(parDeclaration);
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList)
+void TOdlAstNode::SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList)
 {
     FAstNodeType = TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION;
 
 	assert(parIdentifier != nullptr);
 	assert(parTypeIdentifier != nullptr);
-    assert(parPropertyList != nullptr);
+    assert(parTemplateParameterList != nullptr);
 
 	assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
     assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parPropertyList->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
+    assert(parPropertyList->AstNodeType() == TOdlAstNodeType::TEMPLATE_PARAMETER_LIST);
 
 	FIdentifierPointer = parIdentifier;
 	FTypeIdentifierPointer = parTypeIdentifier;
-	FPropertyDeclarationListPointer = parPropertyList;
+	FPropertyDeclarationListPointer = parTemplateParameterList;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsTemplateParameterList()
@@ -543,6 +543,11 @@ bool TOdlAstNode::IsGlobalNamespace() const
 {
 	assert(FAstNodeType == TOdlAstNodeType::NAMESPACE);
 	return FIdentifierPointer == nullptr;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+void TOdlAstNode::BreakPoint()
+{
+	int a = 0;
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************

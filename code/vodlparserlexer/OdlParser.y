@@ -99,7 +99,7 @@ named_declaration
 	theNamespace->SetIdentifierPointer($2);
 	$$ = theNamespace;
 }
-| TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
+| TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_identifier_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
 	templateDeclaration->SetAsTemplateDeclaration($2, $4, $6);
@@ -136,15 +136,19 @@ anomymous_object_declaration_or_reference
 ;
 
 template_identifier_list
-: IDENTIFIER TOKEN_COMMA template_identifier_list
+: template_identifier_list TOKEN_COMMA IDENTIFIER
 {
-	odl::TOdlAstNode* templateParameterList = $3;
-	templateParameterList->TemplateParameterList_AppendParameter($1);
+	odl::TOdlAstNode* templateParameterList = $1;
+	templateParameterList->BreakPoint();
+	templateParameterList->TemplateParameterList_AppendParameter($3);
 	$$ = templateParameterList;
 }
 | IDENTIFIER
 {
-	$$ = $1;
+	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
+	templateParameterList->SetAsTemplateParameterList();
+	templateParameterList->TemplateParameterList_AppendParameter($1);
+	$$ = templateParameterList;
 }
 |
 {
@@ -157,19 +161,21 @@ template_identifier_list
 template_parameter_list
 : expression TOKEN_COMMA template_parameter_list
 {
-	odl::TOdlAstNode* templateParameterList = $3;
-	templateParameterList->TemplateParameterList_AppendParameter($1);
-	$$ = templateParameterList;
+//	odl::TOdlAstNode* templateParameterList = $3;
+//	templateParameterList->TemplateParameterList_AppendParameter($1);
+	$$ = nullptr;
 }
 | expression
 {
-	$$ = $1;
+//	$$ = $1;
+    $$ = nullptr;
 }
 |
 {
-	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateParameterList();
-	$$ = templateParameterList;
+//	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
+//	templateParameterList->SetAsTemplateParameterList();
+//	$$ = templateParameterList;
+	$$ = nullptr;
 }
 ;
 
