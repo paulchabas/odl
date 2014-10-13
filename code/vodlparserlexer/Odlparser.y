@@ -58,7 +58,7 @@
 %type <FAstNode> property_declaration_list property_declaration
 %type <FAstNode> expression term factor
 %type <FAstNode> vector_value_list vector_value
-%type <FAstNode> template_parameter_list
+%type <FAstNode> template_parameter_list template_identifier_list
 
 %start odl_ast
  

@@ -542,9 +542,9 @@ static const char yytranslate[] = {     0,
 #if YY_OdlParserBase_DEBUG != 0
 static const short yyprhs[] = {     0,
      0,     2,     5,     6,    10,    16,    27,    29,    34,    39,
-    41,    45,    47,    48,    51,    52,    56,    60,    64,    66,
-    70,    74,    78,    80,    84,    87,    89,    91,    93,    95,
-    97,   101,   105,   107
+    41,    45,    47,    48,    52,    54,    55,    58,    59,    63,
+    67,    71,    73,    77,    81,    85,    87,    91,    94,    96,
+    98,   100,   102,   104,   108,   112,   114
 };
 
 static const short yyrhs[] = {    26,
@@ -552,13 +552,14 @@ static const short yyrhs[] = {    26,
     24,     5,    26,     6,     0,    14,    24,     4,    24,     9,
     29,    10,     5,    30,     6,     0,    24,     0,    24,     5,
     30,     6,     0,    24,     9,    29,    10,     0,    15,     0,
-    32,    12,    29,     0,    32,     0,     0,    30,    31,     0,
-     0,    24,    11,    32,     0,    32,    16,    33,     0,    32,
-    17,    33,     0,    33,     0,    33,    18,    34,     0,    33,
-    19,    34,     0,    33,    20,    34,     0,    34,     0,     9,
-    32,    10,     0,    17,    34,     0,    21,     0,    22,     0,
-    23,     0,    35,     0,    28,     0,     7,    36,     8,     0,
-    32,    12,    36,     0,    32,     0,     0
+    24,    12,     0,     0,    24,     0,     0,    32,    12,    29,
+     0,    32,     0,     0,    30,    31,     0,     0,    24,    11,
+    32,     0,    32,    16,    33,     0,    32,    17,    33,     0,
+    33,     0,    33,    18,    34,     0,    33,    19,    34,     0,
+    33,    20,    34,     0,    34,     0,     9,    32,    10,     0,
+    17,    34,     0,    21,     0,    22,     0,    23,     0,    35,
+     0,    28,     0,     7,    36,     8,     0,    32,    12,    36,
+     0,    32,     0,     0
 };
 
 #endif
@@ -566,9 +567,9 @@ static const short yyrhs[] = {    26,
 #if YY_OdlParserBase_DEBUG != 0
 static const short yyrline[] = { 0,
     68,    75,    81,    90,    96,   102,   111,   117,   123,   130,
-   140,   146,   150,   159,   165,   174,   183,   189,   195,   202,
-   208,   214,   220,   227,   231,   237,   241,   245,   249,   253,
-   260,   268,   275,   282
+   139,   145,   149,   158,   164,   168,   177,   183,   192,   201,
+   207,   213,   220,   226,   232,   238,   245,   249,   255,   259,
+   263,   267,   271,   278,   286,   293,   300
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","UNKNOWN",
@@ -579,32 +580,32 @@ static const char * const yytname[] = {   "$","error","$illegal.","UNKNOWN",
 "VALUE_STRING","IDENTIFIER","odl_ast","named_declaration_list","named_declaration",
 "anomymous_object_declaration_or_reference","template_parameter_list","property_declaration_list",
 "property_declaration","expression","term","factor","vector_value","vector_value_list",
-""
+"vector_value_list"
 };
 #endif
 
 static const short yyr1[] = {     0,
     25,    26,    26,    27,    27,    27,    28,    28,    28,    28,
-    29,    29,    29,    30,    30,    31,    32,    32,    32,    33,
-    33,    33,    33,    34,    34,    34,    34,    34,    34,    34,
-    35,    36,    36,    36
+    -1,    -1,    -1,    29,    29,    29,    30,    30,    31,    32,
+    32,    32,    33,    33,    33,    33,    34,    34,    34,    34,
+    34,    34,    34,    35,    36,    36,    36
 };
 
 static const short yyr2[] = {     0,
      1,     2,     0,     3,     5,    10,     1,     4,     4,     1,
-     3,     1,     0,     2,     0,     3,     3,     3,     1,     3,
-     3,     3,     1,     3,     2,     1,     1,     1,     1,     1,
-     3,     3,     1,     0
+     3,     1,     0,     3,     1,     0,     2,     0,     3,     3,
+     3,     1,     3,     3,     3,     1,     3,     2,     1,     1,
+     1,     1,     1,     3,     3,     1,     0
 };
 
 static const short yydefact[] = {     3,
      1,     0,     0,     0,     2,     0,     0,     0,     3,     0,
-    34,     0,    10,     0,    26,    27,    28,     7,    30,     4,
-    19,    23,    29,     0,     0,    33,     0,     0,    25,    15,
-    13,     0,     0,     0,     0,     0,     5,    13,    34,    31,
-    24,     0,     0,    12,    17,    18,    20,    21,    22,     0,
-    32,     8,     0,    14,     9,    13,     0,     0,    11,    15,
-    16,     0,     6,     0,     0,     0
+    37,     0,    10,     0,    29,    30,    31,     7,    33,     4,
+    22,    26,    32,     0,     0,    36,     0,     0,    28,    18,
+    16,     0,     0,     0,     0,     0,     5,    16,    37,    34,
+    27,     0,     0,    15,    20,    21,    23,    24,    25,     0,
+    35,     8,     0,    17,     9,    16,     0,     0,    14,    18,
+    19,     0,     6,     0,     0,     0
 };
 
 static const short yydefgoto[] = {    64,
@@ -1140,7 +1141,7 @@ YYLABEL(yyreduce)
 
 
 /* #line 811 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 1144 "OdlGenParser.cpp"
+#line 1145 "OdlGenParser.cpp"
 
   switch (yyn) {
 
@@ -1224,7 +1225,7 @@ case 10:
 ;
     break;}
 case 11:
-#line 141 "OdlParser.y"
+#line 140 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = yyvsp[0].FAstNode;
 	templateParameterList->TemplateParameterList_AppendParameter(yyvsp[-2].FAstNode);
@@ -1232,13 +1233,13 @@ case 11:
 ;
     break;}
 case 12:
-#line 147 "OdlParser.y"
+#line 146 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 13:
-#line 151 "OdlParser.y"
+#line 150 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
 	templateParameterList->SetAsTemplateParameterList();
@@ -1246,53 +1247,53 @@ case 13:
 ;
     break;}
 case 14:
-#line 160 "OdlParser.y"
+#line 159 "OdlParser.y"
+{
+	odl::TOdlAstNode* templateParameterList = yyvsp[0].FAstNode;
+	templateParameterList->TemplateParameterList_AppendParameter(yyvsp[-2].FAstNode);
+	yyval.FAstNode = templateParameterList;
+;
+    break;}
+case 15:
+#line 165 "OdlParser.y"
+{
+	yyval.FAstNode = yyvsp[0].FAstNode;
+;
+    break;}
+case 16:
+#line 169 "OdlParser.y"
+{
+	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
+	templateParameterList->SetAsTemplateParameterList();
+	yyval.FAstNode = templateParameterList;
+;
+    break;}
+case 17:
+#line 178 "OdlParser.y"
 {
 	odl::TOdlAstNode* propertyDeclList = yyvsp[-1].FAstNode;
 	propertyDeclList->PropertyDeclarationList_AppendPropertyDeclaration(yyvsp[0].FAstNode);
 	yyval.FAstNode = propertyDeclList;
 ;
     break;}
-case 15:
-#line 166 "OdlParser.y"
+case 18:
+#line 184 "OdlParser.y"
 {
 	odl::TOdlAstNode* propertyListNode = new odl::TOdlAstNode();
 	propertyListNode->SetAsPropertyDeclarationList();
 	yyval.FAstNode = propertyListNode;
 ;
     break;}
-case 16:
-#line 175 "OdlParser.y"
+case 19:
+#line 193 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsPropertyDeclaration(yyvsp[-2].FAstNode, yyvsp[0].FAstNode);
 	yyval.FAstNode = node;
 ;
     break;}
-case 17:
-#line 184 "OdlParser.y"
-{
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
-	yyval.FAstNode = node;
-;
-    break;}
-case 18:
-#line 190 "OdlParser.y"
-{
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
-	yyval.FAstNode = node;
-;
-    break;}
-case 19:
-#line 196 "OdlParser.y"
-{
-	yyval.FAstNode = yyvsp[0].FAstNode;
-;
-    break;}
 case 20:
-#line 203 "OdlParser.y"
+#line 202 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1300,7 +1301,7 @@ case 20:
 ;
     break;}
 case 21:
-#line 209 "OdlParser.y"
+#line 208 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1308,72 +1309,94 @@ case 21:
 ;
     break;}
 case 22:
-#line 215 "OdlParser.y"
+#line 214 "OdlParser.y"
+{
+	yyval.FAstNode = yyvsp[0].FAstNode;
+;
+    break;}
+case 23:
+#line 221 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
 	yyval.FAstNode = node;
 ;
     break;}
-case 23:
-#line 221 "OdlParser.y"
+case 24:
+#line 227 "OdlParser.y"
+{
+	odl::TOdlAstNode* node = new odl::TOdlAstNode();
+	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
+	yyval.FAstNode = node;
+;
+    break;}
+case 25:
+#line 233 "OdlParser.y"
+{
+	odl::TOdlAstNode* node = new odl::TOdlAstNode();
+	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
+	yyval.FAstNode = node;
+;
+    break;}
+case 26:
+#line 239 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
-case 24:
-#line 228 "OdlParser.y"
+case 27:
+#line 246 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[-1].FAstNode;
 ;
     break;}
-case 25:
-#line 232 "OdlParser.y"
+case 28:
+#line 250 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(nullptr, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
 	yyval.FAstNode = node;
 ;
     break;}
-case 26:
-#line 238 "OdlParser.y"
-{
-	yyval.FAstNode = yyvsp[0].FAstNode;
-;
-    break;}
-case 27:
-#line 242 "OdlParser.y"
-{
-	yyval.FAstNode = yyvsp[0].FAstNode;
-;
-    break;}
-case 28:
-#line 246 "OdlParser.y"
-{
-	yyval.FAstNode = yyvsp[0].FAstNode;
-;
-    break;}
 case 29:
-#line 250 "OdlParser.y"
+#line 256 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 30:
-#line 254 "OdlParser.y"
+#line 260 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 31:
-#line 261 "OdlParser.y"
+#line 264 "OdlParser.y"
+{
+	yyval.FAstNode = yyvsp[0].FAstNode;
+;
+    break;}
+case 32:
+#line 268 "OdlParser.y"
+{
+	yyval.FAstNode = yyvsp[0].FAstNode;
+;
+    break;}
+case 33:
+#line 272 "OdlParser.y"
+{
+	yyval.FAstNode = yyvsp[0].FAstNode;
+;
+    break;}
+case 34:
+#line 279 "OdlParser.y"
 {
 	odl::TOdlAstNode* vector = yyvsp[-1].FAstNode;
 	yyval.FAstNode = vector;
 ;
     break;}
-case 32:
-#line 269 "OdlParser.y"
+case 35:
+#line 287 "OdlParser.y"
 {
 	odl::TOdlAstNode* vector = yyvsp[0].FAstNode;
 	odl::TOdlAstNode* expression = yyvsp[-2].FAstNode;
@@ -1381,8 +1404,8 @@ case 32:
 	yyval.FAstNode = vector;
 ;
     break;}
-case 33:
-#line 276 "OdlParser.y"
+case 36:
+#line 294 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsVector();
@@ -1390,8 +1413,8 @@ case 33:
 	yyval.FAstNode = node;
 ;
     break;}
-case 34:
-#line 283 "OdlParser.y"
+case 37:
+#line 301 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsVector();
@@ -1602,6 +1625,6 @@ YYLABEL(yyerrhandle)
 /* END */
 
 /* #line 1010 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 1606 "OdlGenParser.cpp"
-#line 291 "OdlParser.y"
+#line 1629 "OdlGenParser.cpp"
+#line 309 "OdlParser.y"
 
