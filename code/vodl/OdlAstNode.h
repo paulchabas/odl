@@ -112,6 +112,7 @@ public:
     std::vector< TOdlAstNode* > const& PropertyList() const { return FPropertyList; }
     std::vector< TOdlAstNode* > const& NamespaceContent() const { return FNamedDeclarationList; }
     std::vector< TOdlAstNode* > const& VectorContent() const { return FVectorContent; }
+	std::vector< TOdlAstNode* > const& TemplateParameterList() const { return FTemplateParameterList; }
     
 	TOdlAstNode* IdentifierPointer() const { assert(FIdentifierPointer != NULL); return FIdentifierPointer; }
     TOdlAstNode* IdentifierPointer_IFP() const { return FIdentifierPointer; }
@@ -121,6 +122,7 @@ public:
     TOdlAstNode* RightExpressionPointer() const { return FRightExpressionPointer; }
     TOdlAstNode* ExpressionPointer() const { return FExpressionPointer; }
     TOdlAstNode* PropertyDeclarationListPointer() const { return FPropertyDeclarationListPointer; }
+	TOdlAstNode* TemplateParameterListPointer() const { return FTemplateParameterListPointer; }
 
     int ValueInteger() const { return FValueInteger; }
     float ValueFloat() const { return FValueFloat; }

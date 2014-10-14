@@ -111,8 +111,8 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
 		break ;
     case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
         {
-            // todo.
-            int a = 0;
+			TOdlAstNode* propertyDeclarationList = parAstNode->PropertyDeclarationListPointer();
+			(*parCallback)(propertyDeclarationList, parContext);
         }
         break ;
     case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
@@ -445,19 +445,43 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 						size_t const invI = parentNamespaceCount - i - 1;
 
 						TOdlAstNode* namespaceCandidate = parentNamespaces[invI];
-						std::vector< TOdlAstNode* > const& namespaceContent = namespaceCandidate->NamespaceContent();
-						for (size_t j = 0; j < namespaceContent.size(); ++j)
+
+						// PAUL(14/10/2014) property filled in case of namespace.
+						if (namespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
 						{
-							TOdlAstNode* candidateNode = namespaceContent[j];
-							std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
-							if (identifierToResolve == declarationIdentifier)
+							std::vector< TOdlAstNode* > const& namespaceContent = namespaceCandidate->NamespaceContent();
+							for (size_t j = 0; j < namespaceContent.size(); ++j)
 							{
-								#if ODL_ENABLE_VERBOSE_DEBUG
-								std::string pathDebug = context.DatabasePath().ToString();
-								#endif
-								parAstNode->ResolveReference(candidateNode);
-								foundReference = candidateNode;
-								break ;
+								TOdlAstNode* candidateNode = namespaceContent[j];
+								std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
+								if (declarationIdentifier == identifierToResolve)
+								{
+									#if ODL_ENABLE_VERBOSE_DEBUG
+									std::string pathDebug = context.DatabasePath().ToString();
+									#endif
+									parAstNode->ResolveReference(candidateNode);
+									foundReference = candidateNode;
+									break ;
+								}
+							}
+						}
+						else if (namespaceCandidate->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION)
+						{
+							std::vector< TOdlAstNode* > const& templateParameters = namespaceCandidate->TemplateParameterListPointer()->TemplateParameterList();
+							for (size_t i = 0; i < templateParameters.size(); ++i)
+							{
+								TOdlAstNode* templateParameter = templateParameters[i];
+								assert(templateParameter->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
+								std::string const& parameterName = templateParameter->Identifier();
+								if (parameterName == identifierToResolve)
+								{
+									#if ODL_ENABLE_VERBOSE_DEBUG
+									std::string pathDebug = context.DatabasePath().ToString();
+									#endif
+									parAstNode->ResolveReference(templateParameter);
+									foundReference = templateParameter;
+									break ;
+								}
 							}
 						}
 					}
@@ -592,6 +616,25 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 				context.LeaveNamespace();
 			context.PopParentNode();
         }
+		break ;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
+		{
+			// resolve resolve arguments.
+			TResolveValueIdentifierInterpretContext& context = static_cast< TResolveValueIdentifierInterpretContext& >(parContext);
+            context.PushParentNode(parAstNode);
+			std::string const& namespaceName = parAstNode->IdentifierPointer()->Identifier();
+			if (!namespaceName.empty())
+				context.EnterNamespace(namespaceName);
+            VisitAst(parAstNode, parContext, ResolveValueIdentifier);
+			if (!namespaceName.empty())
+				context.LeaveNamespace();
+			context.PopParentNode();
+		};
+	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
+		{
+			// resolve parameters.
+			int a = 0;
+		}
 		break ;
     default:
         VisitAst(parAstNode, parContext, ResolveValueIdentifier);
