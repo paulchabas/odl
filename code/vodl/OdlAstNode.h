@@ -16,22 +16,23 @@ namespace TOdlAstNodeType
 
 	enum TType
 	{
-        UNKNOWN                     = 0,
-        IDENTIFIER                  = 1 | EXPRESSION_MASK | VALUE_MASK,
-		VALUE_STRING                = 2 | EXPRESSION_MASK | VALUE_MASK,
-        VALUE_INTEGER               = 3 | EXPRESSION_MASK | VALUE_MASK,
-        VALUE_FLOAT                 = 4 | EXPRESSION_MASK | VALUE_MASK,
-        OPERATOR                    = 5,
-        PROPERTY_DECLARATION        = 6,
-        PROPERTY_DECLARATION_LIST   = 7,
-        OBJECT_DECLARATION          = 8 | EXPRESSION_MASK | VALUE_MASK,
-        NAMESPACE                   = 9,
-		NAMED_DECLARATION			= 10,
-        EXPRESSION                  = 11 | EXPRESSION_MASK,
-		VALUE_VECTOR				= 12 | EXPRESSION_MASK | VALUE_MASK,
-        OBJECT_TEMPLATE_DECLARATION = 13 | TEMPLATE_MASK,
-        OBJECT_TEMPLATE_INSTANCIATION = 14 | TEMPLATE_MASK,
-		TEMPLATE_PARAMETER_LIST		= 15
+        UNKNOWN									= 0,
+        IDENTIFIER								= 1 | EXPRESSION_MASK | VALUE_MASK,
+		VALUE_STRING							= 2 | EXPRESSION_MASK | VALUE_MASK,
+        VALUE_INTEGER							= 3 | EXPRESSION_MASK | VALUE_MASK,
+        VALUE_FLOAT								= 4 | EXPRESSION_MASK | VALUE_MASK,
+        OPERATOR								= 5,
+        PROPERTY_DECLARATION					= 6,
+        PROPERTY_DECLARATION_LIST				= 7,
+        OBJECT_DECLARATION						= 8 | EXPRESSION_MASK | VALUE_MASK,
+        NAMESPACE								= 9,
+		NAMED_DECLARATION						= 10,
+        EXPRESSION								= 11 | EXPRESSION_MASK,
+		VALUE_VECTOR							= 12 | EXPRESSION_MASK | VALUE_MASK,
+        OBJECT_TEMPLATE_DECLARATION				= 13 | TEMPLATE_MASK,
+        OBJECT_TEMPLATE_INSTANCIATION			= 14 | TEMPLATE_MASK,
+		TEMPLATE_DECLARATION_PARAMETER_LIST		= 15,
+		TEMPLATE_INSTANCIATION_PARAMETER_LIST	= 16
 	};
 }
 
@@ -79,9 +80,14 @@ public:
 	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
 
     void SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList);
-    void SetAsTemplateInstanciation();
-	void SetAsTemplateParameterList();
-	void TemplateParameterList_AppendParameter(TOdlAstNode* parIdentifier);
+    void SetAsTemplateInstanciation(TOdlAstNode* parIdentifier, TOdlAstNode* parTemplateExpressionList);
+	void SetAsTemplateDeclarationParameterList();
+	void TemplateDeclarationParameterList_AppendParameter(TOdlAstNode* parIdentifier);
+
+	void SetAsTemplateInstanciationParameterList();
+		 
+	void TemplateInstanciationParameterList_AppendParameter(TOdlAstNode* parExpression);
+
 
     void SetAsPropertyDeclarationList();
     void PropertyDeclarationList_AppendPropertyDeclaration(TOdlAstNode* parPropertyDeclarationNode);

@@ -119,7 +119,7 @@ void TOdlAstNode::SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNo
 
 	assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
     assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parTemplateParameterList->AstNodeType() == TOdlAstNodeType::TEMPLATE_PARAMETER_LIST);
+    assert(parTemplateParameterList->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
 	assert(parPropertyList->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
 
 	FIdentifierPointer = parIdentifier;
@@ -128,21 +128,43 @@ void TOdlAstNode::SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNo
 	FPropertyDeclarationListPointer = parPropertyList;
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateParameterList()
+void TOdlAstNode::SetAsTemplateDeclarationParameterList()
 {
-	FAstNodeType = TOdlAstNodeType::TEMPLATE_PARAMETER_LIST;
+	FAstNodeType = TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST;
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::TemplateParameterList_AppendParameter(TOdlAstNode* parIdentifier)
+void TOdlAstNode::TemplateDeclarationParameterList_AppendParameter(TOdlAstNode* parIdentifier)
 {
-	assert(FAstNodeType == TOdlAstNodeType::TEMPLATE_PARAMETER_LIST);
+	assert(FAstNodeType == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
 	FTemplateParameterList.push_back(parIdentifier);
 }
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+void TOdlAstNode::SetAsTemplateInstanciationParameterList()
+{
+	FAstNodeType = TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+void TOdlAstNode::TemplateInstanciationParameterList_AppendParameter(TOdlAstNode* parExpression)
+{
+	assert(FAstNodeType == TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST);
+
+	assert(parExpression != nullptr);
+	assert((parExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK) != 0);
+	FTemplateParameterList.push_back(parExpression);
+}
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateInstanciation()
+void TOdlAstNode::SetAsTemplateInstanciation(TOdlAstNode* parIdentifier, TOdlAstNode* parTemplateExpressionList)
 {
     FAstNodeType = TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION;
 
+	assert(parIdentifier != nullptr);
+	assert(parTemplateExpressionList != nullptr);
+
+	assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
+	assert(parTemplateExpressionList->AstNodeType() == TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST);
+
+	FIdentifierPointer = parIdentifier;
+	FTemplateParameterListPointer = parTemplateExpressionList;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression)
@@ -303,7 +325,28 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 {
     switch (FAstNodeType)
     {
-	case TOdlAstNodeType::TEMPLATE_PARAMETER_LIST:
+	case TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST:
+		{
+			parOss << '(';
+			bool printComma = false;
+			for (TOdlAstNode const* parameter : FTemplateParameterList)
+			{
+				if (printComma)
+					parOss << ", ";
+				printComma = true;
+				parameter->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+			}
+			parOss << ')';
+		}
+		break ;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
+		{
+			parOss << FIdentifierPointer->Identifier(); // template name.
+			FTemplateParameterListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+			parOss << std::endl;	
+		}
+		break ;
+	case TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST:
 		{
 			parOss << '(';
 			bool printComma = false;

@@ -123,12 +123,8 @@ anomymous_object_declaration_or_reference
 | IDENTIFIER TOKEN_OPEN_PARENTHESIS template_parameter_list TOKEN_CLOSE_PARENTHESIS
 {
 	// template instanciation.
-
-	delete $1;
-	delete $3;
-
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
-	templateDeclaration->SetAsTemplateInstanciation();
+	templateDeclaration->SetAsTemplateInstanciation($1, $3);
 	$$ = templateDeclaration;
 }
 | TOKEN_NULLPTR
@@ -143,20 +139,20 @@ template_identifier_list
 : template_identifier_list TOKEN_COMMA IDENTIFIER
 {
 	odl::TOdlAstNode* templateParameterList = $1;
-	templateParameterList->TemplateParameterList_AppendParameter($3);
+	templateParameterList->TemplateDeclarationParameterList_AppendParameter($3);
 	$$ = templateParameterList;
 }
 | IDENTIFIER
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateParameterList();
-	templateParameterList->TemplateParameterList_AppendParameter($1);
+	templateParameterList->SetAsTemplateDeclarationParameterList();
+	templateParameterList->TemplateDeclarationParameterList_AppendParameter($1);
 	$$ = templateParameterList;
 }
 |
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateParameterList();
+	templateParameterList->SetAsTemplateDeclarationParameterList();
 	$$ = templateParameterList;
 }
 ;
@@ -165,20 +161,20 @@ template_parameter_list
 : template_parameter_list TOKEN_COMMA expression
 {
 	odl::TOdlAstNode* templateParameterList = $1;
-	templateParameterList->TemplateParameterList_AppendParameter($3);
+	templateParameterList->TemplateInstanciationParameterList_AppendParameter($3);
 	$$ = templateParameterList;
 }
 | expression
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateParameterList();
-	templateParameterList->TemplateParameterList_AppendParameter($1);
+	templateParameterList->SetAsTemplateInstanciationParameterList();
+	templateParameterList->TemplateInstanciationParameterList_AppendParameter($1);
 	$$ = templateParameterList;
 }
 |
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateParameterList();
+	templateParameterList->SetAsTemplateInstanciationParameterList();
 	$$ = templateParameterList;
 }
 ;
