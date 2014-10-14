@@ -10,8 +10,10 @@ namespace toto
 }
 
 
-tata is toto/TemplateTest(5, 12.2, "bla", tata)
-
+namespace origin
+{
+	tata is toto/TemplateTest(5, 12.2, "bla", tata)
+}
 
 
 

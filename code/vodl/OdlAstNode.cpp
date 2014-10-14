@@ -153,17 +153,17 @@ void TOdlAstNode::TemplateInstanciationParameterList_AppendParameter(TOdlAstNode
 	FTemplateParameterList.push_back(parExpression);
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateInstanciation(TOdlAstNode* parIdentifier, TOdlAstNode* parTemplateExpressionList)
+void TOdlAstNode::SetAsTemplateInstanciation(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateExpressionList)
 {
     FAstNodeType = TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION;
 
-	assert(parIdentifier != nullptr);
+	assert(parTypeIdentifier != nullptr);
 	assert(parTemplateExpressionList != nullptr);
 
-	assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
+	assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
 	assert(parTemplateExpressionList->AstNodeType() == TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST);
 
-	FIdentifierPointer = parIdentifier;
+	FTypeIdentifierPointer = parTypeIdentifier;
 	FTemplateParameterListPointer = parTemplateExpressionList;
 }
 //-------------------------------------------------------------------------------
@@ -341,7 +341,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 		break ;
 	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
 		{
-			parOss << FIdentifierPointer->Identifier(); // template name.
+			parOss << FTypeIdentifierPointer->Identifier(); // template name.
 			FTemplateParameterListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
 			parOss << std::endl;	
 		}

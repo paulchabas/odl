@@ -80,7 +80,7 @@ public:
 	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
 
     void SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList);
-    void SetAsTemplateInstanciation(TOdlAstNode* parIdentifier, TOdlAstNode* parTemplateExpressionList);
+    void SetAsTemplateInstanciation(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateExpressionList);
 	void SetAsTemplateDeclarationParameterList();
 	void TemplateDeclarationParameterList_AppendParameter(TOdlAstNode* parIdentifier);
 

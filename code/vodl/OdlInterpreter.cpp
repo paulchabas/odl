@@ -156,6 +156,27 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
 			parContext.LeaveNamespace();
 		}
 		break;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
+		{
+			// nothing to do
+			int a = 0;
+		}
+		break ;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
+		{
+			TOdlAstNode const* typeIdentifierPointer = parAstNode->TypeIdentifierPointer();;
+			TOdlAstNode const* templateDeclaration = typeIdentifierPointer->ResolvedReference_ReturnNamedDeclaration();
+			assert(templateDeclaration != nullptr);
+			std::string const& objectType = templateDeclaration->TypeIdentifierPointer()->Identifier();
+			TMetaClassBase const* objectMetaClass = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
+			TOdlObject* odlObject = objectMetaClass->CreateObject();
+			TOdlDatabasePath const& objectNamespaceAndName = parContext.DatabasePath();
+			#ifdef ODL_ENABLE_VERBOSE_DEBUG
+			std::string fordebug = objectNamespaceAndName.ToString();
+			#endif
+			TOdlDatabase::Instance().StoreObject(objectNamespaceAndName, odlObject, objectMetaClass);
+		}
+		break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
 			if (!parAstNode->IsNullPtr())
@@ -273,6 +294,17 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 			context.LeaveNamespace();
         }
         break ;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
+		{
+			// nothing to do.
+			int a = 0;
+		};
+		break ;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
+		{
+			int a = 0;
+		}
+		break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
 		{
 			if (!parAstNode->IsNullPtr())
@@ -638,7 +670,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 		break;
 	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
 		{
-			ResolveValueIdentifier(parAstNode->IdentifierPointer(), parContext);
+			ResolveValueIdentifier(parAstNode->TypeIdentifierPointer(), parContext);
 
 			std::vector< TOdlAstNode* > const& templateParameters = parAstNode->TemplateParameterListPointer()->TemplateParameterList();
 			for (size_t i = 0; i < templateParameters.size(); ++i)
