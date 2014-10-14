@@ -110,10 +110,13 @@ private:
 //-------------------------------------------------------------------------------
 struct TEvalExpressionContext
 {
+	TEvalExpressionContext(
+
 	bool AddToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 	void RemoveToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 
 private:
+	std::vector< TOdlAstNode const* >& TemplateDeclarations;
 	std::vector< TOdlAstNode const* > FCircularReferenceCheck;
 };
 //-------------------------------------------------------------------------------

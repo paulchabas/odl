@@ -9,6 +9,23 @@
 
 namespace odl
 {
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+static TOdlAstNode const* GetTemplateInstanciationDeclaration(TOdlAstNode* parAstNode)
+{
+	assert(parAstNode->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION);
+	TOdlAstNode const* typeIdentifierPointer = parAstNode->TypeIdentifierPointer();
+	assert(typeIdentifierPointer != nullptr);
+	TOdlAstNode const* templateDeclaration = typeIdentifierPointer->ResolvedReference_ReturnNamedDeclaration();
+	assert(templateDeclaration != nullptr);
+	return templateDeclaration;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+static std::string const& GetTemplateInstanciationDeclarationTypeAsString(TOdlAstNode* parAstNode)
+{
+	TOdlAstNode const* templateDeclaration = GetTemplateInstanciationDeclaration(parAstNode);
+	std::string const& objectType = templateDeclaration->TypeIdentifierPointer()->Identifier();
+	return objectType;
+}
 //-------------------------------------------------------------------------------
 class TInterpretContext
 {
@@ -164,10 +181,8 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
 		break ;
 	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
 		{
-			TOdlAstNode const* typeIdentifierPointer = parAstNode->TypeIdentifierPointer();;
-			TOdlAstNode const* templateDeclaration = typeIdentifierPointer->ResolvedReference_ReturnNamedDeclaration();
-			assert(templateDeclaration != nullptr);
-			std::string const& objectType = templateDeclaration->TypeIdentifierPointer()->Identifier();
+			std::string const& objectType = GetTemplateInstanciationDeclarationTypeAsString(parAstNode);
+
 			TMetaClassBase const* objectMetaClass = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 			TOdlObject* odlObject = objectMetaClass->CreateObject();
 			TOdlDatabasePath const& objectNamespaceAndName = parContext.DatabasePath();
@@ -237,29 +252,27 @@ static void EvalExpressionAndStoreProperty(TOdlObject* parObject,
 struct TFillObjectPropertiesInterpretContext : public TInterpretContext
 {
 public:
-    TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath) :
-        TInterpretContext(parDatabasePath),
-        FCurrentObject(nullptr),
-        FMetaClassBase(nullptr)
-    {
-    }
 
-    TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath,
+	TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath,
                                           TOdlObject* parCurrentObject, 
-                                          TMetaClassBase const* parMetaClass) :
+                                          TMetaClassBase const* parMetaClass,
+										  TOdlAstNode const* parTemplateInstanciationNode) :
         TInterpretContext(parDatabasePath),
         FCurrentObject(parCurrentObject),
-        FMetaClassBase(parMetaClass)
+        FMetaClassBase(parMetaClass),
+		FTemplateDeclarationNode(parTemplateInstanciationNode)
     {
 
     }
 
     TOdlObject* CurrentObject() const { assert(FCurrentObject != nullptr); return FCurrentObject; }
     TMetaClassBase const* MetaClassBase() const { assert(FMetaClassBase != nullptr); return FMetaClassBase; }
+	TOdlAstNode const* TemplateInstanciationNode() const { return FTemplateDeclarationNode; }
 
 private:
     TOdlObject*             FCurrentObject;
     TMetaClassBase const*   FMetaClassBase;
+	TOdlAstNode const*		FTemplateDeclarationNode;
 };
 //-------------------------------------------------------------------------------
 void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContext)
@@ -302,7 +315,28 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 		break ;
 	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
 		{
-			int a = 0;
+			TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
+
+			TOdlDatabasePath& templateInstanciationDatabaseName = parContext.DatabasePath();
+			#ifdef ODL_ENABLE_VERBOSE_DEBUG
+			std::string fordebug = templateInstanciationDatabaseName.ToString();
+			#endif
+
+			TOdlAstNode const* templateDeclaration = GetTemplateInstanciationDeclaration(parAstNode);
+			#ifdef ODL_ENABLE_VERBOSE_DEBUG
+			TOdlDatabasePath templateDatabasePath = templateDeclaration->FullDatabasePath();
+			std::string templateDatabasePathForDebug = templateDatabasePath.ToString();
+			#endif
+
+			std::string const& objectType = GetTemplateInstanciationDeclarationTypeAsString(parAstNode);
+			TOdlObject* object = TOdlDatabase::Instance().GetObject(templateInstanciationDatabaseName);
+			TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
+			TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, object, metaClassBase, parAstNode);
+
+			TOdlAstNode* propertiesToFill = templateDeclaration->PropertyDeclarationListPointer();
+			// FillObjectsProperties(
+
+			VisitAst(propertiesToFill, newContext, FillObjectsProperties);
 		}
 		break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
@@ -323,7 +357,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 
 				TOdlObject* object = TOdlDatabase::Instance().GetObject(objectNamespaceAndName);
 				TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
-				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, object, metaClassBase);
+				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, object, metaClassBase, context.TemplateInstanciationNode());
 				VisitAst(parAstNode, newContext, FillObjectsProperties);
 				if (!autonamedObjectOrEmptyString.empty())
 					parContext.LeaveNamespace();
@@ -386,6 +420,18 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 			parContext.LeaveNamespace();
 		}
 		break ;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
+		{
+			std::string const& templateDeclarationName = parAstNode->IdentifierPointer_IFP()->Identifier();
+			parContext.EnterNamespace(templateDeclarationName);
+			#if ODL_ENABLE_VERBOSE_DEBUG
+			std::string debug = parContext.DatabasePath().ToString();
+			#endif
+			parAstNode->SetFullDatabasePath(parContext.DatabasePath());
+			VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
+			parContext.LeaveNamespace();
+		}
+		break;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
 			// ... object declaration store name in IdentifierPointer...
@@ -716,7 +762,7 @@ void InterpretAst(TOdlAstNode* parAstNode)
             
             // fill objets properties.
             assert(databasePath.empty());
-            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath);
+            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, nullptr, nullptr, nullptr);
             VisitAst(parAstNode, fillObjectsPropertiesContext, FillObjectsProperties);
         };
         break ;

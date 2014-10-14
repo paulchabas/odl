@@ -405,6 +405,12 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
                
 				TOdlAstNode* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
                 TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
+				if (namedDeclarationExpression == nullptr)
+				{
+
+				}
+
+				assert(namedDeclarationExpression != nullptr);
                 return EvalExpression(parContext, namedDeclarationExpression, parDatabasePath);
 
 			}
