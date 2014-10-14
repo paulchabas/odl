@@ -1,13 +1,16 @@
 
 
-template TemplateTest is TTestClass2(a,b,c,d)
+namespace toto
 {
-    FInteger = a
+	template TemplateTest is TTestClass2(a,b,c,d)
+	{
+	    FInteger = a
 
+	}
 }
 
 
-toto is TemplateTest(5, 12.2, "bla", toto)
+tata is toto/TemplateTest(5, 12.2, "bla", tata)
 
 
 

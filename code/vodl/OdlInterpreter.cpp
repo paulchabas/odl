@@ -453,15 +453,19 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 							for (size_t j = 0; j < namespaceContent.size(); ++j)
 							{
 								TOdlAstNode* candidateNode = namespaceContent[j];
-								std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
-								if (declarationIdentifier == identifierToResolve)
+								if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION ||
+									candidateNode->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION)
 								{
-									#if ODL_ENABLE_VERBOSE_DEBUG
-									std::string pathDebug = context.DatabasePath().ToString();
-									#endif
-									parAstNode->ResolveReference(candidateNode);
-									foundReference = candidateNode;
-									break ;
+									std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
+									if (declarationIdentifier == identifierToResolve)
+									{
+										#if ODL_ENABLE_VERBOSE_DEBUG
+										std::string pathDebug = context.DatabasePath().ToString();
+										#endif
+										parAstNode->ResolveReference(candidateNode);
+										foundReference = candidateNode;
+										break ;
+									}
 								}
 							}
 						}
@@ -557,7 +561,8 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 							{
 								TOdlAstNode* candidateNode = namespaceContent[j];
 								std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
-								if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
+								if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION ||
+									candidateNode->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION)
 								{
 									if (identifierToResolve == declarationIdentifier)
 									{
@@ -630,10 +635,17 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 				context.LeaveNamespace();
 			context.PopParentNode();
 		};
+		break;
 	case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
 		{
-			// resolve parameters.
-			int a = 0;
+			ResolveValueIdentifier(parAstNode->IdentifierPointer(), parContext);
+
+			std::vector< TOdlAstNode* > const& templateParameters = parAstNode->TemplateParameterListPointer()->TemplateParameterList();
+			for (size_t i = 0; i < templateParameters.size(); ++i)
+			{
+				TOdlAstNode* templateParameter = templateParameters[i];
+				ResolveValueIdentifier(templateParameter, parContext);
+			}
 		}
 		break ;
     default:

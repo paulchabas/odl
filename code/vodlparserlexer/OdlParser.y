@@ -123,6 +123,9 @@ anomymous_object_declaration_or_reference
 | IDENTIFIER TOKEN_OPEN_PARENTHESIS template_parameter_list TOKEN_CLOSE_PARENTHESIS
 {
 	// template instanciation.
+	
+	odl::TOdlAstNode* identifier = $1;
+	identifier->SetAsReferenceToResolve(); // find the required template declaration.
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
 	templateDeclaration->SetAsTemplateInstanciation($1, $3);
 	$$ = templateDeclaration;
