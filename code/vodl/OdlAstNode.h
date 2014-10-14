@@ -78,7 +78,7 @@ public:
 	void SetAsNullPtr();
 	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
 
-    void SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList);
+    void SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList);
     void SetAsTemplateInstanciation();
 	void SetAsTemplateParameterList();
 	void TemplateParameterList_AppendParameter(TOdlAstNode* parIdentifier);
@@ -154,6 +154,7 @@ private:
     TOdlAstNode*                    FTypeIdentifierPointer;
     TOdlAstNode*                    FPropertyDeclarationListPointer;
     TOdlAstNode*                    FExpressionPointer;
+	TOdlAstNode*					FTemplateParameterListPointer;
     
     TOdlAstNode*                    FLeftExpressionPointer;
     TOdlAstNode*                    FOperatorExpressionPointer;

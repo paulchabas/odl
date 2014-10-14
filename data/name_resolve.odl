@@ -1,4 +1,26 @@
 
+
+
+namespace pointdeviedesperso
+{
+	maConstante is 45
+}
+
+monObject is TTestClass
+{
+	FInteger = 4
+	FFloat = 3.2254 + pointdeviedesperso/maConstante
+
+}
+
+autreObject is TTestClass2
+{
+	FTestClassBasePointer = monObject
+}
+
+
+
+
 namespace tata
 {
 	namespace toto

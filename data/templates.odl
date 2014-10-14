@@ -2,9 +2,9 @@
 
 
 
-template TemplateTest is TTestClas2(a,b,c,d)
+template TemplateTest is TTestClass2(a,b,c,d)
 {
-    
+    FInteger = 4
 
 }
 

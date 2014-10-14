@@ -34,6 +34,7 @@ TOdlAstNode::TOdlAstNode() :
     FTypeIdentifierPointer(nullptr),
     FPropertyDeclarationListPointer(nullptr),
     FExpressionPointer(nullptr),
+	FTemplateParameterListPointer(nullptr),
     FLeftExpressionPointer(nullptr),
     FOperatorExpressionPointer(nullptr),
     FRightExpressionPointer(nullptr),
@@ -64,6 +65,12 @@ TOdlAstNode::~TOdlAstNode()
         TOdlAstNode const* node = FVectorContent[i];
         delete node;
     }
+
+	for (size_t i = 0; i < FTemplateParameterList.size(); ++i)
+	{
+		TOdlAstNode const* node = FTemplateParameterList[i];
+        delete node;
+	}
     
     delete FIdentifierPointer;
     delete FTypeIdentifierPointer;
@@ -72,6 +79,7 @@ TOdlAstNode::~TOdlAstNode()
     delete FLeftExpressionPointer;
     delete FOperatorExpressionPointer;
     delete FRightExpressionPointer;
+	delete FTemplateParameterListPointer;
 
     FResolvedReferenceWeak = nullptr; // weak reference.
 }
@@ -100,21 +108,24 @@ void TOdlAstNode::Namespace_AppendNamedDeclaration(TOdlAstNode* parDeclaration)
     FNamedDeclarationList.push_back(parDeclaration);
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList)
+void TOdlAstNode::SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList)
 {
     FAstNodeType = TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION;
 
 	assert(parIdentifier != nullptr);
 	assert(parTypeIdentifier != nullptr);
     assert(parTemplateParameterList != nullptr);
+	assert(parPropertyList != nullptr);
 
 	assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
     assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parPropertyList->AstNodeType() == TOdlAstNodeType::TEMPLATE_PARAMETER_LIST);
+    assert(parTemplateParameterList->AstNodeType() == TOdlAstNodeType::TEMPLATE_PARAMETER_LIST);
+	assert(parPropertyList->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
 
 	FIdentifierPointer = parIdentifier;
 	FTypeIdentifierPointer = parTypeIdentifier;
-	FPropertyDeclarationListPointer = parTemplateParameterList;
+	FTemplateParameterListPointer = parTemplateParameterList;
+	FPropertyDeclarationListPointer = parPropertyList;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsTemplateParameterList()
@@ -292,6 +303,35 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 {
     switch (FAstNodeType)
     {
+	case TOdlAstNodeType::TEMPLATE_PARAMETER_LIST:
+		{
+			parOss << '(';
+			bool printComma = false;
+			for (TOdlAstNode const* parameter : FTemplateParameterList)
+			{
+				if (printComma)
+					parOss << ", ";
+				printComma = true;
+				parOss << parameter->Identifier();
+			}
+			parOss << ')';
+		}
+		break;
+	case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
+		{
+			Indent(parOss, parIndentLevel);
+			parOss << "template ";
+			parOss << FIdentifierPointer->Identifier();
+			parOss << " is ";
+			parOss << FTypeIdentifierPointer->Identifier();
+			FTemplateParameterListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+			parOss << std::endl;
+			Indent(parOss, parIndentLevel) << "{" << std::endl;
+			FPropertyDeclarationListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+			Indent(parOss, parIndentLevel) << "}";
+			parOss << std::endl;
+		}
+		break ;
 	case TOdlAstNodeType::EXPRESSION:
         {
             bool anonymous = FIdentifierPointer == nullptr;
