@@ -226,12 +226,12 @@ static void EvalExpressionAndStoreProperty(TOdlObject* parObject,
                                            TMetaClassBase const* parObjectMetaClassBase,
                                            TPropertyBase const* parPropertyBase, 
                                            TOdlAstNode const* parExpression,
-                                           TOdlDatabasePath const& parDatabasePath)
+                                           TTemplateDeclarations& parTemplateDeclarations)
 {
     TMetaClassBase const* propertyMetaClassBase = parPropertyBase->Type();
 
-	TEvalExpressionContext evalExpressionContext;
-    TOdlExpression const result = EvalExpression(evalExpressionContext, parExpression, parDatabasePath);
+	TEvalExpressionContext evalExpressionContext(parTemplateDeclarations);
+    TOdlExpression const result = EvalExpression(evalExpressionContext, parExpression);
 
 	if (result.Type() != TOdlExpression::UNTYPED)
 	{
@@ -378,7 +378,8 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
             std::string const& propertyName = parAstNode->IdentifierPointer()->Identifier();
             TPropertyBase const* propertyBase = objectMetaClassBase->PropertyByName(propertyName);
             TOdlAstNode const* expression = parAstNode->ExpressionPointer();
-            EvalExpressionAndStoreProperty(object, objectMetaClassBase, propertyBase, expression, odlDatabasePath);
+			TTemplateDeclarations emptyTemplateDeclarations;
+            EvalExpressionAndStoreProperty(object, objectMetaClassBase, propertyBase, expression, emptyTemplateDeclarations);
 
             VisitAst(parAstNode, context, FillObjectsProperties);
         }

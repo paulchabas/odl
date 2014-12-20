@@ -108,15 +108,17 @@ private:
     TMetaClassBase const*       FMetaClassBase;
 };
 //-------------------------------------------------------------------------------
+typedef std::vector< TOdlAstNode const* > TTemplateDeclarations;
+//-------------------------------------------------------------------------------
 struct TEvalExpressionContext
 {
-	TEvalExpressionContext(
+	TEvalExpressionContext(TTemplateDeclarations& parTemplateDeclarations);
 
 	bool AddToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 	void RemoveToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 
 private:
-	std::vector< TOdlAstNode const* >& TemplateDeclarations;
+	std::vector< TOdlAstNode const* >& FTemplateDeclarations;
 	std::vector< TOdlAstNode const* > FCircularReferenceCheck;
 };
 //-------------------------------------------------------------------------------
@@ -144,7 +146,7 @@ private:
 	bool FCheckResult;
 };
 //-------------------------------------------------------------------------------
-TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode const* parExpression, TOdlDatabasePath const& parDatabasePath);
+TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode const* parExpression);
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------

@@ -316,7 +316,7 @@ TOdlExpression EvalOperationModulo(TOdlExpression& parLeft, TOdlExpression& parR
     return TOdlExpression();
 }
 //-------------------------------------------------------------------------------
-TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode const* parExpression, TOdlDatabasePath const& parDatabasePath)
+TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode const* parExpression)
 {
 	TScopedCheckCircularReferenceCheck scopedCheck(parContext, parExpression);
 
@@ -389,7 +389,7 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
                         size_t invI = childCount - i - 1;
                         TOdlAstNode const* child = childs[invI];
                     
-                        vectorContent[i] = EvalExpression(parContext, child, parDatabasePath);
+                        vectorContent[i] = EvalExpression(parContext, child);
                     }
                 }
 
@@ -411,7 +411,7 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 				}
 
 				assert(namedDeclarationExpression != nullptr);
-                return EvalExpression(parContext, namedDeclarationExpression, parDatabasePath);
+                return EvalExpression(parContext, namedDeclarationExpression);
 
 			}
 			break ;
@@ -431,10 +431,10 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-                TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+                TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
-                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(parContext, right);
 				if (rightResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
 
@@ -453,11 +453,11 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 				TOdlExpression leftResult(0);
 				if (left != nullptr)
 				{
-					leftResult = EvalExpression(parContext, left, parDatabasePath);
+					leftResult = EvalExpression(parContext, left);
 					if (leftResult.Type() == TOdlExpression::UNTYPED)
 						return TOdlExpression();
 				}
-                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(parContext, right);
 				if (rightResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
 
@@ -473,10 +473,10 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-				TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
-                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(parContext, right);
 				if (rightResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
 
@@ -492,10 +492,10 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-				TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
-                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(parContext, right);
 				if (rightResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
 
@@ -511,10 +511,10 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
                 TOdlAstNode const* left = parExpression->LeftExpressionPointer();
                 TOdlAstNode const* right = parExpression->RightExpressionPointer();
 
-				TOdlExpression leftResult = EvalExpression(parContext, left, parDatabasePath);
+				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
-                TOdlExpression rightResult = EvalExpression(parContext, right, parDatabasePath);
+                TOdlExpression rightResult = EvalExpression(parContext, right);
 				if (rightResult.Type() == TOdlExpression::UNTYPED)
 					return TOdlExpression();
 				if (ExpressionTypeCompatible(leftResult, rightResult))
@@ -535,6 +535,12 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+TEvalExpressionContext::TEvalExpressionContext(TTemplateDeclarations& parTemplateDeclarations) :
+	FTemplateDeclarations(parTemplateDeclarations)
+{
+
+}
+//------------------------------------------------------------------------------
 bool TEvalExpressionContext::AddToCircularReferenceCheck(TOdlAstNode const* parAstNode)
 {
 	auto it = std::find(FCircularReferenceCheck.begin(), FCircularReferenceCheck.end(), parAstNode);
