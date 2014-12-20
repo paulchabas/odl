@@ -48,7 +48,7 @@
 %type <FAstNode> property_declaration_list property_declaration
 %type <FAstNode> expression term factor
 %type <FAstNode> vector_value_list vector_value
-%type <FAstNode> template_parameter_list template_identifier_list
+%type <FAstNode> template_parameter_list template_declaration_parameter_list
 
 %start odl_ast
  
@@ -89,7 +89,7 @@ named_declaration
 	theNamespace->SetIdentifierPointer($2);
 	$$ = theNamespace;
 }
-| TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_identifier_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
+| TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_declaration_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
 	templateDeclaration->SetAsTemplateDeclaration($2, $4, $6, $9);
@@ -128,18 +128,22 @@ anomymous_object_declaration_or_reference
 }
 ;
 
-template_identifier_list
-: template_identifier_list TOKEN_COMMA IDENTIFIER
+template_declaration_parameter_list
+: template_declaration_parameter_list TOKEN_COMMA IDENTIFIER
 {
 	odl::TOdlAstNode* templateParameterList = $1;
-	templateParameterList->TemplateDeclarationParameterList_AppendParameter($3);
+	odl::TOdlAstNode* templateDeclarationParameter = $3;
+	templateDeclarationParameter->SetAsTemplateDeclarationParameter();
+	templateParameterList->TemplateDeclarationParameterList_AppendParameter(templateDeclarationParameter);
 	$$ = templateParameterList;
 }
 | IDENTIFIER
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
 	templateParameterList->SetAsTemplateDeclarationParameterList();
-	templateParameterList->TemplateDeclarationParameterList_AppendParameter($1);
+	odl::TOdlAstNode* templateDeclarationParameter = $1;
+	templateDeclarationParameter->SetAsTemplateDeclarationParameter();
+	templateParameterList->TemplateDeclarationParameterList_AppendParameter(templateDeclarationParameter);
 	$$ = templateParameterList;
 }
 |

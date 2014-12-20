@@ -85,8 +85,9 @@ public:
 	void TemplateDeclarationParameterList_AppendParameter(TOdlAstNode* parIdentifier);
 
 	void SetAsTemplateInstanciationParameterList();
-		 
 	void TemplateInstanciationParameterList_AppendParameter(TOdlAstNode* parExpression);
+	bool IsTemplateDeclarationParameter() const { return FIsTemplateDeclarationParameter; }
+	void SetAsTemplateDeclarationParameter() { FIsTemplateDeclarationParameter = true; }
 
 
     void SetAsPropertyDeclarationList();
@@ -173,6 +174,7 @@ private:
     bool                            FAnonymousDeclaration;
     bool                            FReferenceToResolve;
     bool                            FIsValueReference;
+	bool							FIsTemplateDeclarationParameter;
 	TOdlDatabasePath				FFullDatabasePath;
 };
 //-------------------------------------------------------------------------------

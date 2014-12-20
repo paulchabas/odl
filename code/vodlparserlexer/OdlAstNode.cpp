@@ -40,7 +40,8 @@ TOdlAstNode::TOdlAstNode() :
     FResolvedReferenceWeak(nullptr),
     FAnonymousDeclaration(true), // value reset by named declarations.
     FReferenceToResolve(false),
-    FIsValueReference(false)
+    FIsValueReference(false),
+	FIsTemplateDeclarationParameter(false)
 {
 
 }
@@ -135,6 +136,7 @@ void TOdlAstNode::SetAsTemplateDeclarationParameterList()
 void TOdlAstNode::TemplateDeclarationParameterList_AppendParameter(TOdlAstNode* parIdentifier)
 {
 	assert(FAstNodeType == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
+	assert(parIdentifier->IsTemplateDeclarationParameter());
 	FTemplateParameterList.push_back(parIdentifier);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
