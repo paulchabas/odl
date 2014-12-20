@@ -6,7 +6,7 @@
   */
 
 
-#line 1 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 1 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Bob Corbett and Richard Stallman
@@ -80,7 +80,7 @@ void *alloca ();
 #include <stdio.h>
 #define YYBISON 1  
 
-/* #line 73 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
+/* #line 73 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
 #line 85 "OdlGenParser.cpp"
 #define YY_OdlParserBase_LSP_NEEDED 
 #define YY_OdlParserBase_ERROR_BODY  = 0
@@ -91,28 +91,18 @@ void *alloca ();
 #line 11 "OdlParser.y"
 
 
-#ifdef _DEBUG
-   #ifndef DBG_NEW
-      #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-      #define new DBG_NEW
-   #endif
-#endif  // _DEBUG
-
-#include <iostream>
-#include <fstream>
-#include <string>
-
-#include "vOdl/OdlAstNode.h"
+#include "BasicTypes.h"
+#include "OdlAstNode.h"
 
 
-#line 28 "OdlParser.y"
+#line 18 "OdlParser.y"
 typedef union
 {
 	odl::TOdlAstNode* FAstNode;
 } yy_OdlParserBase_stype;
 #define YY_OdlParserBase_STYPE yy_OdlParserBase_stype
 
-#line 73 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 73 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
 /* %{ and %header{ and %union, during decl */
 #define YY_OdlParserBase_BISON 1
 #ifndef YY_OdlParserBase_COMPATIBILITY
@@ -158,36 +148,36 @@ typedef union
 
 #ifndef YY_OdlParserBase_PURE
 
-/* #line 117 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 163 "OdlGenParser.cpp"
+/* #line 117 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 153 "OdlGenParser.cpp"
 
-#line 117 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 117 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
 /*  YY_OdlParserBase_PURE */
 #endif
 
 /* section apres lecture def, avant lecture grammaire S2 */
 
-/* #line 121 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 172 "OdlGenParser.cpp"
+/* #line 121 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 162 "OdlGenParser.cpp"
 
-#line 121 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 121 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
 /* prefix */
 #ifndef YY_OdlParserBase_DEBUG
 
-/* #line 123 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 179 "OdlGenParser.cpp"
+/* #line 123 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 169 "OdlGenParser.cpp"
 
-#line 123 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 123 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
 /* YY_OdlParserBase_DEBUG */
 #endif
 
 
 #ifndef YY_OdlParserBase_LSP_NEEDED
 
-/* #line 128 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 189 "OdlGenParser.cpp"
+/* #line 128 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 179 "OdlGenParser.cpp"
 
-#line 128 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 128 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
  /* YY_OdlParserBase_LSP_NEEDED*/
 #endif
 
@@ -297,8 +287,8 @@ typedef
 #ifndef YY_USE_CLASS
 /* TOKEN C */
 
-/* #line 236 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 302 "OdlGenParser.cpp"
+/* #line 236 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 292 "OdlGenParser.cpp"
 #define	UNKNOWN	258
 #define	TOKEN_IS	259
 #define	TOKEN_OPEN_BRACE	260
@@ -323,7 +313,7 @@ typedef
 #define	IDENTIFIER	279
 
 
-#line 236 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 236 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
  /* #defines tokens */
 #else
 /* CLASS */
@@ -369,8 +359,8 @@ public:
 #if YY_OdlParserBase_USE_CONST_TOKEN != 0
 /* static const int token ... */
 
-/* #line 280 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 374 "OdlGenParser.cpp"
+/* #line 280 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 364 "OdlGenParser.cpp"
 static const int UNKNOWN;
 static const int TOKEN_IS;
 static const int TOKEN_OPEN_BRACE;
@@ -395,13 +385,13 @@ static const int VALUE_STRING;
 static const int IDENTIFIER;
 
 
-#line 280 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 280 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
  /* decl const */
 #else
 enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 
-/* #line 283 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 405 "OdlGenParser.cpp"
+/* #line 283 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 395 "OdlGenParser.cpp"
 	,UNKNOWN=258
 	,TOKEN_IS=259
 	,TOKEN_OPEN_BRACE=260
@@ -426,7 +416,7 @@ enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 	,IDENTIFIER=279
 
 
-#line 283 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 283 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
  /* enum token */
      }; /* end of enum declaration */
 #endif
@@ -459,8 +449,8 @@ public:
 /* other declare folow */
 #if YY_OdlParserBase_USE_CONST_TOKEN != 0
 
-/* #line 314 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 464 "OdlGenParser.cpp"
+/* #line 314 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 454 "OdlGenParser.cpp"
 const int YY_OdlParserBase_CLASS::UNKNOWN=258;
 const int YY_OdlParserBase_CLASS::TOKEN_IS=259;
 const int YY_OdlParserBase_CLASS::TOKEN_OPEN_BRACE=260;
@@ -485,7 +475,7 @@ const int YY_OdlParserBase_CLASS::VALUE_STRING=278;
 const int YY_OdlParserBase_CLASS::IDENTIFIER=279;
 
 
-#line 314 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 314 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
  /* const YY_OdlParserBase_CLASS::token */
 #endif
 /*apres const  */
@@ -498,8 +488,8 @@ YY_OdlParserBase_CONSTRUCTOR_CODE;
 };
 #endif
 
-/* #line 325 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 503 "OdlGenParser.cpp"
+/* #line 325 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 493 "OdlGenParser.cpp"
 
 
 #define	YYFINAL		69
@@ -566,10 +556,10 @@ static const short yyrhs[] = {    26,
 
 #if YY_OdlParserBase_DEBUG != 0
 static const short yyrline[] = { 0,
-    68,    75,    81,    90,    96,   102,   111,   117,   123,   133,
-   142,   148,   155,   164,   170,   177,   186,   192,   201,   210,
-   216,   222,   229,   235,   241,   247,   254,   258,   264,   268,
-   272,   276,   280,   287,   295,   302,   309
+    58,    65,    71,    80,    86,    92,   101,   107,   113,   123,
+   132,   138,   145,   154,   160,   167,   176,   182,   191,   200,
+   206,   212,   219,   225,   231,   237,   244,   248,   254,   258,
+   262,   266,   270,   277,   285,   292,   299
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","UNKNOWN",
@@ -652,7 +642,7 @@ static const short yycheck[] = {     8,
      9,    39,    62
 };
 
-#line 325 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 325 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
  /* fattrs + tables */
 
 /* parser code folow  */
@@ -1140,19 +1130,19 @@ YYLABEL(yyreduce)
 #endif
 
 
-/* #line 811 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 1145 "OdlGenParser.cpp"
+/* #line 811 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 1135 "OdlGenParser.cpp"
 
   switch (yyn) {
 
 case 1:
-#line 69 "OdlParser.y"
+#line 59 "OdlParser.y"
 {
 	outputAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 2:
-#line 76 "OdlParser.y"
+#line 66 "OdlParser.y"
 {
 	odl::TOdlAstNode* theNamespace = yyvsp[-1].FAstNode;
 	theNamespace->Namespace_AppendNamedDeclaration(yyvsp[0].FAstNode);
@@ -1160,7 +1150,7 @@ case 2:
 ;
     break;}
 case 3:
-#line 82 "OdlParser.y"
+#line 72 "OdlParser.y"
 {
 	odl::TOdlAstNode* theNamespace = new odl::TOdlAstNode();
 	theNamespace->SetAsNamespace();
@@ -1168,7 +1158,7 @@ case 3:
 ;
     break;}
 case 4:
-#line 91 "OdlParser.y"
+#line 81 "OdlParser.y"
 {
 	odl::TOdlAstNode* namedDeclaration = new odl::TOdlAstNode();
 	namedDeclaration->SetAsNamedDeclaration(yyvsp[-2].FAstNode, yyvsp[0].FAstNode);
@@ -1176,7 +1166,7 @@ case 4:
 ;
     break;}
 case 5:
-#line 97 "OdlParser.y"
+#line 87 "OdlParser.y"
 {
 	odl::TOdlAstNode* theNamespace = yyvsp[-1].FAstNode;
 	theNamespace->SetIdentifierPointer(yyvsp[-3].FAstNode);
@@ -1184,7 +1174,7 @@ case 5:
 ;
     break;}
 case 6:
-#line 103 "OdlParser.y"
+#line 93 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
 	templateDeclaration->SetAsTemplateDeclaration(yyvsp[-8].FAstNode, yyvsp[-6].FAstNode, yyvsp[-4].FAstNode, yyvsp[-1].FAstNode);
@@ -1192,7 +1182,7 @@ case 6:
 ;
     break;}
 case 7:
-#line 112 "OdlParser.y"
+#line 102 "OdlParser.y"
 {
 	odl::TOdlAstNode* reference = yyvsp[0].FAstNode;
 	reference->SetAsReferenceToResolve();	
@@ -1200,7 +1190,7 @@ case 7:
 ;
     break;}
 case 8:
-#line 118 "OdlParser.y"
+#line 108 "OdlParser.y"
 {
 	odl::TOdlAstNode* objectDeclaration = new odl::TOdlAstNode();
 	objectDeclaration->SetAsObjectDeclaration(yyvsp[-3].FAstNode, yyvsp[-1].FAstNode);
@@ -1208,7 +1198,7 @@ case 8:
 ;
     break;}
 case 9:
-#line 124 "OdlParser.y"
+#line 114 "OdlParser.y"
 {
 	// template instanciation.
 	
@@ -1220,7 +1210,7 @@ case 9:
 ;
     break;}
 case 10:
-#line 134 "OdlParser.y"
+#line 124 "OdlParser.y"
 {
 	odl::TOdlAstNode* theNullptr = new odl::TOdlAstNode();
 	theNullptr->SetAsNullPtr();
@@ -1228,7 +1218,7 @@ case 10:
 ;
     break;}
 case 11:
-#line 143 "OdlParser.y"
+#line 133 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = yyvsp[-2].FAstNode;
 	templateParameterList->TemplateDeclarationParameterList_AppendParameter(yyvsp[0].FAstNode);
@@ -1236,7 +1226,7 @@ case 11:
 ;
     break;}
 case 12:
-#line 149 "OdlParser.y"
+#line 139 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
 	templateParameterList->SetAsTemplateDeclarationParameterList();
@@ -1245,7 +1235,7 @@ case 12:
 ;
     break;}
 case 13:
-#line 156 "OdlParser.y"
+#line 146 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
 	templateParameterList->SetAsTemplateDeclarationParameterList();
@@ -1253,7 +1243,7 @@ case 13:
 ;
     break;}
 case 14:
-#line 165 "OdlParser.y"
+#line 155 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = yyvsp[-2].FAstNode;
 	templateParameterList->TemplateInstanciationParameterList_AppendParameter(yyvsp[0].FAstNode);
@@ -1261,7 +1251,7 @@ case 14:
 ;
     break;}
 case 15:
-#line 171 "OdlParser.y"
+#line 161 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
 	templateParameterList->SetAsTemplateInstanciationParameterList();
@@ -1270,7 +1260,7 @@ case 15:
 ;
     break;}
 case 16:
-#line 178 "OdlParser.y"
+#line 168 "OdlParser.y"
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
 	templateParameterList->SetAsTemplateInstanciationParameterList();
@@ -1278,7 +1268,7 @@ case 16:
 ;
     break;}
 case 17:
-#line 187 "OdlParser.y"
+#line 177 "OdlParser.y"
 {
 	odl::TOdlAstNode* propertyDeclList = yyvsp[-1].FAstNode;
 	propertyDeclList->PropertyDeclarationList_AppendPropertyDeclaration(yyvsp[0].FAstNode);
@@ -1286,7 +1276,7 @@ case 17:
 ;
     break;}
 case 18:
-#line 193 "OdlParser.y"
+#line 183 "OdlParser.y"
 {
 	odl::TOdlAstNode* propertyListNode = new odl::TOdlAstNode();
 	propertyListNode->SetAsPropertyDeclarationList();
@@ -1294,7 +1284,7 @@ case 18:
 ;
     break;}
 case 19:
-#line 202 "OdlParser.y"
+#line 192 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsPropertyDeclaration(yyvsp[-2].FAstNode, yyvsp[0].FAstNode);
@@ -1302,7 +1292,7 @@ case 19:
 ;
     break;}
 case 20:
-#line 211 "OdlParser.y"
+#line 201 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1310,7 +1300,7 @@ case 20:
 ;
     break;}
 case 21:
-#line 217 "OdlParser.y"
+#line 207 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1318,13 +1308,13 @@ case 21:
 ;
     break;}
 case 22:
-#line 223 "OdlParser.y"
+#line 213 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 23:
-#line 230 "OdlParser.y"
+#line 220 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1332,7 +1322,7 @@ case 23:
 ;
     break;}
 case 24:
-#line 236 "OdlParser.y"
+#line 226 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1340,7 +1330,7 @@ case 24:
 ;
     break;}
 case 25:
-#line 242 "OdlParser.y"
+#line 232 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(yyvsp[-2].FAstNode, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1348,19 +1338,19 @@ case 25:
 ;
     break;}
 case 26:
-#line 248 "OdlParser.y"
+#line 238 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 27:
-#line 255 "OdlParser.y"
+#line 245 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[-1].FAstNode;
 ;
     break;}
 case 28:
-#line 259 "OdlParser.y"
+#line 249 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsExpression(nullptr, yyvsp[-1].FAstNode, yyvsp[0].FAstNode);
@@ -1368,44 +1358,44 @@ case 28:
 ;
     break;}
 case 29:
-#line 265 "OdlParser.y"
+#line 255 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 30:
-#line 269 "OdlParser.y"
+#line 259 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 31:
-#line 273 "OdlParser.y"
+#line 263 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 32:
-#line 277 "OdlParser.y"
+#line 267 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 33:
-#line 281 "OdlParser.y"
+#line 271 "OdlParser.y"
 {
 	yyval.FAstNode = yyvsp[0].FAstNode;
 ;
     break;}
 case 34:
-#line 288 "OdlParser.y"
+#line 278 "OdlParser.y"
 {
 	odl::TOdlAstNode* vector = yyvsp[-1].FAstNode;
 	yyval.FAstNode = vector;
 ;
     break;}
 case 35:
-#line 296 "OdlParser.y"
+#line 286 "OdlParser.y"
 {
 	odl::TOdlAstNode* vector = yyvsp[0].FAstNode;
 	odl::TOdlAstNode* expression = yyvsp[-2].FAstNode;
@@ -1414,7 +1404,7 @@ case 35:
 ;
     break;}
 case 36:
-#line 303 "OdlParser.y"
+#line 293 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsVector();
@@ -1423,7 +1413,7 @@ case 36:
 ;
     break;}
 case 37:
-#line 310 "OdlParser.y"
+#line 300 "OdlParser.y"
 {
 	odl::TOdlAstNode* node = new odl::TOdlAstNode();
 	node->SetAsVector();
@@ -1432,7 +1422,7 @@ case 37:
     break;}
 }
 
-#line 811 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc"
+#line 811 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc"
    /* the action file gets copied in in place of this dollarsign  */
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1633,7 +1623,7 @@ YYLABEL(yyerrhandle)
 
 /* END */
 
-/* #line 1010 "D:\\GitHub\\odl\\extern\\flexppbisonpp\\bison.cc" */
-#line 1638 "OdlGenParser.cpp"
-#line 318 "OdlParser.y"
+/* #line 1010 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.cc" */
+#line 1628 "OdlGenParser.cpp"
+#line 308 "OdlParser.y"
 

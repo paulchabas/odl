@@ -138,12 +138,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\code\vodlparserlexer\OdlAstNode.cpp" />
     <ClCompile Include="..\..\code\vodlparserlexer\OdlGenLexer.cpp" />
     <ClCompile Include="..\..\code\vodlparserlexer\OdlGenParser.cpp" />
+    <ClCompile Include="..\..\code\vodlparserlexer\OdlTokenDatabase.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\code\vodlparserlexer\BasicTypes.h" />
+    <ClInclude Include="..\..\code\vodlparserlexer\OdlAstNode.h" />
     <ClInclude Include="..\..\code\vodlparserlexer\OdlGenLexer.h" />
     <ClInclude Include="..\..\code\vodlparserlexer\OdlGenParser.h" />
+    <ClInclude Include="..\..\code\vodlparserlexer\OdlSingleton.h" />
+    <ClInclude Include="..\..\code\vodlparserlexer\OdlTokenDatabase.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\vodlparserlexer\OdlLexer.l">

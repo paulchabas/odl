@@ -133,25 +133,19 @@
     <None Include="..\..\code\vodl\Data\main.odl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\code\vodl\BasicTypes.h" />
     <ClInclude Include="..\..\code\vodl\Odl.h" />
-    <ClInclude Include="..\..\code\vodl\OdlAstNode.h" />
     <ClInclude Include="..\..\code\vodl\OdlDatabase.h" />
     <ClInclude Include="..\..\code\vodl\OdlExpression.h" />
     <ClInclude Include="..\..\code\vodl\OdlInterpreter.h" />
     <ClInclude Include="..\..\code\vodl\OdlParser.h" />
-    <ClInclude Include="..\..\code\vodl\OdlSingleton.h" />
-    <ClInclude Include="..\..\code\vodl\OdlTokenDatabase.h" />
     <ClInclude Include="..\..\code\vodl\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\code\vodl\Odl.cpp" />
-    <ClCompile Include="..\..\code\vodl\OdlAstNode.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlDatabase.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlExpression.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlInterpreter.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlParser.cpp" />
-    <ClCompile Include="..\..\code\vodl\OdlTokenDatabase.cpp" />
     <ClCompile Include="..\..\code\vodl\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>

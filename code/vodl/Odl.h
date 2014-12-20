@@ -2,10 +2,11 @@
 #ifndef ODL_H
 #define ODL_H
 
-#include "BasicTypes.h"
+#include "vodlParserLexer/BasicTypes.h"
 #include "OdlDatabase.h"
+#include "vodlParserLexer/OdlTokenDatabase.h"
 #include "OdlExpression.h"
-#include "OdlTokenDatabase.h"
+
 
 namespace odl
 {

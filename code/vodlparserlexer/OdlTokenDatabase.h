@@ -80,8 +80,6 @@ public:
 private:
     unsigned int FToken;
 };
-
-
 //-------------------------------------------------------------------------------
 template < int TTokenDomain >
 class TTokenDatabase : public TSingleton< TTokenDatabase< TTokenDomain > >
@@ -117,7 +115,6 @@ private:
     std::hash_map< std::string, unsigned int > FTokenGenerator;
     std::vector< std::string > FTokenValues;
 };
-
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
@@ -262,7 +259,7 @@ protected:
 private:
 	std::vector< TTokenType > FTokens;
 };
-
+//-------------------------------------------------------------------------------
 class TOdlDatabasePath : public TTokenPath< TTokenDomain::ODL_DATABASE_NAME >
 {
     typedef TTokenPath< TTokenDomain::ODL_DATABASE_NAME > parent_type;
@@ -282,12 +279,12 @@ public:
         return false;
     };
 };
-
+//-------------------------------------------------------------------------------
 typedef TToken< TTokenDomain::ODL_DATABASE_NAME > TOdlDatabaseToken;
-
+//-------------------------------------------------------------------------------
 void CreateTokenDatabases();
 void DestroyTokenDatabases();
-
+//-------------------------------------------------------------------------------
 } // namespace odl
 
 

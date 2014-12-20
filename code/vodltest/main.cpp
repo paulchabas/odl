@@ -11,7 +11,7 @@
 #include <typeinfo>
 #include <cstdlib>
 
-#include "vOdl/BasicTypes.h"
+#include "vOdlParserLexer/BasicTypes.h"
 
 #include <vector>
 #include <map>

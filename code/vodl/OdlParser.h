@@ -3,9 +3,7 @@
 
 #include "vOdlParserLexer/OdlGenLexer.h"
 #include "vOdlParserLexer/OdlGenParser.h"
-#include "OdlAstNode.h"
-
-#include <sstream>
+#include "vodlParserLexer/OdlAstNode.h"
 
 namespace odl
 {

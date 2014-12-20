@@ -1,8 +1,8 @@
 #ifndef ODL_DATABASE_H
 #define ODL_DATABASE_H
 
-#include "BasicTypes.h"
-#include "OdlSingleton.h"
+#include "vodlParserLexer/BasicTypes.h"
+#include "vodlParserLexer/OdlSingleton.h"
 
 namespace odl
 {

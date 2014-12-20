@@ -3,7 +3,7 @@
 
 #include "OdlExpression.h"
 #include "Odl.h"
-#include "OdlAstNode.h"
+#include "vodlParserLexer/OdlAstNode.h"
 #include "OdlDatabase.h"
 
 

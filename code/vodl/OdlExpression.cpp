@@ -2,7 +2,7 @@
 #include "OdlExpression.h"
 
 #include "Odl.h"
-#include "OdlTokenDatabase.h"
+#include "vOdlParserLexer/OdlTokenDatabase.h"
 
 namespace odl
 {

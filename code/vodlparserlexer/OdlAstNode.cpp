@@ -1,7 +1,6 @@
-#include "StdAfx.h"
+#include "BasicTypes.h"
 #include "OdlAstNode.h"
 
-#include <cassert>
 
 namespace odl
 {

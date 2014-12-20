@@ -2,7 +2,7 @@
 # define ODL_EXPRESSION_H
 
 
-#include "OdlAstNode.h"
+#include "vodlParserLexer/OdlAstNode.h"
 
 namespace odl
 {
