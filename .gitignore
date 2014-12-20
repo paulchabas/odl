@@ -2,6 +2,7 @@
 *.sdf
 *.suo
 
+VS2013/ipch/
 VS2013/Win32/
 VS2013/vodl/
 VS2013/vodlparserlexer/
