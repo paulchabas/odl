@@ -3,11 +3,11 @@ template TemplateTest is TTestClass2()
 {
 }
 
-template TemplateTest is TTestClass2(ta a)
+template TemplateTest is TTestClass2(a)
 {
 }
 
-template TemplateTest is TTestClass2(ta a, tb b)
+template TemplateTest is TTestClass2(a, b)
 {
 }
 
@@ -18,11 +18,11 @@ namespace toto
 	{
 		namespace chlobo { }
 		
-		template TemplateTest is TTestClass2(a a, b b,c c)
+		template TemplateTest is TTestClass2(a, b,c)
 		{
 		}
 		
-		template TemplateTest2 is TTestClass2(a a, b b,c c)
+		template TemplateTest2 is TTestClass2(a, b, c)
 		{
 		}
 		

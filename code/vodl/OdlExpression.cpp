@@ -400,10 +400,10 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 			{
 				// identifier: object name of link
 				#if ODL_ENABLE_VERBOSE_DEBUG
-		        std::string const& objectName = parExpression->Identifier();
+		        std::string const& objectName = parExpression->CastNode<TOdlAstNodeIdentifier>()->Identifier();
 				#endif
                
-				TOdlAstNode* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
+				TOdlAstNode const* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
                 TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
 				if (namedDeclarationExpression == nullptr)
 				{

@@ -167,8 +167,7 @@ LINE_COMMENT "//".*\n
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						val->FAstNode = new odl::TOdlAstNode();
-						val->FAstNode->SetAsIdentifier(std::string(yytext));
+						val->FAstNode = new odl::TOdlAstNodeIdentifier(std::string(yytext));
 						return OdlParserBase::IDENTIFIER;
 				  }
 <<EOF>>           {

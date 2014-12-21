@@ -9,7 +9,11 @@ namespace tn0()
 
 namespace tn1(a)
 {
+    object0 is TTestClass2
+    {
+        FInteger = 4
 
+    }
 }
 
 namespace tn2(a,b,c)

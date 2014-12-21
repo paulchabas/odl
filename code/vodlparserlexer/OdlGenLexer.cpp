@@ -491,7 +491,7 @@ static const short int yy_rule_linenum[28] =
     {   0,
        29,   32,   36,   40,   43,   47,   51,   55,   59,   63,
        69,   75,   81,   87,   94,   98,  102,  106,  110,  114,
-      118,  122,  127,  137,  166,  166,  178
+      118,  122,  127,  137,  166,  166,  177
     } ;
 
 #endif
@@ -868,19 +868,18 @@ case 25:
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						val->FAstNode = new odl::TOdlAstNode();
-						val->FAstNode->SetAsIdentifier(std::string(yytext));
+						val->FAstNode = new odl::TOdlAstNodeIdentifier(std::string(yytext));
 						return OdlParserBase::IDENTIFIER;
 				  }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 174 "OdlLexer.l"
+#line 173 "OdlLexer.l"
 {
                     yyterminate();
                   }
 	YY_BREAK
 case 27:
-#line 178 "OdlLexer.l"
+#line 177 "OdlLexer.l"
 {
 					 int const textLength = strlen(yytext);
 					 ++column;
@@ -888,7 +887,7 @@ case 27:
 				  }
 	YY_BREAK
 case 28:
-#line 184 "OdlLexer.l"
+#line 183 "OdlLexer.l"
 ECHO;
 	YY_BREAK
 #line 493 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\flexskel.cc"
@@ -1483,4 +1482,4 @@ void YY_OdlScanner_CLASS::YY_OdlScanner_INIT_BUFFER( YY_BUFFER_STATE b, YY_OdlSc
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 184 "OdlLexer.l"
+#line 183 "OdlLexer.l"

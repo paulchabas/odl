@@ -17,7 +17,8 @@
  
 %union
 {
-	odl::TOdlAstNode* FAstNode;
+	odl::TOdlAstNode*				FAstNode;
+	odl::TOdlAstNodeIdentifier*		FAstNodeIdentifier;
 }
  
 %token UNKNOWN
@@ -39,10 +40,11 @@
 %token <FAstNode> VALUE_INTEGER
 %token <FAstNode> VALUE_FLOAT
 %token <FAstNode> VALUE_STRING
-%token <FAstNode> IDENTIFIER
+%token <FAstNodeIdentifier> IDENTIFIER
 %token< FAstNode> TOKEN_NULLPTR
 
 // rules types
+
 %type <FAstNode> named_declaration_list named_declaration
 %type <FAstNode> anomymous_object_declaration_or_reference
 %type <FAstNode> property_declaration_list property_declaration
@@ -118,7 +120,7 @@ named_declaration
 anomymous_object_declaration_or_reference
 : IDENTIFIER
 {
-	odl::TOdlAstNode* reference = $1;
+	odl::TOdlAstNodeIdentifier* reference = $1;
 	reference->SetAsReferenceToResolve();	
 	$$ = reference;
 }
@@ -132,7 +134,7 @@ anomymous_object_declaration_or_reference
 {
 	// template instanciation.
 	
-	odl::TOdlAstNode* identifier = $1;
+	odl::TOdlAstNodeIdentifier* identifier = $1;
 	identifier->SetAsReferenceToResolve(); // find the required template declaration.
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
 	templateDeclaration->SetAsTemplateInstanciation($1, $3);
@@ -150,7 +152,7 @@ template_declaration_parameter_list
 : template_declaration_parameter_list TOKEN_COMMA IDENTIFIER
 {
 	odl::TOdlAstNode* templateParameterList = $1;
-	odl::TOdlAstNode* templateDeclarationParameter = $3;
+	odl::TOdlAstNodeIdentifier* templateDeclarationParameter = $3;
 	templateDeclarationParameter->SetAsTemplateDeclarationParameter();
 	templateParameterList->TemplateDeclarationParameterList_AppendParameter(templateDeclarationParameter);
 	$$ = templateParameterList;
@@ -159,7 +161,7 @@ template_declaration_parameter_list
 {
 	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
 	templateParameterList->SetAsTemplateDeclarationParameterList();
-	odl::TOdlAstNode* templateDeclarationParameter = $1;
+	odl::TOdlAstNodeIdentifier* templateDeclarationParameter = $1;
 	templateDeclarationParameter->SetAsTemplateDeclarationParameter();
 	templateParameterList->TemplateDeclarationParameterList_AppendParameter(templateDeclarationParameter);
 	$$ = templateParameterList;

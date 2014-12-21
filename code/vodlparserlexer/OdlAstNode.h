@@ -51,25 +51,43 @@ namespace TOdlAstNodeOperatorType
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+class TOdlAstNodeIdentifier;
+//-------------------------------------------------------------------------------
 class TOdlAstNode
 {
 public:
+    TOdlAstNode(TOdlAstNodeType::TType parAstNodeType);
     TOdlAstNode();
-    ~TOdlAstNode();
+    virtual ~TOdlAstNode();
+
+    template < typename T >
+    T const* CastNode() const
+    {
+        assert(dynamic_cast<T const*>(this) != nullptr);
+        return static_cast<T const*>(this);
+    }
+    
+    template < typename T >
+    T* CastNode()
+    {
+        assert(dynamic_cast<T*>(this) != nullptr);
+        return static_cast<T*>(this);
+    }
 
     TOdlAstNodeType::TType AstNodeType() const { return FAstNodeType; }
+
 	TOdlAstNodeOperatorType::TType OperatorType() const { return FOperatorType; }
 
 	void BreakPoint();
 
-    void SetIdentifierPointer(TOdlAstNode* parIdentifierPointer);
+    void SetIdentifierPointer(TOdlAstNodeIdentifier* parIdentifierPointer);
     void AutoGenerateIdentifier();
 
     void SetAsNamespace();
     void Namespace_AppendNamedDeclaration(TOdlAstNode* parDeclaration);
 	void Namespace_SetTemplateParameterList(TOdlAstNode* parTemplateArgumentListPointer);
 
-	void SetAsNamespaceTemplateInstanciation(TOdlAstNode* parIdentifier, TOdlAstNode* parTargetTemplateNamespaceIdentifierPointer, TOdlAstNode* parTemplateExpressionList);
+	void SetAsNamespaceTemplateInstanciation(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeIdentifier* parTargetTemplateNamespaceIdentifierPointer, TOdlAstNode* parTemplateExpressionList);
     
     void SetAsExpression(TOdlAstNode* parLeftExpression,
                          TOdlAstNode* parOperator,
@@ -78,14 +96,14 @@ public:
 	void SetAsVector();
 	void Vector_AppendItem(TOdlAstNode* parVectorItem);
 
-    void SetAsObjectDeclaration(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parPropertyList);
+    void SetAsObjectDeclaration(TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNode* parPropertyList);
 	void SetAsNullPtr();
-	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
+	void SetAsNamedDeclaration(TOdlAstNodeIdentifier* parNameIdentifier, TOdlAstNode* parExpression);
 
-    void SetAsObjectTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList);
-    void SetAsTemplateInstanciation(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateExpressionList);
+    void SetAsObjectTemplateDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList);
+    void SetAsTemplateInstanciation(TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNode* parTemplateExpressionList);
 	void SetAsTemplateDeclarationParameterList();
-	void TemplateDeclarationParameterList_AppendParameter(TOdlAstNode* parIdentifier);
+	void TemplateDeclarationParameterList_AppendParameter(TOdlAstNodeIdentifier* parIdentifier);
 
 	void SetAsTemplateInstanciationParameterList();
 	void TemplateInstanciationParameterList_AppendParameter(TOdlAstNode* parExpression);
@@ -95,10 +113,8 @@ public:
 
     void SetAsPropertyDeclarationList();
     void PropertyDeclarationList_AppendPropertyDeclaration(TOdlAstNode* parPropertyDeclarationNode);
-    void SetAsPropertyDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parExpression);
+    void SetAsPropertyDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNode* parExpression);
 
-    void SetAsIdentifier(std::string const& parIdentifier);
-    std::string const& Identifier() const { return FValueIdentifier; }
     void SetAsStringValue(std::string const& parStringValue);
     void SetAsIntegerValue(int parIntegerValue);
     void SetAsFloatValue(float parFloatValue);
@@ -118,9 +134,10 @@ public:
     std::vector< TOdlAstNode* > const& VectorContent() const { return FVectorContent; }
 	std::vector< TOdlAstNode* > const& TemplateParameterList() const { return FTemplateParameterList; }
     
-	TOdlAstNode* IdentifierPointer() const { assert(FIdentifierPointer != NULL); return FIdentifierPointer; }
-    TOdlAstNode* IdentifierPointer_IFP() const { return FIdentifierPointer; }
-	TOdlAstNode* TypeIdentifierPointer() const { assert(FTypeIdentifierPointer != NULL); return FTypeIdentifierPointer; }
+	TOdlAstNodeIdentifier* IdentifierPointer() const { assert(FIdentifierPointer != NULL); return FIdentifierPointer; }
+    TOdlAstNodeIdentifier* IdentifierPointer_IFP() const { return FIdentifierPointer; }
+	TOdlAstNodeIdentifier* TypeIdentifierPointer() const { assert(FTypeIdentifierPointer != NULL); return FTypeIdentifierPointer; }
+
     TOdlAstNode* LeftExpressionPointer() const { return FLeftExpressionPointer; }
     TOdlAstNode* OperatorExpressionPointer() const { return FOperatorExpressionPointer; }
     TOdlAstNode* RightExpressionPointer() const { return FRightExpressionPointer; }
@@ -140,8 +157,8 @@ public:
     // post processing
     void SetAsReferenceToResolve();
     bool IsValueReference() const { return FIsValueReference; }
-    void ResolveReference(TOdlAstNode* parNodeReference);
-    TOdlAstNode* ResolvedReference_ReturnNamedDeclaration() const { return FResolvedReferenceWeak; }
+    void ResolveReference(TOdlAstNode const* parNodeReference);
+    TOdlAstNode const* ResolvedReference_ReturnNamedDeclaration() const { return FResolvedReferenceWeak; }
 
 	void SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath);
 	TOdlDatabasePath const& FullDatabasePath() const { return FFullDatabasePath; }
@@ -151,8 +168,8 @@ private:
 
 private:
     TOdlAstNodeType::TType          FAstNodeType;
+
     TOdlAstNodeOperatorType::TType  FOperatorType;
-    std::string                     FValueIdentifier;
     std::string                     FValueString;
     int                             FValueInteger;
     float                           FValueFloat;
@@ -162,9 +179,9 @@ private:
 	std::vector< TOdlAstNode* >     FVectorContent;
 	std::vector< TOdlAstNode* >     FTemplateParameterList;
 
-    TOdlAstNode*                    FIdentifierPointer;
-    TOdlAstNode*                    FTypeIdentifierPointer;
-	TOdlAstNode*					FTargetTemplateNamespaceIdentifierPointer;
+    TOdlAstNodeIdentifier*          FIdentifierPointer;
+    TOdlAstNodeIdentifier*          FTypeIdentifierPointer;
+	TOdlAstNodeIdentifier*			FTargetTemplateNamespaceIdentifierPointer;
     TOdlAstNode*                    FPropertyDeclarationListPointer;
     TOdlAstNode*                    FExpressionPointer;
 	TOdlAstNode*					FTemplateParameterListPointer;
@@ -173,13 +190,36 @@ private:
     TOdlAstNode*                    FOperatorExpressionPointer;
     TOdlAstNode*                    FRightExpressionPointer;
 
-    TOdlAstNode*                    FResolvedReferenceWeak;
+    TOdlAstNode const*              FResolvedReferenceWeak;
 
     bool                            FAnonymousDeclaration;
     bool                            FReferenceToResolve;
     bool                            FIsValueReference;
 	bool							FIsTemplateDeclarationParameter;
 	TOdlDatabasePath				FFullDatabasePath;
+};
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+class TOdlAstNodeIdentifier : public TOdlAstNode
+{
+public:
+    TOdlAstNodeIdentifier(std::string const& parIdentifier) :
+        TOdlAstNode(TOdlAstNodeType::IDENTIFIER),
+        FIdentifier(parIdentifier)
+    {
+
+    }
+
+    virtual ~TOdlAstNodeIdentifier()
+    {
+
+    }
+
+    std::string const& Identifier() const { return FIdentifier; }
+
+private:
+    std::string FIdentifier;
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
