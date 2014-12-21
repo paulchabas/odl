@@ -283,7 +283,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
     case TOdlAstNodeType::NAMESPACE:
         {
             TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
-            TOdlAstNode const* identifier = parAstNode->IdentifierPointer_IFP();;
+            TOdlAstNode const* identifier = parAstNode->IdentifierPointer_IFP();
             if (identifier != nullptr)
             {
                 std::string const& namespaceName = identifier->Identifier();
@@ -299,7 +299,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
     case TOdlAstNodeType::NAMED_DECLARATION:
         {
             TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
-            TOdlAstNode const* identifier = parAstNode->IdentifierPointer_IFP();;
+            TOdlAstNode const* identifier = parAstNode->IdentifierPointer_IFP();
             assert(identifier != nullptr);
             std::string const& namespaceName = identifier->Identifier();
             context.EnterNamespace(namespaceName);
