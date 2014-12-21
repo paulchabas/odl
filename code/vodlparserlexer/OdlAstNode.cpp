@@ -24,11 +24,8 @@ TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
     FAstNodeType(parAstNodeType),
     FPropertyList(),
     FIdentifierPointer(nullptr),
-    FTypeIdentifierPointer(nullptr),
     FTargetTemplateNamespaceIdentifierPointer(nullptr),
-    FPropertyDeclarationListPointer(nullptr),
     FExpressionPointer(nullptr),
-    FTemplateParameterListPointer(nullptr),
     FResolvedReferenceWeak(nullptr),
     FAnonymousDeclaration(true), // value reset by named declarations.
     FReferenceToResolve(false),
@@ -42,11 +39,9 @@ TOdlAstNode::TOdlAstNode() :
     FAstNodeType(TOdlAstNodeType::UNKNOWN),
     FPropertyList(),
     FIdentifierPointer(nullptr),
-    FTypeIdentifierPointer(nullptr),
+    //FTypeIdentifierPointer(nullptr),
     FTargetTemplateNamespaceIdentifierPointer(nullptr),
-    FPropertyDeclarationListPointer(nullptr),
     FExpressionPointer(nullptr),
-    FTemplateParameterListPointer(nullptr),
     FResolvedReferenceWeak(nullptr),
     FAnonymousDeclaration(true), // value reset by named declarations.
     FReferenceToResolve(false),
@@ -64,13 +59,6 @@ TOdlAstNode::~TOdlAstNode()
         delete node;
     }
 
-    for (size_t i = 0; i < FNamedDeclarationList.size(); ++i)
-    {
-        TOdlAstNode const* node = FNamedDeclarationList[i];
-        delete node;
-    }
-
-
     for (size_t i = 0; i < FTemplateParameterList.size(); ++i)
     {
         TOdlAstNode const* node = FTemplateParameterList[i];
@@ -78,11 +66,8 @@ TOdlAstNode::~TOdlAstNode()
     }
     
     delete FIdentifierPointer;
-    delete FTypeIdentifierPointer;
     delete FTargetTemplateNamespaceIdentifierPointer;
-    delete FPropertyDeclarationListPointer;
     delete FExpressionPointer;
-    delete FTemplateParameterListPointer;
 
     FResolvedReferenceWeak = nullptr; // weak reference.
 }
@@ -98,60 +83,6 @@ void TOdlAstNode::AutoGenerateIdentifier()
     assert(FIdentifierPointer == nullptr);
     FIdentifierPointer = AutoGenerateObjectIdentifier();
     FAnonymousDeclaration = true;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsNamespace()
-{
-    FAstNodeType = TOdlAstNodeType::NAMESPACE;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::Namespace_SetTemplateParameterList(TOdlAstNode* parTemplateArgumentListPointer)
-{
-    assert(FAstNodeType == TOdlAstNodeType::NAMESPACE);
-    FTemplateParameterListPointer = parTemplateArgumentListPointer;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsNamespaceTemplateInstanciation(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeIdentifier* parTargetTemplateNamespaceIdentifierPointer, TOdlAstNode* parTemplateExpressionList)
-{
-    FAstNodeType = TOdlAstNodeType::NAMESPACE;
-
-    assert(parIdentifier != nullptr);
-    assert(parTargetTemplateNamespaceIdentifierPointer != nullptr);
-    assert(parTemplateExpressionList != nullptr);
-
-    assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parTargetTemplateNamespaceIdentifierPointer->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parTemplateExpressionList->AstNodeType() == TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST);
-
-    FIdentifierPointer = parIdentifier;
-    FTargetTemplateNamespaceIdentifierPointer = parTargetTemplateNamespaceIdentifierPointer;
-    FTemplateParameterListPointer = parTemplateExpressionList;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::Namespace_AppendNamedDeclaration(TOdlAstNode* parDeclaration)
-{
-    assert(FAstNodeType == TOdlAstNodeType::NAMESPACE);
-    FNamedDeclarationList.push_back(parDeclaration);
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsObjectTemplateDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList)
-{
-    FAstNodeType = TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION;
-
-    assert(parIdentifier != nullptr);
-    assert(parTypeIdentifier != nullptr);
-    assert(parTemplateParameterList != nullptr);
-    assert(parPropertyList != nullptr);
-
-    assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parTemplateParameterList->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
-    assert(parPropertyList->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
-
-    FIdentifierPointer = parIdentifier;
-    FTypeIdentifierPointer = parTypeIdentifier;
-    FTemplateParameterListPointer = parTemplateParameterList;
-    FPropertyDeclarationListPointer = parPropertyList;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsTemplateDeclarationParameterList()
@@ -180,20 +111,6 @@ void TOdlAstNode::TemplateInstanciationParameterList_AppendParameter(TOdlAstNode
     FTemplateParameterList.push_back(parExpression);
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateInstanciation(TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNode* parTemplateExpressionList)
-{
-    FAstNodeType = TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION;
-
-    assert(parTypeIdentifier != nullptr);
-    assert(parTemplateExpressionList != nullptr);
-
-    assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parTemplateExpressionList->AstNodeType() == TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST);
-
-    FTypeIdentifierPointer = parTypeIdentifier;
-    FTemplateParameterListPointer = parTemplateExpressionList;
-}
-//-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsNamedDeclaration(TOdlAstNodeIdentifier* parNameIdentifier, TOdlAstNode* parExpression)
 {
     FAstNodeType = TOdlAstNodeType::NAMED_DECLARATION;
@@ -203,45 +120,6 @@ void TOdlAstNode::SetAsNamedDeclaration(TOdlAstNodeIdentifier* parNameIdentifier
 
     FIdentifierPointer = parNameIdentifier;
     FExpressionPointer = parExpression;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsObjectDeclaration(TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNode* parPropertyList)
-{
-    FAstNodeType = TOdlAstNodeType::OBJECT_DECLARATION;
-
-    assert(parTypeIdentifier != nullptr);
-    assert(parPropertyList != nullptr);
-
-    assert(parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parPropertyList->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
-
-    FTypeIdentifierPointer = parTypeIdentifier;
-    FPropertyDeclarationListPointer = parPropertyList;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsNullPtr()
-{
-    FAstNodeType = TOdlAstNodeType::OBJECT_DECLARATION;    
-
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool TOdlAstNode::IsNullPtr() const
-{
-    if (FAstNodeType == TOdlAstNodeType::OBJECT_DECLARATION)
-    {
-        if (FTypeIdentifierPointer == nullptr)
-        {
-            if (FPropertyDeclarationListPointer == nullptr)
-                return true;
-            assert(false); // non typed object.
-        }
-
-        return false;
-    }
-
-    assert(false); // IsNullPtr valid on object type only.
-
-    return false;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsPropertyDeclarationList()
@@ -304,8 +182,9 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
         {
-            parOss << FTypeIdentifierPointer->Identifier(); // template name.
-            FTemplateParameterListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+            TOdlAstNodeTemplateObjectInstanciation const* that = CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+            parOss << that->TypeIdentifierPointer()->Identifier(); // template name.
+            that->TemplateParameterListPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
             parOss << std::endl;    
         }
         break ;
@@ -326,15 +205,17 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break;
     case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
         {
+            TOdlAstNodeTemplateObjectDeclaration const* that = CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+            
             Indent(parOss, parIndentLevel);
             parOss << "template ";
-            parOss << FIdentifierPointer->Identifier();
+            parOss << that->IdentifierPointer()->Identifier();
             parOss << " is ";
-            parOss << FTypeIdentifierPointer->Identifier();
-            FTemplateParameterListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+            parOss << that->TypeIdentifierPointer()->Identifier();
+            that->TemplateParameterListPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
             parOss << std::endl;
             Indent(parOss, parIndentLevel) << "{" << std::endl;
-            FPropertyDeclarationListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+            that->PropertyDeclarationListPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
             Indent(parOss, parIndentLevel) << "}";
             parOss << std::endl;
         }
@@ -523,7 +404,9 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
-            if (IsNullPtr())
+            TOdlAstNodeObjectDeclaration const* that = CastNode<TOdlAstNodeObjectDeclaration>();
+
+            if (that->IsNullPtr())
             {
                 parOss << "<nullptr>" << std::endl;
             }
@@ -536,10 +419,10 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
                     parOss << "] ";
                 }
 
-                parOss << FTypeIdentifierPointer->Identifier() << std::endl;
+                parOss << that->TypeIdentifierPointer()->Identifier() << std::endl;
 
                 Indent(parOss, parIndentLevel) << "{" << std::endl;
-                FPropertyDeclarationListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+                that->PropertyDeclarationListPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
                 Indent(parOss, parIndentLevel) << "}";
                 parOss << std::endl;
             }
@@ -547,22 +430,27 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::NAMESPACE:
         {
+            TOdlAstNodeNamespaceDeclaration const* namespaceDeclarationNode = CastNode<TOdlAstNodeNamespaceDeclaration>();
+
             Indent(parOss, parIndentLevel) << "namespace ";
+
             if (FIdentifierPointer != nullptr)
             {
                 parOss << FIdentifierPointer->Identifier();
             }
 
-            if (FTemplateParameterListPointer != nullptr)
+            TOdlAstNode const* templateParameterListPointer = namespaceDeclarationNode->TemplateParameterListPointer();
+            if (templateParameterListPointer != nullptr)
             {
-                FTemplateParameterListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+                templateParameterListPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
             }
 
             parOss << std::endl;
+            std::vector< TOdlAstNode* > const& namedDeclarations = namespaceDeclarationNode->NamespaceContent();
             Indent(parOss, parIndentLevel) << "{" << std::endl;
-            for (size_t i = 0; i < FNamedDeclarationList.size(); ++i)
+            for (size_t i = 0; i < namedDeclarations.size(); ++i)
             {
-                TOdlAstNode const* child = FNamedDeclarationList[i];
+                TOdlAstNode const* child = namedDeclarations[i];
                 child->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
             }
             Indent(parOss, parIndentLevel) << "}" << std::endl;
@@ -595,12 +483,6 @@ void TOdlAstNode::ResolveReference(TOdlAstNode const* parNodeReference)
 void TOdlAstNode::SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)
 {
     FFullDatabasePath = parFullDatabasePath;
-}
-//-------------------------------------------------------------------------------
-bool TOdlAstNode::IsGlobalNamespace() const
-{
-    assert(FAstNodeType == TOdlAstNodeType::NAMESPACE);
-    return FIdentifierPointer == nullptr;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 void TOdlAstNode::BreakPoint()

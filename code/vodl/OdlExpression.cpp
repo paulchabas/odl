@@ -355,11 +355,13 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
         case TOdlAstNodeType::OBJECT_DECLARATION:
 			{
 				// search nullptr
-				if (!parExpression->IsNullPtr())
+                TOdlAstNodeObjectDeclaration const* objectDeclarationNode = parExpression->CastNode<TOdlAstNodeObjectDeclaration>();
+				if (!objectDeclarationNode->IsNullPtr())
 				{
 					// PAUL(27/05/14 17:57:57) yuk.
 					TOdlDatabasePath const& databasePath = parExpression->FullDatabasePath();
-					std::string const& objectType = parExpression->TypeIdentifierPointer()->Identifier();
+
+					std::string const& objectType = objectDeclarationNode->TypeIdentifierPointer()->Identifier();
 
 					#ifdef ODL_ENABLE_VERBOSE_DEBUG
 					std::string forDebug1 = databasePath.ToString();

@@ -17,15 +17,18 @@
  
 %union
 {
-	odl::TOdlAstNode*				FOdlAstNode;
-	odl::TOdlAstNodeIdentifier*		FOdlAstNodeIdentifier;
+	odl::TOdlAstNode*							FOdlAstNode;
 
-	odl::TOdlAstNodeOperator*		FOdlAstNodeOperator;
+	odl::TOdlAstNodeNamespaceDeclaration*		FOdlAstNodeNamespaceDeclaration;
 
-	odl::TOdlAstNodeExpression*		FOdlAstNodeExpression;
-	odl::TOdlAstNodeValue*			FOdlAstNodeValue;
-	odl::TOdlAstNodeValueVector*	FOdlAstNodeValueVector;
-	odl::TOdlAstNodeOperation*		FOdlAstNodeOperation;
+	odl::TOdlAstNodeIdentifier*					FOdlAstNodeIdentifier;
+
+	odl::TOdlAstNodeOperator*					FOdlAstNodeOperator;
+
+	odl::TOdlAstNodeExpression*					FOdlAstNodeExpression;
+	odl::TOdlAstNodeValue*						FOdlAstNodeValue;
+	odl::TOdlAstNodeValueVector*				FOdlAstNodeValueVector;
+	odl::TOdlAstNodeOperation*					FOdlAstNodeOperation;
 	
 }
  
@@ -53,7 +56,7 @@
 
 // rules types
 
-%type <FOdlAstNode> named_declaration_list named_declaration
+%type <FOdlAstNodeNamespaceDeclaration> named_declaration_list named_declaration
 %type <FOdlAstNodeExpression> anomymous_object_declaration_or_reference
 %type <FOdlAstNode> property_declaration_list property_declaration
 %type <FOdlAstNodeExpression> expression term factor
@@ -74,14 +77,13 @@ odl_ast
 named_declaration_list
 : named_declaration_list named_declaration
 {
-	odl::TOdlAstNode* theNamespace = $1;
+	odl::TOdlAstNodeNamespaceDeclaration* theNamespace = $1;
 	theNamespace->Namespace_AppendNamedDeclaration($2);
 	$$ = theNamespace;
 }
 |
 {
-	odl::TOdlAstNode* theNamespace = new odl::TOdlAstNode();
-	theNamespace->SetAsNamespace();
+	odl::TOdlAstNodeNamespaceDeclaration* theNamespace = new odl::TOdlAstNodeNamespaceDeclaration();
 	$$ = theNamespace;	
 }
 ;
@@ -103,7 +105,7 @@ named_declaration
 {
     // namespace template declaration
 
-	odl::TOdlAstNode* theNamespace = $7;
+	odl::TOdlAstNodeNamespaceDeclaration* theNamespace = $7;
 	theNamespace->SetIdentifierPointer($2);
 	theNamespace->Namespace_SetTemplateParameterList($4);
 	$$ = theNamespace;
@@ -111,16 +113,14 @@ named_declaration
 | TOKEN_NAMESPACE IDENTIFIER TOKEN_EQUALS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
 {
 	// namespace template instanciation
-	odl::TOdlAstNode* theNamespace = new odl::TOdlAstNode();
-	theNamespace->SetAsNamespaceTemplateInstanciation($2, $4, $6);
+	odl::TOdlAstNodeTemplateNamespaceInstanciation* theNamespace = new odl::TOdlAstNodeTemplateNamespaceInstanciation($2, $4, $6);
 	$$ = theNamespace;
 }
 | TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_declaration_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
 	// object template declaration
 
-	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
-	templateDeclaration->SetAsObjectTemplateDeclaration($2, $4, $6, $9);
+	odl::TOdlAstNodeTemplateObjectDeclaration* templateDeclaration = new odl::TOdlAstNodeTemplateObjectDeclaration($2, $4, $6, $9);
 	$$ = templateDeclaration;
 }
 ;
@@ -134,8 +134,7 @@ anomymous_object_declaration_or_reference
 }
 | IDENTIFIER TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
-	odl::TOdlAstNode* objectDeclaration = new odl::TOdlAstNode();
-	objectDeclaration->SetAsObjectDeclaration($1, $3);
+	odl::TOdlAstNodeObjectDeclaration* objectDeclaration = new odl::TOdlAstNodeObjectDeclaration($1, $3);
 	$$ = objectDeclaration;
 }
 | IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
@@ -144,14 +143,12 @@ anomymous_object_declaration_or_reference
 	
 	odl::TOdlAstNodeIdentifier* identifier = $1;
 	identifier->SetAsReferenceToResolve(); // find the required template declaration.
-	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
-	templateDeclaration->SetAsTemplateInstanciation($1, $3);
+	odl::TOdlAstNodeTemplateObjectInstanciation* templateDeclaration = new odl::TOdlAstNodeTemplateObjectInstanciation($1, $3);
 	$$ = templateDeclaration;
 }
 | TOKEN_NULLPTR
 {
-	odl::TOdlAstNode* theNullptr = new odl::TOdlAstNode();
-	theNullptr->SetAsNullPtr();
+	odl::TOdlAstNodeObjectDeclaration* theNullptr = new odl::TOdlAstNodeObjectDeclaration();
 	$$ = theNullptr;
 }
 ;
