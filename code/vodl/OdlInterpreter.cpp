@@ -61,8 +61,8 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
     {
 	case TOdlAstNodeType::EXPRESSION:
 		{
-            TOdlAstNode* parLeft = parAstNode->LeftExpressionPointer();
-            TOdlAstNode* parRight = parAstNode->RightExpressionPointer();
+            TOdlAstNode* parLeft = parAstNode->CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer();
+            TOdlAstNode* parRight = parAstNode->CastNode<TOdlAstNodeOperation>()->RightExpressionPointer();
             if (parLeft != NULL)
                 (*parCallback)(parLeft, parContext);
             (*parCallback)(parRight, parContext);
@@ -70,12 +70,13 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
 		break ;
 	case TOdlAstNodeType::VALUE_VECTOR:
 		{
-            std::vector< TOdlAstNode* >& childs = parAstNode->VectorContent();
+            TOdlAstNodeValueVector const* valueVectorNode = parAstNode->CastNode<TOdlAstNodeValueVector>();
+            std::vector< TOdlAstNodeExpression* > const& childs = valueVectorNode->VectorContent();
             size_t childCount = childs.size();
 		    for (size_t i = 0; i < childCount; ++i)
             {
                 size_t invI = childCount - i - 1;
-                TOdlAstNode* child = childs[invI];
+                TOdlAstNodeExpression* child = childs[invI];
                 (*parCallback)(child, parContext);
             }
 		}

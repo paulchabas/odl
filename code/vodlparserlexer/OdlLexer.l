@@ -62,32 +62,27 @@ LINE_COMMENT "//".*\n
 					}
 "+"               {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_PLUS);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_PLUS);
                     return OdlParserBase::OPERATOR_PLUS;
                   }
 "-"               {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MINUS);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MINUS);
                     return OdlParserBase::OPERATOR_MINUS;
                   }
 "*"               {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MULTIPLY);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MULTIPLY);
                     return OdlParserBase::OPERATOR_MULTIPLY;
                   }
 "/"               {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_DIVIDE);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_DIVIDE);
                     return OdlParserBase::OPERATOR_DIVIDE;
                   }
 "%"				  {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MODULO);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MODULO);
                     return OdlParserBase::OPERATOR_MODULO;						
 				  }
 
@@ -130,7 +125,7 @@ LINE_COMMENT "//".*\n
 
 						// remove quotes.
 						assert(textLength >= 2);
-						val->FAstNode = new odl::TOdlAstNodeValue(std::string(yytext + 1, yytext + textLength - 1));
+						val->FOdlAstNode = new odl::TOdlAstNodeValue(std::string(yytext + 1, yytext + textLength - 1));
 						return OdlParserBase::VALUE_STRING;
 					}
 {VALUE_FLOAT_OR_INTEGER}	{
@@ -149,13 +144,13 @@ LINE_COMMENT "//".*\n
 								if (isFloat)
 								{
 									float const floatValue = (float) atof(yytext);
-									val->FAstNode = new odl::TOdlAstNodeValue(floatValue);
+									val->FOdlAstNode = new odl::TOdlAstNodeValue(floatValue);
 									return OdlParserBase::VALUE_FLOAT;
 								}
 								else
 								{
 									int integerValue = atoi(yytext);
-									val->FAstNode = new odl::TOdlAstNodeValue(integerValue);
+									val->FOdlAstNode = new odl::TOdlAstNodeValue(integerValue);
 									return OdlParserBase::VALUE_INTEGER;
 								}
 							}
@@ -164,7 +159,7 @@ LINE_COMMENT "//".*\n
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						val->FAstNode = new odl::TOdlAstNodeIdentifier(std::string(yytext));
+						val->FOdlAstNode = new odl::TOdlAstNodeIdentifier(std::string(yytext));
 						return OdlParserBase::IDENTIFIER;
 				  }
 <<EOF>>           {

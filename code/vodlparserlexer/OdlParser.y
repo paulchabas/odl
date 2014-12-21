@@ -17,9 +17,16 @@
  
 %union
 {
-	odl::TOdlAstNode*				FAstNode;
-	odl::TOdlAstNodeIdentifier*		FAstNodeIdentifier;
+	odl::TOdlAstNode*				FOdlAstNode;
+	odl::TOdlAstNodeIdentifier*		FOdlAstNodeIdentifier;
+
+	odl::TOdlAstNodeOperator*		FOdlAstNodeOperator;
+
+	odl::TOdlAstNodeExpression*		FOdlAstNodeExpression;
 	odl::TOdlAstNodeValue*			FOdlAstNodeValue;
+	odl::TOdlAstNodeValueVector*	FOdlAstNodeValueVector;
+	odl::TOdlAstNodeOperation*		FOdlAstNodeOperation;
+	
 }
  
 %token UNKNOWN
@@ -37,21 +44,21 @@
 %token TOKEN_TEMPLATE
 %token TOKEN_NULLPTR
 
-%token <FAstNode> OPERATOR_PLUS OPERATOR_MINUS OPERATOR_MULTIPLY OPERATOR_DIVIDE OPERATOR_MODULO
+%token <FOdlAstNodeOperator> OPERATOR_PLUS OPERATOR_MINUS OPERATOR_MULTIPLY OPERATOR_DIVIDE OPERATOR_MODULO
 %token <FOdlAstNodeValue> VALUE_INTEGER
 %token <FOdlAstNodeValue> VALUE_FLOAT
 %token <FOdlAstNodeValue> VALUE_STRING
-%token <FAstNodeIdentifier> IDENTIFIER
-%token< FAstNode> TOKEN_NULLPTR
+%token <FOdlAstNodeIdentifier> IDENTIFIER
+%token< FOdlAstNode> TOKEN_NULLPTR
 
 // rules types
 
-%type <FAstNode> named_declaration_list named_declaration
-%type <FAstNode> anomymous_object_declaration_or_reference
-%type <FAstNode> property_declaration_list property_declaration
-%type <FAstNode> expression term factor
-%type <FAstNode> vector_value_list vector_value
-%type <FAstNode> template_instanciation_parameter_list template_declaration_parameter_list
+%type <FOdlAstNode> named_declaration_list named_declaration
+%type <FOdlAstNodeExpression> anomymous_object_declaration_or_reference
+%type <FOdlAstNode> property_declaration_list property_declaration
+%type <FOdlAstNodeExpression> expression term factor
+%type <FOdlAstNodeValueVector> vector_value_list vector_value
+%type <FOdlAstNode> template_instanciation_parameter_list template_declaration_parameter_list
 
 %start odl_ast
  
@@ -224,14 +231,12 @@ property_declaration
 expression
 : expression OPERATOR_PLUS term
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression($1, $2, $3);
+	odl::TOdlAstNodeOperation* node = new odl::TOdlAstNodeOperation($1, $2, $3);
 	$$ = node;
 }
 | expression OPERATOR_MINUS term
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression($1, $2, $3);
+	odl::TOdlAstNodeOperation* node = new odl::TOdlAstNodeOperation($1, $2, $3);
 	$$ = node;
 }
 | term
@@ -243,20 +248,17 @@ expression
 term
 : term OPERATOR_MULTIPLY factor
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression($1, $2, $3);
+	odl::TOdlAstNodeOperation* node = new odl::TOdlAstNodeOperation($1, $2, $3);
 	$$ = node;
 }
 | term OPERATOR_DIVIDE factor
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression($1, $2, $3);
+	odl::TOdlAstNodeOperation* node = new odl::TOdlAstNodeOperation($1, $2, $3);
 	$$ = node;
 }
 | term OPERATOR_MODULO factor
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression($1, $2, $3);
+	odl::TOdlAstNodeOperation* node = new odl::TOdlAstNodeOperation($1, $2, $3);
 	$$ = node;
 }
 | factor
@@ -272,8 +274,7 @@ factor
 }
 | OPERATOR_MINUS factor
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsExpression(nullptr, $1, $2);
+	odl::TOdlAstNodeOperation* node = new odl::TOdlAstNodeOperation(nullptr, $1, $2);
 	$$ = node;
 }
 | VALUE_INTEGER
@@ -301,7 +302,7 @@ factor
 vector_value
 : TOKEN_OPEN_BRACKET vector_value_list TOKEN_CLOSE_BRACKET
 {
-	odl::TOdlAstNode* vector = $2;
+	odl::TOdlAstNodeValueVector* vector = $2;
 	$$ = vector;
 }
 ;
@@ -309,22 +310,21 @@ vector_value
 vector_value_list
 : expression TOKEN_COMMA vector_value_list 
 {
-	odl::TOdlAstNode* vector = $3;
-	odl::TOdlAstNode* expression = $1;
+	odl::TOdlAstNodeValueVector* vector = $3;
+	odl::TOdlAstNodeExpression* expression = $1;
 	vector->Vector_AppendItem(expression);
 	$$ = vector;
 }
 | expression 
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsVector();
-	node->Vector_AppendItem($1);
+	odl::TOdlAstNodeValueVector* node = new odl::TOdlAstNodeValueVector();
+	odl::TOdlAstNodeExpression* expression = $1;
+	node->Vector_AppendItem(expression);
 	$$ = node;
 }
 |
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsVector();
+	odl::TOdlAstNodeValueVector* node = new odl::TOdlAstNodeValueVector();
 	$$ = node;
 }
 ;

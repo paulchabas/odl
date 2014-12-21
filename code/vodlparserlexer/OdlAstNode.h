@@ -76,7 +76,6 @@ public:
 
     TOdlAstNodeType::TType AstNodeType() const { return FAstNodeType; }
 
-	TOdlAstNodeOperatorType::TType OperatorType() const { return FOperatorType; }
 
 	void BreakPoint();
 
@@ -89,13 +88,6 @@ public:
 
 	void SetAsNamespaceTemplateInstanciation(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeIdentifier* parTargetTemplateNamespaceIdentifierPointer, TOdlAstNode* parTemplateExpressionList);
     
-    void SetAsExpression(TOdlAstNode* parLeftExpression,
-                         TOdlAstNode* parOperator,
-                         TOdlAstNode* parRightExpression);
-
-	void SetAsVector();
-	void Vector_AppendItem(TOdlAstNode* parVectorItem);
-
     void SetAsObjectDeclaration(TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNode* parPropertyList);
 	void SetAsNullPtr();
 	void SetAsNamedDeclaration(TOdlAstNodeIdentifier* parNameIdentifier, TOdlAstNode* parExpression);
@@ -115,28 +107,23 @@ public:
     void PropertyDeclarationList_AppendPropertyDeclaration(TOdlAstNode* parPropertyDeclarationNode);
     void SetAsPropertyDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNode* parExpression);
 
-    void SetAsOperator(TOdlAstNodeOperatorType::TType parOperatorType);
-
 	void SetAnonymousDeclaration(bool parState) { FAnonymousDeclaration = parState; }
 
     void PrettyPrint(std::ostringstream& parOss) const;
 
     std::vector< TOdlAstNode* >& PropertyList() { return FPropertyList; }
     std::vector< TOdlAstNode* >& NamespaceContent() { return FNamedDeclarationList; }
-    std::vector< TOdlAstNode* >& VectorContent() { return FVectorContent; }
+    
 
     std::vector< TOdlAstNode* > const& PropertyList() const { return FPropertyList; }
     std::vector< TOdlAstNode* > const& NamespaceContent() const { return FNamedDeclarationList; }
-    std::vector< TOdlAstNode* > const& VectorContent() const { return FVectorContent; }
+
 	std::vector< TOdlAstNode* > const& TemplateParameterList() const { return FTemplateParameterList; }
     
 	TOdlAstNodeIdentifier* IdentifierPointer() const { assert(FIdentifierPointer != NULL); return FIdentifierPointer; }
     TOdlAstNodeIdentifier* IdentifierPointer_IFP() const { return FIdentifierPointer; }
 	TOdlAstNodeIdentifier* TypeIdentifierPointer() const { assert(FTypeIdentifierPointer != NULL); return FTypeIdentifierPointer; }
 
-    TOdlAstNode* LeftExpressionPointer() const { return FLeftExpressionPointer; }
-    TOdlAstNode* OperatorExpressionPointer() const { return FOperatorExpressionPointer; }
-    TOdlAstNode* RightExpressionPointer() const { return FRightExpressionPointer; }
     TOdlAstNode* ExpressionPointer() const { return FExpressionPointer; }
     TOdlAstNode* PropertyDeclarationListPointer() const { return FPropertyDeclarationListPointer; }
 	TOdlAstNode* TemplateParameterListPointer() const { return FTemplateParameterListPointer; }
@@ -162,12 +149,8 @@ private:
 private:
     TOdlAstNodeType::TType          FAstNodeType;
 
-    TOdlAstNodeOperatorType::TType  FOperatorType;
-
-    
     std::vector< TOdlAstNode* >     FPropertyList;
     std::vector< TOdlAstNode* >     FNamedDeclarationList;
-	std::vector< TOdlAstNode* >     FVectorContent;
 	std::vector< TOdlAstNode* >     FTemplateParameterList;
 
     TOdlAstNodeIdentifier*          FIdentifierPointer;
@@ -177,10 +160,6 @@ private:
     TOdlAstNode*                    FExpressionPointer;
 	TOdlAstNode*					FTemplateParameterListPointer;
     
-    TOdlAstNode*                    FLeftExpressionPointer;
-    TOdlAstNode*                    FOperatorExpressionPointer;
-    TOdlAstNode*                    FRightExpressionPointer;
-
     TOdlAstNode const*              FResolvedReferenceWeak;
 
     bool                            FAnonymousDeclaration;
@@ -192,11 +171,25 @@ private:
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-class TOdlAstNodeIdentifier : public TOdlAstNode
+class TOdlAstNodeExpression : public TOdlAstNode
 {
 public:
+    TOdlAstNodeExpression(TOdlAstNodeType::TType parOdlAstNodeType) :
+        TOdlAstNode(parOdlAstNodeType)
+    {
+        assert(parOdlAstNodeType & TOdlAstNodeType::EXPRESSION_MASK);
+    }
+
+};
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+class TOdlAstNodeIdentifier : public TOdlAstNodeExpression
+{
+    typedef TOdlAstNodeExpression parent_type;
+public:
     TOdlAstNodeIdentifier(std::string const& parIdentifier) :
-        TOdlAstNode(TOdlAstNodeType::IDENTIFIER),
+        parent_type(TOdlAstNodeType::IDENTIFIER),
         FIdentifier(parIdentifier)
     {
 
@@ -215,11 +208,13 @@ private:
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-class TOdlAstNodeValue : public TOdlAstNode
+class TOdlAstNodeValue : public TOdlAstNodeExpression
 {
+private:
+    typedef TOdlAstNodeExpression parent_type;
 public:
     TOdlAstNodeValue(std::string const& parValueString) :
-        TOdlAstNode(TOdlAstNodeType::VALUE_STRING),
+        parent_type(TOdlAstNodeType::VALUE_STRING),
         FValueString(parValueString),
         FValueInteger(0),
         FValueFloat(0.0f)
@@ -228,7 +223,7 @@ public:
     }
 
     TOdlAstNodeValue(float parValueFloat) :
-        TOdlAstNode(TOdlAstNodeType::VALUE_FLOAT),
+        parent_type(TOdlAstNodeType::VALUE_FLOAT),
         FValueString(),
         FValueInteger(0),
         FValueFloat(parValueFloat)
@@ -237,7 +232,7 @@ public:
     }
 
     TOdlAstNodeValue(int parValueInteger) :
-        TOdlAstNode(TOdlAstNodeType::VALUE_INTEGER),
+        parent_type(TOdlAstNodeType::VALUE_INTEGER),
         FValueString(),
         FValueInteger(parValueInteger),
         FValueFloat(0.0f)
@@ -256,9 +251,106 @@ private:
     float                           FValueFloat;
 };
 //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+class TOdlAstNodeValueVector : public TOdlAstNodeExpression
+{
+    typedef TOdlAstNodeExpression parent_type;
+public:
+    TOdlAstNodeValueVector() :
+        parent_type(TOdlAstNodeType::VALUE_VECTOR)
+    {
+
+    }
+
+    virtual ~TOdlAstNodeValueVector()
+    {
+        for (size_t i = 0; i < FVectorContent.size(); ++i)
+        {
+            TOdlAstNode const* node = FVectorContent[i];
+            delete node;
+        }
+    }
+
+    void Vector_AppendItem(TOdlAstNodeExpression* parVectorItem)
+    {
+        FVectorContent.push_back(parVectorItem);
+    }
+
+    std::vector< TOdlAstNodeExpression* >& VectorContent() { return FVectorContent; }
+    std::vector< TOdlAstNodeExpression* > const& VectorContent() const { return FVectorContent; }
+
+    
+private:
+    std::vector< TOdlAstNodeExpression* >  FVectorContent;
+};
+//-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+class TOdlAstNodeOperator : public TOdlAstNode
+{
+public:
+    TOdlAstNodeOperator(TOdlAstNodeOperatorType::TType parOperatorType) :
+        TOdlAstNode(TOdlAstNodeType::OPERATOR),
+        FOperatorType(parOperatorType)
+    {
 
+    }
+
+    TOdlAstNodeOperatorType::TType OperatorType() const { return FOperatorType; }
+
+private:
+    TOdlAstNodeOperatorType::TType  FOperatorType;
+};
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+class TOdlAstNodeOperation : public TOdlAstNodeExpression
+{
+    typedef TOdlAstNodeExpression parent_type;
+public:
+    TOdlAstNodeOperation(TOdlAstNodeExpression* parLeftExpression,
+                         TOdlAstNodeOperator* parOperator,
+                         TOdlAstNodeExpression* parRightExpression) :
+        parent_type(TOdlAstNodeType::EXPRESSION),
+        FLeftExpressionPointer(nullptr),
+        FOperatorExpressionPointer(nullptr),
+        FRightExpressionPointer(nullptr)
+    {
+        assert(parRightExpression != nullptr);
+        assert(parOperator != nullptr);
+        if (parOperator->OperatorType() != TOdlAstNodeOperatorType::OPERATOR_MINUS)
+        {
+            assert(parLeftExpression != nullptr);
+        }
+    
+        assert(parLeftExpression != nullptr ? parLeftExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK : true);
+        assert(parRightExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK);
+        assert(parOperator->AstNodeType() == TOdlAstNodeType::OPERATOR);
+
+        FLeftExpressionPointer = parLeftExpression;
+        FOperatorExpressionPointer = parOperator;
+        FRightExpressionPointer = parRightExpression;    
+    }
+
+    virtual ~TOdlAstNodeOperation()
+    {
+        delete FLeftExpressionPointer;
+        delete FOperatorExpressionPointer;
+        delete FRightExpressionPointer;
+    }
+
+    TOdlAstNodeExpression* LeftExpressionPointer() const { return FLeftExpressionPointer; }
+    TOdlAstNodeOperator* OperatorExpressionPointer() const { return FOperatorExpressionPointer; }
+    TOdlAstNodeExpression* RightExpressionPointer() const { return FRightExpressionPointer; }
+
+private:
+    TOdlAstNodeExpression*  FLeftExpressionPointer;
+    TOdlAstNodeOperator*    FOperatorExpressionPointer;
+    TOdlAstNodeExpression*  FRightExpressionPointer;
+};
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
 }
 
 

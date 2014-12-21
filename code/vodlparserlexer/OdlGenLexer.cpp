@@ -490,8 +490,8 @@ static YY_CHAR *yy_last_accepting_cpos;
 static const short int yy_rule_linenum[28] =
     {   0,
        29,   32,   36,   40,   43,   47,   51,   55,   59,   63,
-       69,   75,   81,   87,   94,   98,  102,  106,  110,  114,
-      118,  122,  127,  136,  163,  163,  174
+       68,   73,   78,   83,   89,   93,   97,  101,  105,  109,
+      113,  117,  122,  131,  158,  158,  169
     } ;
 
 #endif
@@ -721,117 +721,112 @@ case 10:
 #line 63 "OdlLexer.l"
 {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_PLUS);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_PLUS);
                     return OdlParserBase::OPERATOR_PLUS;
                   }
 	YY_BREAK
 case 11:
-#line 69 "OdlLexer.l"
+#line 68 "OdlLexer.l"
 {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MINUS);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MINUS);
                     return OdlParserBase::OPERATOR_MINUS;
                   }
 	YY_BREAK
 case 12:
-#line 75 "OdlLexer.l"
+#line 73 "OdlLexer.l"
 {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MULTIPLY);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MULTIPLY);
                     return OdlParserBase::OPERATOR_MULTIPLY;
                   }
 	YY_BREAK
 case 13:
-#line 81 "OdlLexer.l"
+#line 78 "OdlLexer.l"
 {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_DIVIDE);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_DIVIDE);
                     return OdlParserBase::OPERATOR_DIVIDE;
                   }
 	YY_BREAK
 case 14:
-#line 87 "OdlLexer.l"
+#line 83 "OdlLexer.l"
 {
                     ++column;
-					val->FAstNode = new odl::TOdlAstNode();
-					val->FAstNode->SetAsOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MODULO);
+					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MODULO);
                     return OdlParserBase::OPERATOR_MODULO;						
 				  }
 	YY_BREAK
 case 15:
-#line 94 "OdlLexer.l"
+#line 89 "OdlLexer.l"
 {
                     ++column;
                     return OdlParserBase::TOKEN_EQUALS;
                   }
 	YY_BREAK
 case 16:
-#line 98 "OdlLexer.l"
+#line 93 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_OPEN_BRACE;
 					}
 	YY_BREAK
 case 17:
-#line 102 "OdlLexer.l"
+#line 97 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_CLOSE_BRACE;
 					}
 	YY_BREAK
 case 18:
-#line 106 "OdlLexer.l"
+#line 101 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_OPEN_BRACKET;
 					}
 	YY_BREAK
 case 19:
-#line 110 "OdlLexer.l"
+#line 105 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_CLOSE_BRACKET;
 					}
 	YY_BREAK
 case 20:
-#line 114 "OdlLexer.l"
+#line 109 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_OPEN_PARENTHESIS;
 					}
 	YY_BREAK
 case 21:
-#line 118 "OdlLexer.l"
+#line 113 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_CLOSE_PARENTHESIS;
 					}
 	YY_BREAK
 case 22:
-#line 122 "OdlLexer.l"
+#line 117 "OdlLexer.l"
 {
 						++column;
 						return OdlParserBase::TOKEN_COMMA;
 					}
 	YY_BREAK
 case 23:
-#line 127 "OdlLexer.l"
+#line 122 "OdlLexer.l"
 {
 						int const textLength = strlen(yytext);
 						column += textLength;
 
 						// remove quotes.
 						assert(textLength >= 2);
-						val->FAstNode = new odl::TOdlAstNodeValue(std::string(yytext + 1, yytext + textLength - 1));
+						val->FOdlAstNode = new odl::TOdlAstNodeValue(std::string(yytext + 1, yytext + textLength - 1));
 						return OdlParserBase::VALUE_STRING;
 					}
 	YY_BREAK
 case 24:
-#line 136 "OdlLexer.l"
+#line 131 "OdlLexer.l"
 {
 								int const characterCount = strlen(yytext);
 								column += characterCount;
@@ -848,35 +843,35 @@ case 24:
 								if (isFloat)
 								{
 									float const floatValue = (float) atof(yytext);
-									val->FAstNode = new odl::TOdlAstNodeValue(floatValue);
+									val->FOdlAstNode = new odl::TOdlAstNodeValue(floatValue);
 									return OdlParserBase::VALUE_FLOAT;
 								}
 								else
 								{
 									int integerValue = atoi(yytext);
-									val->FAstNode = new odl::TOdlAstNodeValue(integerValue);
+									val->FOdlAstNode = new odl::TOdlAstNodeValue(integerValue);
 									return OdlParserBase::VALUE_INTEGER;
 								}
 							}
 	YY_BREAK
 case 25:
-#line 163 "OdlLexer.l"
+#line 158 "OdlLexer.l"
 {
 						int const textLength = strlen(yytext);
 						column += textLength;
 						
-						val->FAstNode = new odl::TOdlAstNodeIdentifier(std::string(yytext));
+						val->FOdlAstNode = new odl::TOdlAstNodeIdentifier(std::string(yytext));
 						return OdlParserBase::IDENTIFIER;
 				  }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 170 "OdlLexer.l"
+#line 165 "OdlLexer.l"
 {
                     yyterminate();
                   }
 	YY_BREAK
 case 27:
-#line 174 "OdlLexer.l"
+#line 169 "OdlLexer.l"
 {
 					 int const textLength = strlen(yytext);
 					 ++column;
@@ -884,7 +879,7 @@ case 27:
 				  }
 	YY_BREAK
 case 28:
-#line 180 "OdlLexer.l"
+#line 175 "OdlLexer.l"
 ECHO;
 	YY_BREAK
 #line 493 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\flexskel.cc"
@@ -1479,4 +1474,4 @@ void YY_OdlScanner_CLASS::YY_OdlScanner_INIT_BUFFER( YY_BUFFER_STATE b, YY_OdlSc
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 180 "OdlLexer.l"
+#line 175 "OdlLexer.l"

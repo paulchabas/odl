@@ -22,7 +22,6 @@ static odl::TOdlAstNodeIdentifier* AutoGenerateObjectIdentifier()
 //-------------------------------------------------------------------------------
 TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
     FAstNodeType(parAstNodeType),
-    FOperatorType(TOdlAstNodeOperatorType::OPERATOR_NONE),
     FPropertyList(),
     FIdentifierPointer(nullptr),
     FTypeIdentifierPointer(nullptr),
@@ -30,9 +29,6 @@ TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
     FPropertyDeclarationListPointer(nullptr),
     FExpressionPointer(nullptr),
     FTemplateParameterListPointer(nullptr),
-    FLeftExpressionPointer(nullptr),
-    FOperatorExpressionPointer(nullptr),
-    FRightExpressionPointer(nullptr),
     FResolvedReferenceWeak(nullptr),
     FAnonymousDeclaration(true), // value reset by named declarations.
     FReferenceToResolve(false),
@@ -44,7 +40,6 @@ TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
 //-------------------------------------------------------------------------------
 TOdlAstNode::TOdlAstNode() :
     FAstNodeType(TOdlAstNodeType::UNKNOWN),
-    FOperatorType(TOdlAstNodeOperatorType::OPERATOR_NONE),
     FPropertyList(),
     FIdentifierPointer(nullptr),
     FTypeIdentifierPointer(nullptr),
@@ -52,9 +47,6 @@ TOdlAstNode::TOdlAstNode() :
     FPropertyDeclarationListPointer(nullptr),
     FExpressionPointer(nullptr),
     FTemplateParameterListPointer(nullptr),
-    FLeftExpressionPointer(nullptr),
-    FOperatorExpressionPointer(nullptr),
-    FRightExpressionPointer(nullptr),
     FResolvedReferenceWeak(nullptr),
     FAnonymousDeclaration(true), // value reset by named declarations.
     FReferenceToResolve(false),
@@ -78,11 +70,6 @@ TOdlAstNode::~TOdlAstNode()
         delete node;
     }
 
-    for (size_t i = 0; i < FVectorContent.size(); ++i)
-    {
-        TOdlAstNode const* node = FVectorContent[i];
-        delete node;
-    }
 
     for (size_t i = 0; i < FTemplateParameterList.size(); ++i)
     {
@@ -95,9 +82,6 @@ TOdlAstNode::~TOdlAstNode()
     delete FTargetTemplateNamespaceIdentifierPointer;
     delete FPropertyDeclarationListPointer;
     delete FExpressionPointer;
-    delete FLeftExpressionPointer;
-    delete FOperatorExpressionPointer;
-    delete FRightExpressionPointer;
     delete FTemplateParameterListPointer;
 
     FResolvedReferenceWeak = nullptr; // weak reference.
@@ -285,46 +269,6 @@ void TOdlAstNode::SetAsPropertyDeclaration(TOdlAstNodeIdentifier* parIdentifier,
     FExpressionPointer = parExpression;
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsOperator(TOdlAstNodeOperatorType::TType parOperatorType)
-{
-    FAstNodeType = TOdlAstNodeType::OPERATOR;
-    FOperatorType = parOperatorType;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsExpression(TOdlAstNode* parLeftExpression,
-                                  TOdlAstNode* parOperator,
-                                  TOdlAstNode* parRightExpression)
-{
-    FAstNodeType = TOdlAstNodeType::EXPRESSION;
-
-    assert(parRightExpression != nullptr);
-    assert(parOperator != nullptr);
-    if (parOperator->OperatorType() != TOdlAstNodeOperatorType::OPERATOR_MINUS)
-    {
-        assert(parLeftExpression != nullptr);
-    }
-    
-    assert(parLeftExpression != nullptr ? parLeftExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK : true);
-    assert(parRightExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK);
-    assert(parOperator->AstNodeType() == TOdlAstNodeType::OPERATOR);
-
-    FLeftExpressionPointer = parLeftExpression;
-    FOperatorExpressionPointer = parOperator;
-    FRightExpressionPointer = parRightExpression;    
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsVector()
-{
-    FAstNodeType = TOdlAstNodeType::VALUE_VECTOR;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::Vector_AppendItem(TOdlAstNode* parVectorItem)
-{
-    assert(AstNodeType() == TOdlAstNodeType::VALUE_VECTOR);
-
-    FVectorContent.push_back(parVectorItem);
-}
-//-------------------------------------------------------------------------------
 void TOdlAstNode::PrettyPrint(std::ostringstream& parOss) const
 {
     PrettyPrintWithIndentLevel(parOss, 0);
@@ -408,23 +352,24 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             }
 
             parOss << "(" << std::endl;
-            if (FLeftExpressionPointer != nullptr)
+            if (CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer() != nullptr)
             {
                 Indent(parOss, parIndentLevel + 4);
-                FLeftExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
-                if (FLeftExpressionPointer->AstNodeType() != TOdlAstNodeType::EXPRESSION)
+                CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+                if (CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer()->AstNodeType() != TOdlAstNodeType::EXPRESSION)
                     parOss << std::endl;
             }
-            FOperatorExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+            CastNode<TOdlAstNodeOperation>()->OperatorExpressionPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
             Indent(parOss, parIndentLevel + 4);
-            FRightExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
+            CastNode<TOdlAstNodeOperation>()->RightExpressionPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
             parOss << std::endl;
             Indent(parOss, parIndentLevel) << ")" << std::endl;
         }
         break ;
     case TOdlAstNodeType::OPERATOR:
     {
-        switch (FOperatorType)
+        TOdlAstNodeOperatorType::TType operatorType = CastNode<TOdlAstNodeOperator>()->OperatorType();
+        switch (operatorType)
         {
         case TOdlAstNodeOperatorType::OPERATOR_PLUS:
             {
@@ -530,15 +475,18 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
                 parOss << " is ";
             }
 
+
+            TOdlAstNodeValueVector const* valueVectorNode = CastNode<TOdlAstNodeValueVector>();
+            std::vector< TOdlAstNodeExpression* > const& vectorContent = valueVectorNode->VectorContent();
             parOss << '[';
-            for (int i = 0; i < (int) FVectorContent.size(); ++i)
+            for (int i = 0; i < (int) vectorContent.size(); ++i)
             {
                 // PAUL(15/05/14 18:19:11) les items sont stockés à l'envers 
                 // (description de la grammaire permet de supporter la notation [ expression , ]
-                int const invI = (int) FVectorContent.size() - i - 1;
-                TOdlAstNode const* item = FVectorContent[invI];
+                int const invI = (int) vectorContent.size() - i - 1;
+                TOdlAstNode const* item = vectorContent[invI];
                 item->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
-                if (i + 1 != FVectorContent.size())
+                if (i + 1 != vectorContent.size())
                     parOss << ", ";
             }
             parOss << ']';
