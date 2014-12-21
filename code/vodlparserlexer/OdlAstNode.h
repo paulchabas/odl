@@ -67,6 +67,9 @@ public:
 
     void SetAsNamespace();
     void Namespace_AppendNamedDeclaration(TOdlAstNode* parDeclaration);
+	void Namespace_SetTemplateParameterList(TOdlAstNode* parTemplateArgumentListPointer);
+
+	void SetAsNamespaceTemplateInstanciation(TOdlAstNode* parIdentifier, TOdlAstNode* parTargetTemplateNamespaceIdentifierPointer, TOdlAstNode* parTemplateExpressionList);
     
     void SetAsExpression(TOdlAstNode* parLeftExpression,
                          TOdlAstNode* parOperator,
@@ -79,7 +82,7 @@ public:
 	void SetAsNullPtr();
 	void SetAsNamedDeclaration(TOdlAstNode* parNameIdentifier, TOdlAstNode* parExpression);
 
-    void SetAsTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList);
+    void SetAsObjectTemplateDeclaration(TOdlAstNode* parIdentifier, TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateParameterList, TOdlAstNode* parPropertyList);
     void SetAsTemplateInstanciation(TOdlAstNode* parTypeIdentifier, TOdlAstNode* parTemplateExpressionList);
 	void SetAsTemplateDeclarationParameterList();
 	void TemplateDeclarationParameterList_AppendParameter(TOdlAstNode* parIdentifier);
@@ -161,6 +164,7 @@ private:
 
     TOdlAstNode*                    FIdentifierPointer;
     TOdlAstNode*                    FTypeIdentifierPointer;
+	TOdlAstNode*					FTargetTemplateNamespaceIdentifierPointer;
     TOdlAstNode*                    FPropertyDeclarationListPointer;
     TOdlAstNode*                    FExpressionPointer;
 	TOdlAstNode*					FTemplateParameterListPointer;

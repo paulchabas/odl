@@ -164,7 +164,7 @@ void TrueMain()
 	// odlAst = odlParser.ParseFile("Data/main.odl");
 	// odlAst = odlParser.ParseFile("Data/circular_reference.odl");
 	// odlAst = odlParser.ParseFile("Data/float.odl");
-	odlAst = odlParser.ParseFile("Data/templates.odl");
+	odlAst = odlParser.ParseFile("Data/namespace_templates.odl");
    
     {
 		std::cout << "-----------------------------" << std::endl;

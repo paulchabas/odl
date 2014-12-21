@@ -1,0 +1,28 @@
+
+
+
+namespace tn0()
+{
+    
+
+}
+
+namespace tn1(a)
+{
+
+}
+
+namespace tn2(a,b,c)
+{
+    
+
+}
+
+namespace aba = tn2(5,2,4)
+
+
+namespace n0
+{
+    
+
+}

@@ -48,7 +48,7 @@
 %type <FAstNode> property_declaration_list property_declaration
 %type <FAstNode> expression term factor
 %type <FAstNode> vector_value_list vector_value
-%type <FAstNode> template_parameter_list template_declaration_parameter_list
+%type <FAstNode> template_instanciation_parameter_list template_declaration_parameter_list
 
 %start odl_ast
  
@@ -89,10 +89,28 @@ named_declaration
 	theNamespace->SetIdentifierPointer($2);
 	$$ = theNamespace;
 }
+| TOKEN_NAMESPACE IDENTIFIER TOKEN_OPEN_PARENTHESIS template_declaration_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE named_declaration_list TOKEN_CLOSE_BRACE
+{
+    // namespace template declaration
+
+	odl::TOdlAstNode* theNamespace = $7;
+	theNamespace->SetIdentifierPointer($2);
+	theNamespace->Namespace_SetTemplateParameterList($4);
+	$$ = theNamespace;
+}
+| TOKEN_NAMESPACE IDENTIFIER TOKEN_EQUALS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
+{
+	// namespace template instanciation
+	odl::TOdlAstNode* theNamespace = new odl::TOdlAstNode();
+	theNamespace->SetAsNamespaceTemplateInstanciation($2, $4, $6);
+	$$ = theNamespace;
+}
 | TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_declaration_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
+	// object template declaration
+
 	odl::TOdlAstNode* templateDeclaration = new odl::TOdlAstNode();
-	templateDeclaration->SetAsTemplateDeclaration($2, $4, $6, $9);
+	templateDeclaration->SetAsObjectTemplateDeclaration($2, $4, $6, $9);
 	$$ = templateDeclaration;
 }
 ;
@@ -110,7 +128,7 @@ anomymous_object_declaration_or_reference
 	objectDeclaration->SetAsObjectDeclaration($1, $3);
 	$$ = objectDeclaration;
 }
-| IDENTIFIER TOKEN_OPEN_PARENTHESIS template_parameter_list TOKEN_CLOSE_PARENTHESIS
+| IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
 {
 	// template instanciation.
 	
@@ -154,8 +172,8 @@ template_declaration_parameter_list
 }
 ;
 
-template_parameter_list
-: template_parameter_list TOKEN_COMMA expression
+template_instanciation_parameter_list
+: template_instanciation_parameter_list TOKEN_COMMA expression
 {
 	odl::TOdlAstNode* templateParameterList = $1;
 	templateParameterList->TemplateInstanciationParameterList_AppendParameter($3);
