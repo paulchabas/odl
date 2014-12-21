@@ -19,6 +19,7 @@
 {
 	odl::TOdlAstNode*				FAstNode;
 	odl::TOdlAstNodeIdentifier*		FAstNodeIdentifier;
+	odl::TOdlAstNodeValue*			FOdlAstNodeValue;
 }
  
 %token UNKNOWN
@@ -37,9 +38,9 @@
 %token TOKEN_NULLPTR
 
 %token <FAstNode> OPERATOR_PLUS OPERATOR_MINUS OPERATOR_MULTIPLY OPERATOR_DIVIDE OPERATOR_MODULO
-%token <FAstNode> VALUE_INTEGER
-%token <FAstNode> VALUE_FLOAT
-%token <FAstNode> VALUE_STRING
+%token <FOdlAstNodeValue> VALUE_INTEGER
+%token <FOdlAstNodeValue> VALUE_FLOAT
+%token <FOdlAstNodeValue> VALUE_STRING
 %token <FAstNodeIdentifier> IDENTIFIER
 %token< FAstNode> TOKEN_NULLPTR
 

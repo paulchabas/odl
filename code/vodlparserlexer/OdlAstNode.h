@@ -115,10 +115,6 @@ public:
     void PropertyDeclarationList_AppendPropertyDeclaration(TOdlAstNode* parPropertyDeclarationNode);
     void SetAsPropertyDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNode* parExpression);
 
-    void SetAsStringValue(std::string const& parStringValue);
-    void SetAsIntegerValue(int parIntegerValue);
-    void SetAsFloatValue(float parFloatValue);
-
     void SetAsOperator(TOdlAstNodeOperatorType::TType parOperatorType);
 
 	void SetAnonymousDeclaration(bool parState) { FAnonymousDeclaration = parState; }
@@ -145,9 +141,6 @@ public:
     TOdlAstNode* PropertyDeclarationListPointer() const { return FPropertyDeclarationListPointer; }
 	TOdlAstNode* TemplateParameterListPointer() const { return FTemplateParameterListPointer; }
 
-    int ValueInteger() const { return FValueInteger; }
-    float ValueFloat() const { return FValueFloat; }
-    char const* ValueString() const { return FValueString.c_str(); }
 	bool IsNullPtr() const;
 
     bool IsReferenceToResolve() const { return FReferenceToResolve; }
@@ -170,9 +163,7 @@ private:
     TOdlAstNodeType::TType          FAstNodeType;
 
     TOdlAstNodeOperatorType::TType  FOperatorType;
-    std::string                     FValueString;
-    int                             FValueInteger;
-    float                           FValueFloat;
+
     
     std::vector< TOdlAstNode* >     FPropertyList;
     std::vector< TOdlAstNode* >     FNamedDeclarationList;
@@ -220,6 +211,49 @@ public:
 
 private:
     std::string FIdentifier;
+};
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+class TOdlAstNodeValue : public TOdlAstNode
+{
+public:
+    TOdlAstNodeValue(std::string const& parValueString) :
+        TOdlAstNode(TOdlAstNodeType::VALUE_STRING),
+        FValueString(parValueString),
+        FValueInteger(0),
+        FValueFloat(0.0f)
+    {
+        
+    }
+
+    TOdlAstNodeValue(float parValueFloat) :
+        TOdlAstNode(TOdlAstNodeType::VALUE_FLOAT),
+        FValueString(),
+        FValueInteger(0),
+        FValueFloat(parValueFloat)
+    {
+        
+    }
+
+    TOdlAstNodeValue(int parValueInteger) :
+        TOdlAstNode(TOdlAstNodeType::VALUE_INTEGER),
+        FValueString(),
+        FValueInteger(parValueInteger),
+        FValueFloat(0.0f)
+    {
+        
+    }
+
+
+    int ValueInteger() const { return FValueInteger; }
+    float ValueFloat() const { return FValueFloat; }
+    std::string const& ValueString() const { return FValueString; }
+
+private:
+    std::string                     FValueString;
+    int                             FValueInteger;
+    float                           FValueFloat;
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************

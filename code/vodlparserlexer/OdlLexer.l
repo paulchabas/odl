@@ -130,8 +130,7 @@ LINE_COMMENT "//".*\n
 
 						// remove quotes.
 						assert(textLength >= 2);
-						val->FAstNode = new odl::TOdlAstNode();
-						val->FAstNode->SetAsStringValue(std::string(yytext + 1, yytext + textLength - 1));
+						val->FAstNode = new odl::TOdlAstNodeValue(std::string(yytext + 1, yytext + textLength - 1));
 						return OdlParserBase::VALUE_STRING;
 					}
 {VALUE_FLOAT_OR_INTEGER}	{
@@ -150,15 +149,13 @@ LINE_COMMENT "//".*\n
 								if (isFloat)
 								{
 									float const floatValue = (float) atof(yytext);
-									val->FAstNode = new odl::TOdlAstNode();
-									val->FAstNode->SetAsFloatValue(floatValue);
+									val->FAstNode = new odl::TOdlAstNodeValue(floatValue);
 									return OdlParserBase::VALUE_FLOAT;
 								}
 								else
 								{
 									int integerValue = atoi(yytext);
-									val->FAstNode = new odl::TOdlAstNode();
-									val->FAstNode->SetAsIntegerValue(integerValue);
+									val->FAstNode = new odl::TOdlAstNodeValue(integerValue);
 									return OdlParserBase::VALUE_INTEGER;
 								}
 							}

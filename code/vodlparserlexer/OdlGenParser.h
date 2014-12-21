@@ -36,6 +36,7 @@ typedef union
 {
 	odl::TOdlAstNode*				FAstNode;
 	odl::TOdlAstNodeIdentifier*		FAstNodeIdentifier;
+	odl::TOdlAstNodeValue*			FOdlAstNodeValue;
 } yy_OdlParserBase_stype;
 #define YY_OdlParserBase_STYPE yy_OdlParserBase_stype
 
@@ -91,21 +92,21 @@ typedef union
 #ifndef YY_OdlParserBase_PURE
 
 /* #line 63 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 95 "OdlGenParser.h"
+#line 96 "OdlGenParser.h"
 
 #line 63 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h"
 /* YY_OdlParserBase_PURE */
 #endif
 
 /* #line 65 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 102 "OdlGenParser.h"
+#line 103 "OdlGenParser.h"
 
 #line 65 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h"
 /* prefix */
 #ifndef YY_OdlParserBase_DEBUG
 
 /* #line 67 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 109 "OdlGenParser.h"
+#line 110 "OdlGenParser.h"
 
 #line 67 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h"
 /* YY_OdlParserBase_DEBUG */
@@ -113,7 +114,7 @@ typedef union
 #ifndef YY_OdlParserBase_LSP_NEEDED
 
 /* #line 70 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 117 "OdlGenParser.h"
+#line 118 "OdlGenParser.h"
 
 #line 70 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h"
  /* YY_OdlParserBase_LSP_NEEDED*/
@@ -191,7 +192,7 @@ extern YY_OdlParserBase_STYPE YY_OdlParserBase_LVAL;
 
 
 /* #line 143 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 195 "OdlGenParser.h"
+#line 196 "OdlGenParser.h"
 #define	UNKNOWN	258
 #define	TOKEN_IS	259
 #define	TOKEN_OPEN_BRACE	260
@@ -258,7 +259,7 @@ public:
 /* static const int token ... */
 
 /* #line 182 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 262 "OdlGenParser.h"
+#line 263 "OdlGenParser.h"
 static const int UNKNOWN;
 static const int TOKEN_IS;
 static const int TOKEN_OPEN_BRACE;
@@ -289,7 +290,7 @@ static const int IDENTIFIER;
 enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 
 /* #line 185 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 293 "OdlGenParser.h"
+#line 294 "OdlGenParser.h"
 	,UNKNOWN=258
 	,TOKEN_IS=259
 	,TOKEN_OPEN_BRACE=260
@@ -368,5 +369,5 @@ public:
 /* END */
 
 /* #line 236 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 372 "OdlGenParser.h"
+#line 373 "OdlGenParser.h"
 #endif

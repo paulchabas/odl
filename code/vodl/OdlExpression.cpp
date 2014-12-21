@@ -331,17 +331,17 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
         {
         case TOdlAstNodeType::VALUE_INTEGER:
             {
-                return TOdlExpression(parExpression->ValueInteger());
+                return TOdlExpression(parExpression->CastNode<TOdlAstNodeValue>()->ValueInteger());
             }
             break ;
         case TOdlAstNodeType::VALUE_FLOAT:
             {
-                return TOdlExpression(parExpression->ValueFloat());
+                return TOdlExpression(parExpression->CastNode<TOdlAstNodeValue>()->ValueFloat());
             }
             break ;
         case TOdlAstNodeType::VALUE_STRING:
             {
-                char const* theString = parExpression->ValueString();
+                char const* theString = parExpression->CastNode<TOdlAstNodeValue>()->ValueString().c_str();
                 size_t const stringLength = strlen(theString);
                 char* newString = new char[stringLength + 1];
                 for (size_t i = 0; i < stringLength; ++i)

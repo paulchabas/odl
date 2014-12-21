@@ -23,9 +23,6 @@ static odl::TOdlAstNodeIdentifier* AutoGenerateObjectIdentifier()
 TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
     FAstNodeType(parAstNodeType),
     FOperatorType(TOdlAstNodeOperatorType::OPERATOR_NONE),
-    FValueString(),
-    FValueInteger(0),
-    FValueFloat(0.0f),
     FPropertyList(),
     FIdentifierPointer(nullptr),
     FTypeIdentifierPointer(nullptr),
@@ -48,9 +45,6 @@ TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
 TOdlAstNode::TOdlAstNode() :
     FAstNodeType(TOdlAstNodeType::UNKNOWN),
     FOperatorType(TOdlAstNodeOperatorType::OPERATOR_NONE),
-    FValueString(),
-    FValueInteger(0),
-    FValueFloat(0.0f),
     FPropertyList(),
     FIdentifierPointer(nullptr),
     FTypeIdentifierPointer(nullptr),
@@ -291,24 +285,6 @@ void TOdlAstNode::SetAsPropertyDeclaration(TOdlAstNodeIdentifier* parIdentifier,
     FExpressionPointer = parExpression;
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsStringValue(std::string const& parStringValue)
-{
-    FAstNodeType = TOdlAstNodeType::VALUE_STRING;
-    FValueString = parStringValue;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsIntegerValue(int parIntegerValue)
-{
-    FAstNodeType = TOdlAstNodeType::VALUE_INTEGER;
-    FValueInteger = parIntegerValue;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsFloatValue(float parFloatValue)
-{
-    FAstNodeType = TOdlAstNodeType::VALUE_FLOAT;
-    FValueFloat = parFloatValue;
-}
-//-------------------------------------------------------------------------------
 void TOdlAstNode::SetAsOperator(TOdlAstNodeOperatorType::TType parOperatorType)
 {
     FAstNodeType = TOdlAstNodeType::OPERATOR;
@@ -499,7 +475,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             }
 
             parOss << "\"";
-            parOss << FValueString.c_str();
+            parOss << this->CastNode<TOdlAstNodeValue>()->ValueString().c_str();
             parOss << "\"";
 
             if (!anonymous)
@@ -518,7 +494,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
                 parOss << " is ";
             }
 
-            parOss << FValueInteger;
+            parOss <<  this->CastNode<TOdlAstNodeValue>()->ValueInteger();
 
             if (!anonymous)
             {
@@ -536,7 +512,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
                 parOss << " is ";
             }
 
-            parOss << FValueFloat;
+            parOss <<  this->CastNode<TOdlAstNodeValue>()->ValueFloat();
 
             if (!anonymous)
             {

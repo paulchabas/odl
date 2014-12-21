@@ -491,7 +491,7 @@ static const short int yy_rule_linenum[28] =
     {   0,
        29,   32,   36,   40,   43,   47,   51,   55,   59,   63,
        69,   75,   81,   87,   94,   98,  102,  106,  110,  114,
-      118,  122,  127,  137,  166,  166,  177
+      118,  122,  127,  136,  163,  163,  174
     } ;
 
 #endif
@@ -826,13 +826,12 @@ case 23:
 
 						// remove quotes.
 						assert(textLength >= 2);
-						val->FAstNode = new odl::TOdlAstNode();
-						val->FAstNode->SetAsStringValue(std::string(yytext + 1, yytext + textLength - 1));
+						val->FAstNode = new odl::TOdlAstNodeValue(std::string(yytext + 1, yytext + textLength - 1));
 						return OdlParserBase::VALUE_STRING;
 					}
 	YY_BREAK
 case 24:
-#line 137 "OdlLexer.l"
+#line 136 "OdlLexer.l"
 {
 								int const characterCount = strlen(yytext);
 								column += characterCount;
@@ -849,21 +848,19 @@ case 24:
 								if (isFloat)
 								{
 									float const floatValue = (float) atof(yytext);
-									val->FAstNode = new odl::TOdlAstNode();
-									val->FAstNode->SetAsFloatValue(floatValue);
+									val->FAstNode = new odl::TOdlAstNodeValue(floatValue);
 									return OdlParserBase::VALUE_FLOAT;
 								}
 								else
 								{
 									int integerValue = atoi(yytext);
-									val->FAstNode = new odl::TOdlAstNode();
-									val->FAstNode->SetAsIntegerValue(integerValue);
+									val->FAstNode = new odl::TOdlAstNodeValue(integerValue);
 									return OdlParserBase::VALUE_INTEGER;
 								}
 							}
 	YY_BREAK
 case 25:
-#line 166 "OdlLexer.l"
+#line 163 "OdlLexer.l"
 {
 						int const textLength = strlen(yytext);
 						column += textLength;
@@ -873,13 +870,13 @@ case 25:
 				  }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 173 "OdlLexer.l"
+#line 170 "OdlLexer.l"
 {
                     yyterminate();
                   }
 	YY_BREAK
 case 27:
-#line 177 "OdlLexer.l"
+#line 174 "OdlLexer.l"
 {
 					 int const textLength = strlen(yytext);
 					 ++column;
@@ -887,7 +884,7 @@ case 27:
 				  }
 	YY_BREAK
 case 28:
-#line 183 "OdlLexer.l"
+#line 180 "OdlLexer.l"
 ECHO;
 	YY_BREAK
 #line 493 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\flexskel.cc"
@@ -1482,4 +1479,4 @@ void YY_OdlScanner_CLASS::YY_OdlScanner_INIT_BUFFER( YY_BUFFER_STATE b, YY_OdlSc
 
     b->yy_eof_status = EOF_NOT_SEEN;
     }
-#line 183 "OdlLexer.l"
+#line 180 "OdlLexer.l"
