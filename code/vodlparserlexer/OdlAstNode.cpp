@@ -98,7 +98,6 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         {
             TOdlAstNodeTemplateObjectDeclaration const* that = CastNode<TOdlAstNodeTemplateObjectDeclaration>();
             
-            Indent(parOss, parIndentLevel);
             parOss << "template ";
             parOss << that->IdentifierPointer()->Identifier();
             parOss << " is ";
