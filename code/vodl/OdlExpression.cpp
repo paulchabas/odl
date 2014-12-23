@@ -324,7 +324,13 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 		return TOdlExpression();
 
     TOdlAstNodeType::TType expressionType = parExpression->AstNodeType();
-    if (expressionType & TOdlAstNodeType::VALUE_MASK)
+    if (expressionType == TOdlAstNodeType::NAMED_DECLARATION)
+    {
+        TOdlAstNodeNamedDeclaration const* namedDeclaration = parExpression->CastNode<TOdlAstNodeNamedDeclaration>();
+        TOdlAstNodeExpression const* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
+        return EvalExpression(parContext, namedDeclarationExpression);
+    }
+    else if (expressionType & TOdlAstNodeType::VALUE_MASK)
     {
         switch (expressionType)
         {
