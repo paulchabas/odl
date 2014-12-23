@@ -176,6 +176,7 @@ anomymous_object_declaration_or_reference
 }
 | TOKEN_NULLPTR
 {
+	// nullptr instanciation.
 	odl::TOdlAstNodeObjectDeclaration* theNullptr = new odl::TOdlAstNodeObjectDeclaration();
 	$$ = theNullptr;
 }

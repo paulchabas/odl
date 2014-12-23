@@ -315,7 +315,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
             assert(identifier != nullptr);
             std::string const& namespaceName = identifier->Identifier();
             context.EnterNamespace(namespaceName);
-            VisitAst(namedDeclarationNode, parContext, FillObjectsProperties);
+            VisitAst(parAstNode, parContext, FillObjectsProperties);
 			context.LeaveNamespace();
         }
         break ;
@@ -345,8 +345,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 			TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 			TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, object, metaClassBase, parAstNode);
 
-			TOdlAstNode* propertiesToFill = templateDeclaration->PropertyDeclarationListPointer();
-			// FillObjectsProperties(
+			TOdlAstNodePropertyDeclarationList* propertiesToFill = templateDeclaration->PropertyDeclarationListPointer();
 
 			VisitAst(propertiesToFill, newContext, FillObjectsProperties);
 		}
@@ -733,7 +732,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 			std::string namespaceName = namespaceDeclarationNode->IdentifierPointer_IFP() != nullptr ? namespaceDeclarationNode->IdentifierPointer_IFP()->Identifier() : std::string();
 			if (!namespaceName.empty())
 				context.EnterNamespace(namespaceName);
-            VisitAst(namespaceDeclarationNode, parContext, ResolveValueIdentifier);
+            VisitAst(parAstNode, parContext, ResolveValueIdentifier);
 			if (!namespaceName.empty())
 				context.LeaveNamespace();
             context.PopParentNode();
@@ -747,7 +746,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 			std::string const& namespaceName = namedDeclarationNode->IdentifierPointer()->Identifier();
 			if (!namespaceName.empty())
 				context.EnterNamespace(namespaceName);
-            VisitAst(namedDeclarationNode, parContext, ResolveValueIdentifier);
+            VisitAst(parAstNode, parContext, ResolveValueIdentifier);
 			if (!namespaceName.empty())
 				context.LeaveNamespace();
 			context.PopParentNode();
@@ -759,7 +758,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 			// resolve resolve arguments.
 			TResolveValueIdentifierInterpretContext& context = static_cast< TResolveValueIdentifierInterpretContext& >(parContext);
             context.PushParentNode(templateObjectDeclaration);
-            VisitAst(templateObjectDeclaration, parContext, ResolveValueIdentifier);
+            VisitAst(parAstNode, parContext, ResolveValueIdentifier);
 			context.PopParentNode();
 		};
 		break;
