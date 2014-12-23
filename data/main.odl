@@ -68,7 +68,7 @@ sum is TTestClass2
 }
 
 
-asignVector0 is TTestClass2
+assignVector0 is TTestClass2
 {
 	FVector = [ 4, 5, 6 ]
 	FString = "toto" + "tata"

@@ -332,7 +332,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 
             Indent(parOss, parIndentLevel) << "namespace ";
 
-            TOdlAstNodeIdentifier const* identifierNode = namespaceDeclarationNode->IdentifierPointer();
+            TOdlAstNodeIdentifier const* identifierNode = namespaceDeclarationNode->IdentifierPointer_IFP();
             if (identifierNode != nullptr)
             {
                 parOss << identifierNode->Identifier();

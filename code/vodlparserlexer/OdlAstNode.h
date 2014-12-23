@@ -29,7 +29,7 @@ namespace TOdlAstNodeType
 		NAMED_DECLARATION						= 10,
         OPERATION								= 11 | EXPRESSION_MASK,
 		VALUE_VECTOR							= 12 | EXPRESSION_MASK | VALUE_MASK,
-        TEMPLATE_OBJECT_DECLARATION				= 13 | TEMPLATE_MASK,
+        TEMPLATE_OBJECT_DECLARATION				= 13 | TEMPLATE_MASK | EXPRESSION_MASK,
         TEMPLATE_OBJECT_INSTANCIATION			= 14 | TEMPLATE_MASK | VALUE_MASK,
         TEMPLATE_DECLARATION_PARAMETER          = 15,
 		TEMPLATE_DECLARATION_PARAMETER_LIST		= 16,
@@ -439,15 +439,14 @@ public:
                                          TOdlAstNodeTemplateParameterList* parTemplateParameterList, 
                                          TOdlAstNodePropertyDeclarationList* parPropertyDeclarationList) :
         parent_type(TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION, parTypeIdentifier),
+        FNamedDeclarationWeakRef(nullptr),
         FTemplateParameterListPointer(parTemplateParameterList),
         FPropertyDeclarationListPointer(parPropertyDeclarationList)
     {
         assert(parTypeIdentifier != nullptr); // Paul(2014/12/21)  cannot be null in that case.
-        assert(FNamedDeclarationWeakRef != nullptr);
         assert(FTemplateParameterListPointer != nullptr);
         assert(FPropertyDeclarationListPointer != nullptr);
 
-        assert(FNamedDeclarationWeakRef->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION);
         assert(FTemplateParameterListPointer->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
         assert(FPropertyDeclarationListPointer->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
     }
