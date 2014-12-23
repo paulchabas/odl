@@ -415,16 +415,22 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 		{
             TOdlAstNodeNamespaceDeclaration const* namespaceDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
             std::string namespaceName = namespaceDeclarationNode->IdentifierPointer_IFP() ? namespaceDeclarationNode->IdentifierPointer_IFP()->Identifier() : std::string();
+            // Paul(2014/12/23)  root namespace is empty.
             if (!namespaceName.empty())
             	parContext.EnterNamespace(namespaceName);
             VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
+            // Paul(2014/12/23)  root namespace is empty.
             if (!namespaceName.empty())
             	parContext.LeaveNamespace();
 		}
 		break ;
 	case TOdlAstNodeType::NAMED_DECLARATION:
 		{
-            TOdlAstNodeNamedDeclaration const* namedDeclaration = parAstNode->CastNode<TOdlAstNodeNamedDeclaration>();
+            TOdlAstNodeNamedDeclaration* namedDeclaration = parAstNode->CastNode<TOdlAstNodeNamedDeclaration>();
+
+            // Paul(2014/12/23)  here name objects that needs to.
+            namedDeclaration->AutoGenerateIdentifierIfNone();
+
             std::string namedDeclarationName = namedDeclaration->IdentifierPointer()->Identifier();
             parContext.EnterNamespace(namedDeclarationName);
             TOdlAstNodeExpression* expressionPointer = namedDeclaration->ExpressionPointer();
@@ -435,10 +441,10 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 	case TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION:
 		{
             TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclarationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
-            
             #if ODL_ENABLE_VERBOSE_DEBUG
             std::string debug = parContext.DatabasePath().ToString();
             #endif
+            // Paul(2014/12/23) SetFullDatabasePath for debug.
             templateObjectDeclarationNode->NamedDeclarationWeakRef()->SetFullDatabasePath(parContext.DatabasePath());
             VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
 		}
@@ -450,28 +456,21 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
             {
                 TOdlAstNodeNamedDeclaration* objectDeclarationNamedObject = objectDeclarationNode->NamedDeclarationWeakRef();
 
-                // Paul(2014/12/23) object declaration in expression can be fully anonymous.
-                if (objectDeclarationNamedObject != nullptr)
-                {
-                    objectDeclarationNamedObject->AutoGenerateIdentifierIfNone();
-                }
+                // bool const anonymousDeclaration = objectDeclarationNamedObject->IsAnonymousDeclaration();
+                std::string const& objectName = objectDeclarationNamedObject->IdentifierPointer()->Identifier();
 
-                std::string objectName = objectDeclarationNamedObject != nullptr ? objectDeclarationNamedObject->IdentifierPointer()->Identifier() : std::string();
-                if (!objectName.empty())
-            	    parContext.EnterNamespace(objectName);
+                // parContext.EnterNamespace(objectName);
+
                 #if ODL_ENABLE_VERBOSE_DEBUG
                 std::string debug = parContext.DatabasePath().ToString();
                 #endif
 
-                if (objectDeclarationNamedObject != nullptr)
-                {
-                    objectDeclarationNamedObject->SetFullDatabasePath(parContext.DatabasePath());
-                }
+                // Paul(2014/12/23) SetFullDatabasePath for debug.
+                objectDeclarationNamedObject->SetFullDatabasePath(parContext.DatabasePath());
 
                 VisitAst(objectDeclarationNode, parContext, AutoNameAnomymousObjectDeclaration);
 
-                if (!objectName.empty())
-            	    parContext.LeaveNamespace();
+                // parContext.LeaveNamespace();
             }
         }
         break ;

@@ -324,7 +324,6 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 		return TOdlExpression();
 
     TOdlAstNodeType::TType expressionType = parExpression->AstNodeType();
-    assert(expressionType & TOdlAstNodeType::EXPRESSION_MASK);
     if (expressionType & TOdlAstNodeType::VALUE_MASK)
     {
         switch (expressionType)
@@ -358,7 +357,7 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
                 TOdlAstNodeObjectDeclaration const* objectDeclarationNode = parExpression->CastNode<TOdlAstNodeObjectDeclaration>();
 				if (!objectDeclarationNode->IsNullPtr())
 				{
-					// PAUL(27/05/14 17:57:57) yuk.
+					// PAUL(27/05/14 17:57:57) yuk, using debug data for processing...
 					TOdlDatabasePath const& databasePath = objectDeclarationNode->NamedDeclarationWeakRef()->FullDatabasePath();
 
 					std::string const& objectType = objectDeclarationNode->TypeIdentifierPointer()->Identifier();

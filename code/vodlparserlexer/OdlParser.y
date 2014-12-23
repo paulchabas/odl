@@ -103,13 +103,16 @@ named_declaration
 	odl::TOdlAstNodeIdentifier* identifier = $1;
 	odl::TOdlAstNodeExpression* expression = $3;
 
-	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = new odl::TOdlAstNodeNamedDeclaration(identifier, expression);
-
-	// Paul(2014/12/21) hum.
-	if (expression->AstNodeType() == odl::TOdlAstNodeType::OBJECT_DECLARATION)
+	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = nullptr;
+	// Paul(2014/12/21) hum, little tricky here.
+	if (expression->AstNodeType() == odl::TOdlAstNodeType::NAMED_DECLARATION)
 	{
-		odl::TOdlAstNodeObjectDeclaration* objectDeclaration = expression->CastNode<odl::TOdlAstNodeObjectDeclaration>();
-		objectDeclaration->SetNamedDeclarationWeakRef(namedDeclaration);
+		namedDeclaration = expression->CastNode<odl::TOdlAstNodeNamedDeclaration>();
+		namedDeclaration->SetIdentifierPointer($1);
+	}
+	else
+	{
+		namedDeclaration = new odl::TOdlAstNodeNamedDeclaration($1, $3);
 	}
 
 	$$ = namedDeclaration;
@@ -155,8 +158,12 @@ anomymous_object_declaration_or_reference
 }
 | IDENTIFIER TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
+	// object declaration
+
 	odl::TOdlAstNodeObjectDeclaration* objectDeclaration = new odl::TOdlAstNodeObjectDeclaration($1, $3);
-	$$ = objectDeclaration;
+	odl::TOdlAstNodeNamedDeclaration* anonymousObject = new odl::TOdlAstNodeNamedDeclaration(nullptr, objectDeclaration);
+	objectDeclaration->SetNamedDeclarationWeakRef(anonymousObject);
+	$$ = anonymousObject;
 }
 | IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
 {

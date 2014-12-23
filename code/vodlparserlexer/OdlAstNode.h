@@ -11,25 +11,24 @@ namespace odl
 namespace TOdlAstNodeType
 {
     static const int VALUE_MASK = 0x80000000;
-    static const int EXPRESSION_MASK = 0x40000000;
     static const int TEMPLATE_MASK = 0x20000000;
 
 	enum TType
 	{
         UNKNOWN									= 0,
-        IDENTIFIER								= 1 | EXPRESSION_MASK | VALUE_MASK,
-		VALUE_STRING							= 2 | EXPRESSION_MASK | VALUE_MASK,
-        VALUE_INTEGER							= 3 | EXPRESSION_MASK | VALUE_MASK,
-        VALUE_FLOAT								= 4 | EXPRESSION_MASK | VALUE_MASK,
+        IDENTIFIER								= 1 | VALUE_MASK,
+		VALUE_STRING							= 2 | VALUE_MASK,
+        VALUE_INTEGER							= 3 | VALUE_MASK,
+        VALUE_FLOAT								= 4 | VALUE_MASK,
         OPERATOR								= 5,
         PROPERTY_DECLARATION					= 6,
         PROPERTY_DECLARATION_LIST				= 7,
-        OBJECT_DECLARATION						= 8 | EXPRESSION_MASK | VALUE_MASK,
+        OBJECT_DECLARATION						= 8 | VALUE_MASK,
         NAMESPACE								= 9,
 		NAMED_DECLARATION						= 10,
-        OPERATION								= 11 | EXPRESSION_MASK,
-		VALUE_VECTOR							= 12 | EXPRESSION_MASK | VALUE_MASK,
-        TEMPLATE_OBJECT_DECLARATION				= 13 | TEMPLATE_MASK | EXPRESSION_MASK,
+        OPERATION								= 11,
+		VALUE_VECTOR							= 12 | VALUE_MASK,
+        TEMPLATE_OBJECT_DECLARATION				= 13 | TEMPLATE_MASK,
         TEMPLATE_OBJECT_INSTANCIATION			= 14 | TEMPLATE_MASK | VALUE_MASK,
         TEMPLATE_DECLARATION_PARAMETER          = 15,
 		TEMPLATE_DECLARATION_PARAMETER_LIST		= 16,
@@ -95,9 +94,7 @@ public:
     TOdlAstNodeExpression(TOdlAstNodeType::TType parOdlAstNodeType) :
         TOdlAstNode(parOdlAstNodeType)
     {
-        assert(parOdlAstNodeType & TOdlAstNodeType::EXPRESSION_MASK);
     }
-
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
@@ -141,15 +138,16 @@ private:
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-class TOdlAstNodeNamedDeclaration : public TOdlAstNode
+class TOdlAstNodeNamedDeclaration : public TOdlAstNodeExpression
 {
-    typedef TOdlAstNode parent_type;
+    typedef TOdlAstNodeExpression parent_type;
 public:
 
     TOdlAstNodeNamedDeclaration(TOdlAstNodeType::TType parAstNodeType, TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeExpression* parExpression) :
         parent_type(parAstNodeType),
         FIdentifier(parIdentifier),
-        FExpression(parExpression)
+        FExpression(parExpression),
+        FAnonymousDeclaration(false)
     {
 
     }
@@ -157,7 +155,8 @@ public:
     TOdlAstNodeNamedDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeExpression* parExpression) :
         parent_type(TOdlAstNodeType::NAMED_DECLARATION),
         FIdentifier(parIdentifier),
-        FExpression(parExpression)
+        FExpression(parExpression),
+        FAnonymousDeclaration(false)
     {
 
     }
@@ -175,6 +174,7 @@ public:
     }
 
     void AutoGenerateIdentifierIfNone();
+    bool IsAnonymousDeclaration() const { return FAnonymousDeclaration; }
 
     TOdlAstNodeIdentifier* IdentifierPointer() const { assert(FIdentifier != NULL); return FIdentifier; }
     TOdlAstNodeIdentifier* IdentifierPointer_IFP() const { return FIdentifier; }
@@ -674,10 +674,6 @@ public:
             assert(parLeftExpression != nullptr);
         }
     
-        assert(parLeftExpression != nullptr ? parLeftExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK : true);
-        assert(parRightExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK);
-        assert(parOperator->AstNodeType() == TOdlAstNodeType::OPERATOR);
-
         FLeftExpressionPointer = parLeftExpression;
         FOperatorExpressionPointer = parOperator;
         FRightExpressionPointer = parRightExpression;    
