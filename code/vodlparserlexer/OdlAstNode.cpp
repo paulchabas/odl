@@ -177,7 +177,8 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     case TOdlAstNodeType::IDENTIFIER:
         {
             TOdlAstNodeIdentifier const* nodeIdentifier = CastNode<TOdlAstNodeIdentifier>();
-            parOss << nodeIdentifier->Identifier() << std::endl;
+            std::string const& identifier = nodeIdentifier->Identifier();
+            parOss << identifier << std::endl;
         }
         break ;
     case TOdlAstNodeType::VALUE_STRING:
