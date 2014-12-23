@@ -21,21 +21,13 @@ static odl::TOdlAstNodeIdentifier* AutoGenerateObjectIdentifier()
 //*******************************************************************************
 //-------------------------------------------------------------------------------
 TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
-    FAstNodeType(parAstNodeType),
-    FTargetTemplateNamespaceIdentifierPointer(nullptr),
-    FExpressionPointer(nullptr),
-    FAnonymousDeclaration(true), // value reset by named declarations.
-    FIsValueReference(false) 
+    FAstNodeType(parAstNodeType)
 {
 
 }
 //-------------------------------------------------------------------------------
 TOdlAstNode::TOdlAstNode() :
-    FAstNodeType(TOdlAstNodeType::UNKNOWN),
-    FTargetTemplateNamespaceIdentifierPointer(nullptr),
-    FExpressionPointer(nullptr),
-    FAnonymousDeclaration(true), // value reset by named declarations.
-    FIsValueReference(false)
+    FAstNodeType(TOdlAstNodeType::UNKNOWN)
 {
 
 }
@@ -43,8 +35,6 @@ TOdlAstNode::TOdlAstNode() :
 TOdlAstNode::~TOdlAstNode()
 {
 
-    delete FTargetTemplateNamespaceIdentifierPointer;
-    delete FExpressionPointer;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::PrettyPrint(std::ostringstream& parOss) const
@@ -66,7 +56,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 {
     switch (FAstNodeType)
     {
-    case TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST:
+    case TOdlAstNodeType::TEMPLATE_INSTANCIATION_EXPRESSION_LIST:
         {
             TOdlAstNodeTemplateExpressionList const* that = CastNode<TOdlAstNodeTemplateExpressionList>();
             parOss << '(';
@@ -81,7 +71,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             parOss << ')';
         }
         break ;
-    case TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION:
+    case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
         {
             TOdlAstNodeTemplateObjectInstanciation const* that = CastNode<TOdlAstNodeTemplateObjectInstanciation>();
             parOss << that->TypeIdentifierPointer()->Identifier(); // template name.
@@ -104,7 +94,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             parOss << ')';
         }
         break;
-    case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
+    case TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION:
         {
             TOdlAstNodeTemplateObjectDeclaration const* that = CastNode<TOdlAstNodeTemplateObjectDeclaration>();
             
@@ -283,15 +273,17 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     case TOdlAstNodeType::PROPERTY_DECLARATION:
         {
             TOdlAstNodePropertyDeclaration const* propertyDeclarationNode = this->CastNode<TOdlAstNodePropertyDeclaration>();
+            TOdlAstNodeIdentifier const* identifierNode = propertyDeclarationNode->IdentifierPointer();
+            TOdlAstNodeExpression const* expressionNode = propertyDeclarationNode->ExpressionPointer();
 
             Indent(parOss, parIndentLevel);
-            parOss << propertyDeclarationNode->IdentifierPointer()->Identifier();
+            parOss << identifierNode->Identifier();
             parOss << " = ";
 
-            int const propertyLengthPlusSpacePlusEqualPlusSpace = (int) propertyDeclarationNode->IdentifierPointer()->Identifier().length() + 3;
-            FExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + propertyLengthPlusSpacePlusEqualPlusSpace);
+            int const propertyLengthPlusSpacePlusEqualPlusSpace = (int) identifierNode->Identifier().length() + 3;
+            expressionNode->PrettyPrintWithIndentLevel(parOss, parIndentLevel + propertyLengthPlusSpacePlusEqualPlusSpace);
             // yuk.
-            if (FExpressionPointer->AstNodeType() != TOdlAstNodeType::OPERATION)
+            if (expressionNode->AstNodeType() != TOdlAstNodeType::OPERATION)
             {
                 parOss << std::endl;
             }
@@ -382,23 +374,15 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     };
 }
 //-------------------------------------------------------------------------------
-void TOdlAstNode::SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)
-{
-    FFullDatabasePath = parFullDatabasePath;
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------
-void TOdlAstNode::BreakPoint()
-{
-    int a = 0;
-}
-//-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-void TOdlAstNodeNamedDeclaration::AutoGenerateIdentifier()
+void TOdlAstNodeNamedDeclaration::AutoGenerateIdentifierIfNone()
 {
-    assert(FIdentifier == nullptr);
-    FIdentifier = AutoGenerateObjectIdentifier();
-    FAnonymousDeclaration = true;
+    if (FIdentifier == nullptr)
+    {
+        FIdentifier = AutoGenerateObjectIdentifier();
+        FAnonymousDeclaration = true;
+    }
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************

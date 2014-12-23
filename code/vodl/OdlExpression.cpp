@@ -359,7 +359,7 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 				if (!objectDeclarationNode->IsNullPtr())
 				{
 					// PAUL(27/05/14 17:57:57) yuk.
-					TOdlDatabasePath const& databasePath = parExpression->FullDatabasePath();
+					TOdlDatabasePath const& databasePath = objectDeclarationNode->NamedDeclarationWeakRef()->FullDatabasePath();
 
 					std::string const& objectType = objectDeclarationNode->TypeIdentifierPointer()->Identifier();
 
