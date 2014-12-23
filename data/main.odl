@@ -1,13 +1,13 @@
 
-template TemplateTest is TTestClass2()
+template TemplateTest0 is TTestClass2()
 {
 }
 
-template TemplateTest is TTestClass2(a)
+template TemplateTest1 is TTestClass2(a)
 {
 }
 
-template TemplateTest is TTestClass2(a, b)
+template TemplateTest2 is TTestClass2(a, b)
 {
 }
 
@@ -18,11 +18,11 @@ namespace toto
 	{
 		namespace chlobo { }
 		
-		template TemplateTest is TTestClass2(a, b,c)
+		template TemplateTest0 is TTestClass2(a, b,c)
 		{
 		}
 		
-		template TemplateTest2 is TTestClass2(a, b, c)
+		template TemplateTest1 is TTestClass2(a, b, c)
 		{
 		}
 		
