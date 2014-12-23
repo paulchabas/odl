@@ -178,7 +178,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         {
             TOdlAstNodeIdentifier const* nodeIdentifier = CastNode<TOdlAstNodeIdentifier>();
             std::string const& identifier = nodeIdentifier->Identifier();
-            parOss << identifier << std::endl;
+            parOss << identifier;
         }
         break ;
     case TOdlAstNodeType::VALUE_STRING:
@@ -306,23 +306,20 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 
             if (that->IsNullPtr())
             {
-                parOss << "<nullptr>" << std::endl;
+                parOss << "<nullptr>";
             }
             else
             {
-                //if (FIdentifierPointer != nullptr)
-                //{
-                //    parOss << "[";
-                //    parOss << FIdentifierPointer->Identifier();
-                //    parOss << "] ";
-                //}
-
+                parOss << that->NamedDeclarationWeakRef()->IdentifierPointer()->Identifier();
+                parOss << " is ";
                 parOss << that->TypeIdentifierPointer()->Identifier() << std::endl;
 
                 Indent(parOss, parIndentLevel) << "{" << std::endl;
                 that->PropertyDeclarationListPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
                 Indent(parOss, parIndentLevel) << "}";
-                parOss << std::endl;
+
+                if (!that->NamedDeclarationWeakRef()->IsAnonymousDeclaration())
+                    parOss << std::endl;
             }
         }
         break ;
@@ -359,26 +356,68 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     case TOdlAstNodeType::NAMED_DECLARATION:
         {
             TOdlAstNodeNamedDeclaration const* namedDeclarationNode = CastNode<TOdlAstNodeNamedDeclaration>();
-            Indent(parOss, parIndentLevel);
-
             TOdlAstNodeIdentifier const* identifierNode = namedDeclarationNode->IdentifierPointer();
             TOdlAstNodeExpression const* expressionNode = namedDeclarationNode->ExpressionPointer();
 
-            // Paul(2014/12/23) this kind of named node write their weakly linked name declaration themself.
-            bool const printIdentifierIsNow = expressionNode->AstNodeType() != TOdlAstNodeType::OBJECT_DECLARATION &&
-                                              expressionNode->AstNodeType() != TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION;
-
-            int additionnalIndentation = 0;
-            if (printIdentifierIsNow)
+            // Paul(2014/12/24) has the grammar a bad consistency or the way of formatting a human readable output is really tricky ?
+            bool printIdentifierIsNow = true;
             {
-                parOss << identifierNode->Identifier();
-                parOss << " is ";
-                int const identifierLengthPlusSpaceIsSpace = (int) identifierNode->Identifier().length() + 4;
-                additionnalIndentation = identifierLengthPlusSpaceIsSpace;
+                if (expressionNode->AstNodeType() == TOdlAstNodeType::OBJECT_DECLARATION ||
+                    expressionNode->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION)
+                {
+                    printIdentifierIsNow = false;
+                }
+            }
+
+            // Paul(2014/12/24) has the grammar a bad consistency or the way of formatting a human readable output is really tricky ?
+            {
+                bool const indent = !namedDeclarationNode->IsAnonymousDeclaration();
+                if (indent)
+                    Indent(parOss, parIndentLevel);
+            }
+
+            // Paul(2014/12/24) has the grammar a bad consistency or the way of formatting a human readable output is really tricky ?
+            int additionnalIndentation = 0;
+            {
+                if (printIdentifierIsNow)
+                {
+                    std::string const& identifier = identifierNode->Identifier();
+                    parOss << identifier;
+                    parOss << " is ";
+                    int const identifierLengthPlusSpaceIsSpace = (int) identifierNode->Identifier().length() + 4;
+                    additionnalIndentation = identifierLengthPlusSpaceIsSpace;
+                }
             }
             
             expressionNode->PrettyPrintWithIndentLevel(parOss, parIndentLevel + additionnalIndentation);
-            parOss << std::endl;
+
+            // Paul(2014/12/24) has the grammar a bad consistency or the way of formatting a human readable output is really tricky ?
+            {
+                bool additionnalEndLine1 = true;
+                bool additionnalEndLine2 = true;
+                if (expressionNode->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION)
+                {
+                    additionnalEndLine2 = false;
+                }
+                else if (expressionNode->AstNodeType() == TOdlAstNodeType::OBJECT_DECLARATION)
+                {
+                    TOdlAstNodeObjectDeclaration const* objectDeclaration = expressionNode->CastNode<TOdlAstNodeObjectDeclaration>();
+                    //if (!objectDeclaration->IsNullPtr())
+                        additionnalEndLine2 = false;
+                }
+                else if (expressionNode->AstNodeType() == TOdlAstNodeType::OPERATION)
+                {
+                    additionnalEndLine1 = false;
+
+                    if (namedDeclarationNode->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION)
+                        additionnalEndLine2 = false;
+                }
+
+                if (additionnalEndLine1)
+                    parOss << std::endl;
+                if (additionnalEndLine2)
+                    parOss << std::endl;
+            }
         }
         break ;
     };

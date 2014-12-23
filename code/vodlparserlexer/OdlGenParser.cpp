@@ -1245,7 +1245,7 @@ case 9:
 #line 154 "OdlParser.y"
 {
 	odl::TOdlAstNodeIdentifier* reference = yyvsp[0].FOdlAstNodeIdentifier;
-	reference->SetAsReferenceToResolve();	
+	reference->SetAsReferenceToResolve();
 	yyval.FOdlAstNodeExpression = reference;
 ;
     break;}
