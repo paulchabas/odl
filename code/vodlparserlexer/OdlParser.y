@@ -169,9 +169,10 @@ anomymous_object_declaration_or_reference
 {
 	// template instanciation.
 	
-	odl::TOdlAstNodeIdentifier* identifier = $1;
-	identifier->SetAsReferenceToResolve(); // find the required template declaration.
-	odl::TOdlAstNodeTemplateObjectInstanciation* templateDeclaration = new odl::TOdlAstNodeTemplateObjectInstanciation($1, $3);
+	odl::TOdlAstNodeIdentifier* typeIdentifier = $1;
+	typeIdentifier->SetAsReferenceToResolve(); // find the required template declaration.
+	odl::TOdlAstNodeTemplateExpressionList* expressionList = $3;
+	odl::TOdlAstNodeTemplateObjectInstanciation* templateDeclaration = new odl::TOdlAstNodeTemplateObjectInstanciation(typeIdentifier, expressionList);
 	$$ = templateDeclaration;
 }
 | TOKEN_NULLPTR
