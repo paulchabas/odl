@@ -364,10 +364,20 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             TOdlAstNodeIdentifier const* identifierNode = namedDeclarationNode->IdentifierPointer();
             TOdlAstNodeExpression const* expressionNode = namedDeclarationNode->ExpressionPointer();
 
-            parOss << identifierNode->Identifier();
-            parOss << " is ";
-            int const identifierLengthPlusSpaceIsSpace = (int) identifierNode->Identifier().length() + 4;
-            expressionNode->PrettyPrintWithIndentLevel(parOss, parIndentLevel + identifierLengthPlusSpaceIsSpace);
+            // Paul(2014/12/23) this kind of named node write their weakly linked name declaration themself.
+            bool const printIdentifierIsNow = expressionNode->AstNodeType() != TOdlAstNodeType::OBJECT_DECLARATION &&
+                                              expressionNode->AstNodeType() != TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION;
+
+            int additionnalIndentation = 0;
+            if (printIdentifierIsNow)
+            {
+                parOss << identifierNode->Identifier();
+                parOss << " is ";
+                int const identifierLengthPlusSpaceIsSpace = (int) identifierNode->Identifier().length() + 4;
+                additionnalIndentation = identifierLengthPlusSpaceIsSpace;
+            }
+            
+            expressionNode->PrettyPrintWithIndentLevel(parOss, parIndentLevel + additionnalIndentation);
             parOss << std::endl;
         }
         break ;
