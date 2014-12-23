@@ -15,13 +15,14 @@ static TOdlAstNodeTemplateObjectDeclaration const* GetTemplateObjectInstanciatio
 	assert(parAstNode->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_INSTANCIATION);
     TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
 
-	TOdlAstNode const* typeIdentifierPointer = templateObjectInstanciationNode->TypeIdentifierPointer();
+	TOdlAstNodeIdentifier const* typeIdentifierPointer = templateObjectInstanciationNode->TypeIdentifierPointer();
 	assert(typeIdentifierPointer != nullptr);
-	TOdlAstNode const* templateDeclaration = typeIdentifierPointer->ResolvedReference_ReturnNamedDeclaration();
-	assert(templateDeclaration != nullptr);
-    assert(templateDeclaration->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION);
+	TOdlAstNodeNamedDeclaration const* resolvedNamedDeclaration = typeIdentifierPointer->ResolvedReference();
+	assert(resolvedNamedDeclaration != nullptr);
+    assert(resolvedNamedDeclaration->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION);
 
-	return templateDeclaration->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+    TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclaration = resolvedNamedDeclaration->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+	return templateObjectDeclaration;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 static std::string const& GetTemplateObjectInstanciationDeclarationTypeAsString(TOdlAstNode* parAstNode)
@@ -63,7 +64,7 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
     TOdlAstNodeType::TType nodeType = parAstNode->AstNodeType();
     switch (nodeType)
     {
-	case TOdlAstNodeType::EXPRESSION:
+	case TOdlAstNodeType::OPERATION:
 		{
             TOdlAstNode* parLeft = parAstNode->CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer();
             TOdlAstNode* parRight = parAstNode->CastNode<TOdlAstNodeOperation>()->RightExpressionPointer();
@@ -87,13 +88,15 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
 		break ;
     case TOdlAstNodeType::PROPERTY_DECLARATION:
         {
-            TOdlAstNode* expression = parAstNode->ExpressionPointer();
+            TOdlAstNodePropertyDeclaration* propertyDeclaration = parAstNode->CastNode<TOdlAstNodePropertyDeclaration>();
+            TOdlAstNodeExpression* expression = propertyDeclaration->ExpressionPointer();
             (*parCallback)(expression, parContext);
         }
         break ;
     case TOdlAstNodeType::PROPERTY_DECLARATION_LIST:
         {
-            std::vector< TOdlAstNode* >& properties = parAstNode->PropertyList();
+            TOdlAstNodePropertyDeclarationList* propertyDeclarationList = parAstNode->CastNode<TOdlAstNodePropertyDeclarationList>();
+            std::vector< TOdlAstNodePropertyDeclaration* > const& properties = propertyDeclarationList->PropertyDeclarationList();
 		    for (size_t i = 0; i < properties.size(); ++i)
             {
                 TOdlAstNode* property = properties[i];
@@ -114,7 +117,7 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
     case TOdlAstNodeType::NAMESPACE:
         {
             TOdlAstNodeNamespaceDeclaration const* namespaceDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
-            std::vector< TOdlAstNode* > const& namedDeclarations = namespaceDeclarationNode->NamespaceContent();
+            std::vector< TOdlAstNodeNamedDeclaration* > const& namedDeclarations = namespaceDeclarationNode->NamespaceContent();
 		    for (size_t i = 0; i < namedDeclarations.size(); ++i)
             {
                 TOdlAstNode* namedDeclaration = namedDeclarations[i];
@@ -124,12 +127,13 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
         break ;
 	case TOdlAstNodeType::NAMED_DECLARATION:
 		{
+            TOdlAstNodeNamedDeclaration const* namedDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamedDeclaration>();
 			#ifdef ODL_ENABLE_VERBOSE_DEBUG
-			TOdlAstNode* name = parAstNode->IdentifierPointer();
+			TOdlAstNode* name = namedDeclarationNode->IdentifierPointer();
 			assert(name != nullptr);
 			#endif
 
-			TOdlAstNode* expression = parAstNode->ExpressionPointer();
+			TOdlAstNode* expression = namedDeclarationNode->ExpressionPointer();
 			(*parCallback)(expression, parContext);
 		}
 		break ;
@@ -159,7 +163,8 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
     {
     case TOdlAstNodeType::NAMESPACE:
         {
-            TOdlAstNodeIdentifier const* identifier = parAstNode->IdentifierPointer_IFP();
+            TOdlAstNodeNamespaceDeclaration const* namespaceDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
+            TOdlAstNodeIdentifier const* identifier = namespaceDeclarationNode->IdentifierPointer_IFP();
             if (identifier != nullptr)
             {
                 std::string const& namespaceName = identifier->Identifier();
@@ -174,7 +179,8 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
         break ;
 	case TOdlAstNodeType::NAMED_DECLARATION:
 		{
-			TOdlAstNodeIdentifier const* identifier = parAstNode->IdentifierPointer();
+            TOdlAstNodeNamespaceDeclaration const* namedDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
+			TOdlAstNodeIdentifier const* identifier = namedDeclarationNode->IdentifierPointer();
 			std::string const& namespaceName = identifier->Identifier();
             parContext.EnterNamespace(namespaceName);
             VisitAst(parAstNode, parContext, InstanciateObjects);
@@ -291,8 +297,9 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
     {
     case TOdlAstNodeType::NAMESPACE:
         {
+            TOdlAstNodeNamespaceDeclaration const* namespaceDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
             TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
-            TOdlAstNodeIdentifier const* identifier = parAstNode->IdentifierPointer_IFP();
+            TOdlAstNodeIdentifier const* identifier = namespaceDeclarationNode->IdentifierPointer_IFP();
             if (identifier != nullptr)
             {
                 std::string const& namespaceName = identifier->Identifier();
@@ -307,12 +314,13 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
         break ;
     case TOdlAstNodeType::NAMED_DECLARATION:
         {
+            TOdlAstNodeNamedDeclaration* namedDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamedDeclaration>();
             TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
-            TOdlAstNodeIdentifier const* identifier = parAstNode->IdentifierPointer_IFP();
+            TOdlAstNodeIdentifier const* identifier = namedDeclarationNode->IdentifierPointer_IFP();
             assert(identifier != nullptr);
             std::string const& namespaceName = identifier->Identifier();
             context.EnterNamespace(namespaceName);
-            VisitAst(parAstNode, parContext, FillObjectsProperties);
+            VisitAst(namedDeclarationNode, parContext, FillObjectsProperties);
 			context.LeaveNamespace();
         }
         break ;
@@ -376,6 +384,8 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
         break ;
     case TOdlAstNodeType::PROPERTY_DECLARATION:
         {
+            TOdlAstNodePropertyDeclaration const* propertyDeclarationNode = parAstNode->CastNode<TOdlAstNodePropertyDeclaration>();    
+
             TFillObjectPropertiesInterpretContext& context = static_cast< TFillObjectPropertiesInterpretContext& >(parContext);
             TOdlDatabasePath const& odlDatabasePath = context.DatabasePath();
 
@@ -385,11 +395,11 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 
             TOdlObject* object = context.CurrentObject();
             TMetaClassBase const* objectMetaClassBase = context.MetaClassBase();
-            std::string const& propertyName = parAstNode->IdentifierPointer()->Identifier();
+            std::string const& propertyName = propertyDeclarationNode->IdentifierPointer()->Identifier();
             TPropertyBase const* propertyBase = objectMetaClassBase->PropertyByName(propertyName);
             if (propertyBase != nullptr)
             {
-                TOdlAstNode const* expression = parAstNode->ExpressionPointer();
+                TOdlAstNode const* expression = propertyDeclarationNode->ExpressionPointer();
                 TTemplateDeclarations emptyTemplateDeclarations;
                 EvalExpressionAndStoreProperty(object, objectMetaClassBase, propertyBase, expression, emptyTemplateDeclarations);
             }
@@ -414,7 +424,8 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
     {
 	case TOdlAstNodeType::NAMESPACE:
 		{
-        std::string namespaceName = parAstNode->IdentifierPointer_IFP() ? parAstNode->IdentifierPointer_IFP()->Identifier() : std::string();
+            TOdlAstNodeNamespaceDeclaration const* namespaceDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
+            std::string namespaceName = namespaceDeclarationNode->IdentifierPointer_IFP() ? namespaceDeclarationNode->IdentifierPointer_IFP()->Identifier() : std::string();
             if (!namespaceName.empty())
             	parContext.EnterNamespace(namespaceName);
             VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
@@ -424,20 +435,18 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 		break ;
 	case TOdlAstNodeType::NAMED_DECLARATION:
 		{
-            std::string namedDeclarationName = parAstNode->IdentifierPointer()->Identifier();
+            TOdlAstNodeNamedDeclaration const* namedDeclaration = parAstNode->CastNode<TOdlAstNodeNamedDeclaration>();
+            std::string namedDeclarationName = namedDeclaration->IdentifierPointer()->Identifier();
             parContext.EnterNamespace(namedDeclarationName);
-            TOdlAstNode* expressionPointer = parAstNode->ExpressionPointer();
-            if (expressionPointer->AstNodeType() == TOdlAstNodeType::OBJECT_DECLARATION)
-            {
-            	expressionPointer->SetAnonymousDeclaration(false);
-            }
+            TOdlAstNodeExpression* expressionPointer = namedDeclaration->ExpressionPointer();
             VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
             parContext.LeaveNamespace();
 		}
 		break ;
 	case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
 		{
-            std::string const& templateDeclarationName = parAstNode->IdentifierPointer_IFP()->Identifier();
+            TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclarationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+            std::string const& templateDeclarationName = templateObjectDeclarationNode->IdentifierPointer()->Identifier();
             parContext.EnterNamespace(templateDeclarationName);
             #if ODL_ENABLE_VERBOSE_DEBUG
             std::string debug = parContext.DatabasePath().ToString();
@@ -449,22 +458,23 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 		break;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
-            // ... object declaration store name in IdentifierPointer...
-		    // maybe should it be a named_declaration node construction as well.
-            bool const isAnonymousObject = parAstNode->IsAnonymousDeclaration();
+            TOdlAstNodeObjectDeclaration* objectDeclarationNode = parAstNode->CastNode<TOdlAstNodeObjectDeclaration>();
+
+            bool const isAnonymousObject = objectDeclarationNode->IsAnonymousDeclaration();
             if (isAnonymousObject)
             {
-                parAstNode->AutoGenerateIdentifier();
+                objectDeclarationNode->AutoGenerateIdentifier();
             }
-            std::string objectName = parAstNode->IdentifierPointer_IFP() ? parAstNode->IdentifierPointer_IFP()->Identifier() : std::string();
+
+            std::string objectName = objectDeclarationNode->IdentifierPointer_IFP() ? objectDeclarationNode->IdentifierPointer_IFP()->Identifier() : std::string();
             if (!objectName.empty())
             	parContext.EnterNamespace(objectName);
             #if ODL_ENABLE_VERBOSE_DEBUG
             std::string debug = parContext.DatabasePath().ToString();
             #endif
-            parAstNode->SetFullDatabasePath(parContext.DatabasePath());
+            objectDeclarationNode->SetFullDatabasePath(parContext.DatabasePath());
 
-            VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
+            VisitAst(objectDeclarationNode, parContext, AutoNameAnomymousObjectDeclaration);
 
             if (!objectName.empty())
             	parContext.LeaveNamespace();
@@ -517,7 +527,8 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
     {
     case TOdlAstNodeType::IDENTIFIER:
         {
-            if (parAstNode->IsReferenceToResolve())
+            TOdlAstNodeIdentifier* identifierNode = parAstNode->CastNode<TOdlAstNodeIdentifier>();
+            if (identifierNode->IsReferenceToResolve())
             {
             	TOdlAstNode const* foundReference = nullptr;
 
@@ -543,10 +554,10 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
             			if (namespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
 						{
                             TOdlAstNodeNamespaceDeclaration const* typedNamespaceCandidate = namespaceCandidate->CastNode<TOdlAstNodeNamespaceDeclaration>();
-							std::vector< TOdlAstNode* > const& namespaceContent = typedNamespaceCandidate->NamespaceContent();
+							std::vector< TOdlAstNodeNamedDeclaration* > const& namespaceContent = typedNamespaceCandidate->NamespaceContent();
 							for (size_t j = 0; j < namespaceContent.size(); ++j)
 							{
-								TOdlAstNode* candidateNode = namespaceContent[j];
+								TOdlAstNodeNamedDeclaration* candidateNode = namespaceContent[j];
 								if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION ||
 									candidateNode->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION)
 								{
@@ -556,7 +567,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 										#if ODL_ENABLE_VERBOSE_DEBUG
 										std::string pathDebug = context.DatabasePath().ToString();
 										#endif
-										parAstNode->ResolveReference(candidateNode);
+										identifierNode->ResolveReference(candidateNode);
 										foundReference = candidateNode;
 										break ;
 									}
@@ -565,19 +576,19 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 						}
 						else if (namespaceCandidate->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION)
 						{
+                            TOdlAstNodeTemplateObjectDeclaration* templateObjectDeclarationNode = namespaceCandidate->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
 
-							std::vector< TOdlAstNode* > const& templateParameters = namespaceCandidate->CastNode<TOdlAstNodeTemplateObjectDeclaration>()->TemplateParameterListPointer()->TemplateParameterList();
+							std::vector< TOdlAstNodeTemplateParameter* > const& templateParameters = templateObjectDeclarationNode->TemplateParameterListPointer()->TemplateParameterList();
 							for (size_t i = 0; i < templateParameters.size(); ++i)
 							{
-								TOdlAstNodeIdentifier const* templateParameter = templateParameters[i]->CastNode<TOdlAstNodeIdentifier>();
-								assert(templateParameter->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-								std::string const& parameterName = templateParameter->Identifier();
+								TOdlAstNodeTemplateParameter const* templateParameter = templateParameters[i];
+								std::string const& parameterName = templateParameter->IdentifierPointer()->Identifier();
 								if (parameterName == identifierToResolve)
 								{
 									#if ODL_ENABLE_VERBOSE_DEBUG
 									std::string pathDebug = context.DatabasePath().ToString();
 									#endif
-									parAstNode->ResolveReference(templateParameter);
+									identifierNode->ResolveReference(templateParameter);
 									foundReference = templateParameter;
 									break ;
 								}
@@ -600,10 +611,10 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
                             if (rootNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
                             {
                                 TOdlAstNodeNamespaceDeclaration const* typedRootNamespaceCandidate = rootNamespaceCandidate->CastNode<TOdlAstNodeNamespaceDeclaration>();
-							    std::vector< TOdlAstNode* > const& rootNamespaceContent = typedRootNamespaceCandidate->NamespaceContent();
+							    std::vector< TOdlAstNodeNamedDeclaration* > const& rootNamespaceContent = typedRootNamespaceCandidate->NamespaceContent();
 							    for (size_t j = 0; j < rootNamespaceContent.size(); ++j)
 							    {
-								    TOdlAstNode* namedDeclarationNode = rootNamespaceContent[j];
+								    TOdlAstNodeNamedDeclaration* namedDeclarationNode = rootNamespaceContent[j];
 								    std::string const& namedDeclarationName = namedDeclarationNode->IdentifierPointer()->Identifier();
 
 								    if (namedDeclarationName == rootNamespaceToFind)
@@ -637,10 +648,10 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
                                 if (childNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE)
                                 {
                                     TOdlAstNodeNamespaceDeclaration const* childNamespaceDeclaration = childNamespace->CastNode<TOdlAstNodeNamespaceDeclaration>();
-							        std::vector< TOdlAstNode* > const& childNamespaceContent =  childNamespaceDeclaration->NamespaceContent();
+							        std::vector< TOdlAstNodeNamedDeclaration* > const& childNamespaceContent =  childNamespaceDeclaration->NamespaceContent();
 							        for (size_t j = 0; j < childNamespaceContent.size(); ++j)
 							        {
-								        TOdlAstNode* candidateNamespace = childNamespaceContent[j];
+								        TOdlAstNodeNamedDeclaration* candidateNamespace = childNamespaceContent[j];
 								        if (candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE ||
 									        candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
 								        {
@@ -674,10 +685,10 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
                             if (finalNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE)
                             {
                                 TOdlAstNodeNamespaceDeclaration const* typedFinalNamespace = finalNamespace->CastNode<TOdlAstNodeNamespaceDeclaration>();
-							    std::vector< TOdlAstNode* > const& namespaceContent = typedFinalNamespace->NamespaceContent();
+							    std::vector< TOdlAstNodeNamedDeclaration* > const& namespaceContent = typedFinalNamespace->NamespaceContent();
 							    for (size_t j = 0; j < namespaceContent.size(); ++j)
 							    {
-								    TOdlAstNode* candidateNode = namespaceContent[j];
+								    TOdlAstNodeNamedDeclaration* candidateNode = namespaceContent[j];
 								    std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
 								    if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION ||
 									    candidateNode->AstNodeType() == TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION)
@@ -687,7 +698,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 										    #if ODL_ENABLE_VERBOSE_DEBUG
 										    std::string pathDebug = context.DatabasePath().ToString();
 										    #endif
-										    parAstNode->ResolveReference(candidateNode);
+										    identifierNode->ResolveReference(candidateNode);
 										    foundReference = candidateNode;
 										    break ;
 									    }
@@ -722,12 +733,13 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
         break ;
     case TOdlAstNodeType::NAMESPACE:
         {
+            TOdlAstNodeNamespaceDeclaration* namespaceDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
             TResolveValueIdentifierInterpretContext& context = static_cast< TResolveValueIdentifierInterpretContext& >(parContext);
-            context.PushParentNode(parAstNode);
-			std::string namespaceName = parAstNode->IdentifierPointer_IFP() != nullptr ? parAstNode->IdentifierPointer_IFP()->Identifier() : std::string();
+            context.PushParentNode(namespaceDeclarationNode);
+			std::string namespaceName = namespaceDeclarationNode->IdentifierPointer_IFP() != nullptr ? namespaceDeclarationNode->IdentifierPointer_IFP()->Identifier() : std::string();
 			if (!namespaceName.empty())
 				context.EnterNamespace(namespaceName);
-            VisitAst(parAstNode, parContext, ResolveValueIdentifier);
+            VisitAst(namespaceDeclarationNode, parContext, ResolveValueIdentifier);
 			if (!namespaceName.empty())
 				context.LeaveNamespace();
             context.PopParentNode();
@@ -735,12 +747,13 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
         break ;
 	case TOdlAstNodeType::NAMED_DECLARATION:
         {
+            TOdlAstNodeNamedDeclaration* namedDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamedDeclaration>();
             TResolveValueIdentifierInterpretContext& context = static_cast< TResolveValueIdentifierInterpretContext& >(parContext);
             context.PushParentNode(parAstNode);
-			std::string const& namespaceName = parAstNode->IdentifierPointer()->Identifier();
+			std::string const& namespaceName = namedDeclarationNode->IdentifierPointer()->Identifier();
 			if (!namespaceName.empty())
 				context.EnterNamespace(namespaceName);
-            VisitAst(parAstNode, parContext, ResolveValueIdentifier);
+            VisitAst(namedDeclarationNode, parContext, ResolveValueIdentifier);
 			if (!namespaceName.empty())
 				context.LeaveNamespace();
 			context.PopParentNode();
@@ -748,13 +761,14 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 		break ;
 	case TOdlAstNodeType::OBJECT_TEMPLATE_DECLARATION:
 		{
+            TOdlAstNodeTemplateObjectDeclaration* templateObjectDeclaration = parAstNode->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
 			// resolve resolve arguments.
 			TResolveValueIdentifierInterpretContext& context = static_cast< TResolveValueIdentifierInterpretContext& >(parContext);
-            context.PushParentNode(parAstNode);
-			std::string const& namespaceName = parAstNode->IdentifierPointer()->Identifier();
+            context.PushParentNode(templateObjectDeclaration);
+			std::string const& namespaceName = templateObjectDeclaration->IdentifierPointer()->Identifier();
 			if (!namespaceName.empty())
 				context.EnterNamespace(namespaceName);
-            VisitAst(parAstNode, parContext, ResolveValueIdentifier);
+            VisitAst(templateObjectDeclaration, parContext, ResolveValueIdentifier);
 			if (!namespaceName.empty())
 				context.LeaveNamespace();
 			context.PopParentNode();
@@ -766,10 +780,10 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 
 			ResolveValueIdentifier(templateObjectInstanciationNode->TypeIdentifierPointer(), parContext);
 
-			std::vector< TOdlAstNode* > const& templateParameters = templateObjectInstanciationNode->TemplateParameterListPointer()->TemplateParameterList();
+			std::vector< TOdlAstNodeExpression* > const& templateParameters = templateObjectInstanciationNode->TemplateExpressionListPointer()->TemplateExpressionParameterList();
 			for (size_t i = 0; i < templateParameters.size(); ++i)
 			{
-				TOdlAstNode* templateParameter = templateParameters[i];
+				TOdlAstNodeExpression* templateParameter = templateParameters[i];
 				ResolveValueIdentifier(templateParameter, parContext);
 			}
 		}

@@ -22,129 +22,29 @@ static odl::TOdlAstNodeIdentifier* AutoGenerateObjectIdentifier()
 //-------------------------------------------------------------------------------
 TOdlAstNode::TOdlAstNode(TOdlAstNodeType::TType parAstNodeType) :
     FAstNodeType(parAstNodeType),
-    FPropertyList(),
-    FIdentifierPointer(nullptr),
     FTargetTemplateNamespaceIdentifierPointer(nullptr),
     FExpressionPointer(nullptr),
-    FResolvedReferenceWeak(nullptr),
     FAnonymousDeclaration(true), // value reset by named declarations.
-    FReferenceToResolve(false),
-    FIsValueReference(false),
-    FIsTemplateDeclarationParameter(false)
+    FIsValueReference(false) 
 {
 
 }
 //-------------------------------------------------------------------------------
 TOdlAstNode::TOdlAstNode() :
     FAstNodeType(TOdlAstNodeType::UNKNOWN),
-    FPropertyList(),
-    FIdentifierPointer(nullptr),
-    //FTypeIdentifierPointer(nullptr),
     FTargetTemplateNamespaceIdentifierPointer(nullptr),
     FExpressionPointer(nullptr),
-    FResolvedReferenceWeak(nullptr),
     FAnonymousDeclaration(true), // value reset by named declarations.
-    FReferenceToResolve(false),
-    FIsValueReference(false),
-    FIsTemplateDeclarationParameter(false)
+    FIsValueReference(false)
 {
 
 }
 //-------------------------------------------------------------------------------
 TOdlAstNode::~TOdlAstNode()
 {
-    for (size_t i = 0; i < FPropertyList.size(); ++i)
-    {
-        TOdlAstNode const* node = FPropertyList[i];
-        delete node;
-    }
 
-    for (size_t i = 0; i < FTemplateParameterList.size(); ++i)
-    {
-        TOdlAstNode const* node = FTemplateParameterList[i];
-        delete node;
-    }
-    
-    delete FIdentifierPointer;
     delete FTargetTemplateNamespaceIdentifierPointer;
     delete FExpressionPointer;
-
-    FResolvedReferenceWeak = nullptr; // weak reference.
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetIdentifierPointer(TOdlAstNodeIdentifier* parIdentifierPointer)
-{
-    assert(FIdentifierPointer == nullptr);
-    FIdentifierPointer = parIdentifierPointer;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::AutoGenerateIdentifier()
-{
-    assert(FIdentifierPointer == nullptr);
-    FIdentifierPointer = AutoGenerateObjectIdentifier();
-    FAnonymousDeclaration = true;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateDeclarationParameterList()
-{
-    FAstNodeType = TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::TemplateDeclarationParameterList_AppendParameter(TOdlAstNodeIdentifier* parIdentifier)
-{
-    assert(FAstNodeType == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
-    assert(parIdentifier->IsTemplateDeclarationParameter());
-    FTemplateParameterList.push_back(parIdentifier);
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------
-void TOdlAstNode::SetAsTemplateInstanciationParameterList()
-{
-    FAstNodeType = TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST;
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------
-void TOdlAstNode::TemplateInstanciationParameterList_AppendParameter(TOdlAstNode* parExpression)
-{
-    assert(FAstNodeType == TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST);
-
-    assert(parExpression != nullptr);
-    assert((parExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION_MASK) != 0);
-    FTemplateParameterList.push_back(parExpression);
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsNamedDeclaration(TOdlAstNodeIdentifier* parNameIdentifier, TOdlAstNode* parExpression)
-{
-    FAstNodeType = TOdlAstNodeType::NAMED_DECLARATION;
-    
-    assert(parExpression != nullptr);
-    assert(parNameIdentifier != nullptr);
-
-    FIdentifierPointer = parNameIdentifier;
-    FExpressionPointer = parExpression;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsPropertyDeclarationList()
-{
-    FAstNodeType = TOdlAstNodeType::PROPERTY_DECLARATION_LIST;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::PropertyDeclarationList_AppendPropertyDeclaration(TOdlAstNode* parPropertyDeclarationNode)
-{
-    assert(FAstNodeType == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
-    assert(parPropertyDeclarationNode != nullptr);
-    assert(parPropertyDeclarationNode->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION);
-    FPropertyList.push_back(parPropertyDeclarationNode);
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsPropertyDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNode* parExpression)
-{
-    assert(parIdentifier != nullptr);
-    assert(parIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER);
-    assert(parExpression != nullptr);
-    assert(parExpression->AstNodeType() & TOdlAstNodeType::EXPRESSION);
-
-    FAstNodeType = TOdlAstNodeType::PROPERTY_DECLARATION;
-    FIdentifierPointer = parIdentifier;
-    FExpressionPointer = parExpression;
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::PrettyPrint(std::ostringstream& parOss) const
@@ -168,9 +68,10 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
     {
     case TOdlAstNodeType::TEMPLATE_INSTANCIATION_PARAMETER_LIST:
         {
+            TOdlAstNodeTemplateExpressionList const* that = CastNode<TOdlAstNodeTemplateExpressionList>();
             parOss << '(';
             bool printComma = false;
-            for (TOdlAstNode const* parameter : FTemplateParameterList)
+            for (TOdlAstNodeExpression const* parameter : that->TemplateExpressionParameterList())
             {
                 if (printComma)
                     parOss << ", ";
@@ -184,21 +85,21 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         {
             TOdlAstNodeTemplateObjectInstanciation const* that = CastNode<TOdlAstNodeTemplateObjectInstanciation>();
             parOss << that->TypeIdentifierPointer()->Identifier(); // template name.
-            that->TemplateParameterListPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
+            that->TemplateExpressionListPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
             parOss << std::endl;    
         }
         break ;
     case TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST:
         {
+            TOdlAstNodeTemplateParameterList const* that = CastNode<TOdlAstNodeTemplateParameterList>();
             parOss << '(';
             bool printComma = false;
-            for (TOdlAstNode const* parameter : FTemplateParameterList)
+            for (TOdlAstNodeTemplateParameter const* parameter : that->TemplateParameterList())
             {
                 if (printComma)
                     parOss << ", ";
                 printComma = true;
-                // {TODO} Paul(2014/12/21) strong typing.
-                parOss << parameter->CastNode<TOdlAstNodeIdentifier>()->Identifier();
+                parOss << parameter->IdentifierPointer()->Identifier();
             }
             parOss << ')';
         }
@@ -220,24 +121,24 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             parOss << std::endl;
         }
         break ;
-    case TOdlAstNodeType::EXPRESSION:
+    case TOdlAstNodeType::OPERATION:
         {
-            bool anonymous = FIdentifierPointer == nullptr;
-            if (!anonymous)
-            {
-                Indent(parOss, parIndentLevel);
-                parOss << FIdentifierPointer->Identifier();
-                parOss << " is ";
-                int const propertyLengthPlusSpacePlusIsPlusSpace = (int) FIdentifierPointer->Identifier().length() + 4;
-                parIndentLevel += propertyLengthPlusSpacePlusIsPlusSpace;
-            }
+            //bool anonymous = FIdentifierPointer == nullptr;
+            //if (!anonymous)
+            //{
+            //    Indent(parOss, parIndentLevel);
+            //    parOss << FIdentifierPointer->Identifier();
+            //    parOss << " is ";
+            //    int const propertyLengthPlusSpacePlusIsPlusSpace = (int) FIdentifierPointer->Identifier().length() + 4;
+            //    parIndentLevel += propertyLengthPlusSpacePlusIsPlusSpace;
+            //}
 
             parOss << "(" << std::endl;
             if (CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer() != nullptr)
             {
                 Indent(parOss, parIndentLevel + 4);
                 CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
-                if (CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer()->AstNodeType() != TOdlAstNodeType::EXPRESSION)
+                if (CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer()->AstNodeType() != TOdlAstNodeType::OPERATION)
                     parOss << std::endl;
             }
             CastNode<TOdlAstNodeOperation>()->OperatorExpressionPointer()->PrettyPrintWithIndentLevel(parOss, parIndentLevel + 4);
@@ -292,69 +193,70 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::VALUE_STRING:
         {
+            /*
             bool anonymous = FIdentifierPointer == nullptr;
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
                 parOss << FIdentifierPointer->Identifier();
                 parOss << " is ";
-            }
+            }*/
 
             parOss << "\"";
             parOss << this->CastNode<TOdlAstNodeValue>()->ValueString().c_str();
             parOss << "\"";
 
-            if (!anonymous)
+            /*if (!anonymous)
             {
                 parOss << std::endl;
-            }
+            }*/
         }
         break ;
     case TOdlAstNodeType::VALUE_INTEGER:
         {
-            bool anonymous = FIdentifierPointer == nullptr;
+            /*bool anonymous = FIdentifierPointer == nullptr;
             if (!anonymous)
             {
                 Indent(parOss, parIndentLevel);
                 parOss << FIdentifierPointer->Identifier();
                 parOss << " is ";
-            }
+            }*/
 
             parOss <<  this->CastNode<TOdlAstNodeValue>()->ValueInteger();
 
-            if (!anonymous)
-            {
-                parOss << std::endl;
-            }
+            //if (!anonymous)
+            //{
+            //    parOss << std::endl;
+            //}
         }
         break ;
     case TOdlAstNodeType::VALUE_FLOAT:
         {
-            bool anonymous = FIdentifierPointer == nullptr;
-            if (!anonymous)
-            {
-                Indent(parOss, parIndentLevel);
-                parOss << FIdentifierPointer->Identifier();
-                parOss << " is ";
-            }
+            //bool anonymous = FIdentifierPointer == nullptr;
+            //if (!anonymous)
+            //{
+            //    Indent(parOss, parIndentLevel);
+            //    parOss << FIdentifierPointer->Identifier();
+            //    parOss << " is ";
+            //}
 
             parOss <<  this->CastNode<TOdlAstNodeValue>()->ValueFloat();
 
-            if (!anonymous)
-            {
-                parOss << std::endl;
-            }
+            //if (!anonymous)
+            //{
+            //    parOss << std::endl;
+            //}
         }
         break ;
     case TOdlAstNodeType::VALUE_VECTOR:
         {
-            bool anonymous = FIdentifierPointer == nullptr;
-            if (!anonymous)
-            {
-                Indent(parOss, parIndentLevel);
-                parOss << FIdentifierPointer->Identifier();
-                parOss << " is ";
-            }
+            //bool anonymous = FIdentifierPointer == nullptr;
+            //if (!anonymous)
+            //{
+            //    Indent(parOss, parIndentLevel);
+            //    parOss << FIdentifierPointer->Identifier();
+            //    parOss << " is ";
+            //}
 
 
             TOdlAstNodeValueVector const* valueVectorNode = CastNode<TOdlAstNodeValueVector>();
@@ -372,22 +274,24 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             }
             parOss << ']';
 
-            if (!anonymous)
+ /*           if (!anonymous)
             {
                 parOss << std::endl;
-            }
+            }*/
         }
         break ;
     case TOdlAstNodeType::PROPERTY_DECLARATION:
         {
+            TOdlAstNodePropertyDeclaration const* propertyDeclarationNode = this->CastNode<TOdlAstNodePropertyDeclaration>();
+
             Indent(parOss, parIndentLevel);
-            parOss << FIdentifierPointer->Identifier();
+            parOss << propertyDeclarationNode->IdentifierPointer()->Identifier();
             parOss << " = ";
 
-            int const propertyLengthPlusSpacePlusEqualPlusSpace = (int) FIdentifierPointer->Identifier().length() + 3;
+            int const propertyLengthPlusSpacePlusEqualPlusSpace = (int) propertyDeclarationNode->IdentifierPointer()->Identifier().length() + 3;
             FExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + propertyLengthPlusSpacePlusEqualPlusSpace);
             // yuk.
-            if (FExpressionPointer->AstNodeType() != TOdlAstNodeType::EXPRESSION)
+            if (FExpressionPointer->AstNodeType() != TOdlAstNodeType::OPERATION)
             {
                 parOss << std::endl;
             }
@@ -395,9 +299,11 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::PROPERTY_DECLARATION_LIST:
         {
-            for (size_t i = 0; i < FPropertyList.size(); ++i)
+            TOdlAstNodePropertyDeclarationList const* that = CastNode<TOdlAstNodePropertyDeclarationList >();
+            std::vector< TOdlAstNodePropertyDeclaration* > const& properties = that->PropertyDeclarationList();
+            for (size_t i = 0; i < properties.size(); ++i)
             {
-                TOdlAstNode const* child = FPropertyList[i];
+                TOdlAstNodePropertyDeclaration const* child = properties[i];
                 child->PrettyPrintWithIndentLevel(parOss, parIndentLevel);
             }
         }
@@ -412,12 +318,12 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             }
             else
             {
-                if (FIdentifierPointer != nullptr)
-                {
-                    parOss << "[";
-                    parOss << FIdentifierPointer->Identifier();
-                    parOss << "] ";
-                }
+                //if (FIdentifierPointer != nullptr)
+                //{
+                //    parOss << "[";
+                //    parOss << FIdentifierPointer->Identifier();
+                //    parOss << "] ";
+                //}
 
                 parOss << that->TypeIdentifierPointer()->Identifier() << std::endl;
 
@@ -434,9 +340,10 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 
             Indent(parOss, parIndentLevel) << "namespace ";
 
-            if (FIdentifierPointer != nullptr)
+            TOdlAstNodeIdentifier const* identifierNode = namespaceDeclarationNode->IdentifierPointer();
+            if (identifierNode != nullptr)
             {
-                parOss << FIdentifierPointer->Identifier();
+                parOss << identifierNode->Identifier();
             }
 
             TOdlAstNode const* templateParameterListPointer = namespaceDeclarationNode->TemplateParameterListPointer();
@@ -446,7 +353,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             }
 
             parOss << std::endl;
-            std::vector< TOdlAstNode* > const& namedDeclarations = namespaceDeclarationNode->NamespaceContent();
+            std::vector< TOdlAstNodeNamedDeclaration* > const& namedDeclarations = namespaceDeclarationNode->NamespaceContent();
             Indent(parOss, parIndentLevel) << "{" << std::endl;
             for (size_t i = 0; i < namedDeclarations.size(); ++i)
             {
@@ -459,25 +366,20 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
         break ;
     case TOdlAstNodeType::NAMED_DECLARATION:
         {
+            TOdlAstNodeNamedDeclaration const* namedDeclarationNode = CastNode<TOdlAstNodeNamedDeclaration>();
             Indent(parOss, parIndentLevel);
-            parOss << FIdentifierPointer->Identifier();
+
+            TOdlAstNodeIdentifier const* identifierNode = namedDeclarationNode->IdentifierPointer();
+            TOdlAstNodeExpression const* expressionNode = namedDeclarationNode->ExpressionPointer();
+
+            parOss << identifierNode->Identifier();
             parOss << " is ";
-            int const identifierLengthPlusSpaceIsSpace = (int) FIdentifierPointer->Identifier().length() + 4;
-            FExpressionPointer->PrettyPrintWithIndentLevel(parOss, parIndentLevel + identifierLengthPlusSpaceIsSpace);
+            int const identifierLengthPlusSpaceIsSpace = (int) identifierNode->Identifier().length() + 4;
+            expressionNode->PrettyPrintWithIndentLevel(parOss, parIndentLevel + identifierLengthPlusSpaceIsSpace);
             parOss << std::endl;
         }
         break ;
     };
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::SetAsReferenceToResolve()
-{
-    FReferenceToResolve = true;
-}
-//-------------------------------------------------------------------------------
-void TOdlAstNode::ResolveReference(TOdlAstNode const* parNodeReference)
-{
-    FResolvedReferenceWeak = parNodeReference; 
 }
 //-------------------------------------------------------------------------------
 void TOdlAstNode::SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)
@@ -492,4 +394,14 @@ void TOdlAstNode::BreakPoint()
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+void TOdlAstNodeNamedDeclaration::AutoGenerateIdentifier()
+{
+    assert(FIdentifier == nullptr);
+    FIdentifier = AutoGenerateObjectIdentifier();
+    FAnonymousDeclaration = true;
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+
 } // namespace odl

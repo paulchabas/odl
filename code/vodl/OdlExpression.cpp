@@ -401,12 +401,13 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
             break ;
 		case TOdlAstNodeType::IDENTIFIER:
 			{
+                TOdlAstNodeIdentifier const* identifierNode = parExpression->CastNode<TOdlAstNodeIdentifier>();
 				// identifier: object name of link
 				#if ODL_ENABLE_VERBOSE_DEBUG
-		        std::string const& objectName = parExpression->CastNode<TOdlAstNodeIdentifier>()->Identifier();
+		        std::string const& objectName = identifierNode->Identifier();
 				#endif
                
-				TOdlAstNode const* namedDeclaration = parExpression->ResolvedReference_ReturnNamedDeclaration();
+				TOdlAstNodeNamedDeclaration const* namedDeclaration = identifierNode->ResolvedReference();
                 TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
 				if (namedDeclarationExpression == nullptr)
 				{
@@ -425,14 +426,15 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
     }
     else
     {
-        assert(expressionType == TOdlAstNodeType::EXPRESSION);
-        TOdlAstNodeOperatorType::TType nodeOperator = parExpression->CastNode<TOdlAstNodeOperation>()->OperatorExpressionPointer()->OperatorType();
+        assert(expressionType == TOdlAstNodeType::OPERATION);
+        TOdlAstNodeOperation const* operationNode = parExpression->CastNode<TOdlAstNodeOperation>();
+        TOdlAstNodeOperatorType::TType nodeOperator = operationNode->OperatorExpressionPointer()->OperatorType();
         switch (nodeOperator)
         {
         case TOdlAstNodeOperatorType::OPERATOR_PLUS:
             {
-                TOdlAstNode const* left = parExpression->CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer();
-                TOdlAstNode const* right = parExpression->CastNode<TOdlAstNodeOperation>()->RightExpressionPointer();
+                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNode const* right = operationNode->RightExpressionPointer();
 
                 TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
@@ -450,8 +452,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
             break ;
         case TOdlAstNodeOperatorType::OPERATOR_MINUS:
             {
-				TOdlAstNode const* left = parExpression->CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer();
-                TOdlAstNode const* right = parExpression->CastNode<TOdlAstNodeOperation>()->RightExpressionPointer();
+				TOdlAstNode const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNode const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult(0);
 				if (left != nullptr)
@@ -473,8 +475,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 
         case TOdlAstNodeOperatorType::OPERATOR_MULTIPLY:
             {
-                TOdlAstNode const* left = parExpression->CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer();
-                TOdlAstNode const* right = parExpression->CastNode<TOdlAstNodeOperation>()->RightExpressionPointer();
+                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNode const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
@@ -492,8 +494,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 
         case TOdlAstNodeOperatorType::OPERATOR_DIVIDE:
             {
-                TOdlAstNode const* left = parExpression->CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer();
-                TOdlAstNode const* right = parExpression->CastNode<TOdlAstNodeOperation>()->RightExpressionPointer();
+                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNode const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
@@ -511,8 +513,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 
         case TOdlAstNodeOperatorType::OPERATOR_MODULO:
             {
-                TOdlAstNode const* left = parExpression->CastNode<TOdlAstNodeOperation>()->LeftExpressionPointer();
-                TOdlAstNode const* right = parExpression->CastNode<TOdlAstNodeOperation>()->RightExpressionPointer();
+                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNode const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)

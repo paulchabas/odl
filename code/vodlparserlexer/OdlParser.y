@@ -20,6 +20,7 @@
 	odl::TOdlAstNode*							FOdlAstNode;
 
 	odl::TOdlAstNodeNamespaceDeclaration*		FOdlAstNodeNamespaceDeclaration;
+	odl::TOdlAstNodeNamedDeclaration*			FOdlAstNodeNamedDeclaration;
 
 	odl::TOdlAstNodeIdentifier*					FOdlAstNodeIdentifier;
 
@@ -29,7 +30,12 @@
 	odl::TOdlAstNodeValue*						FOdlAstNodeValue;
 	odl::TOdlAstNodeValueVector*				FOdlAstNodeValueVector;
 	odl::TOdlAstNodeOperation*					FOdlAstNodeOperation;
-	
+
+	odl::TOdlAstNodeTemplateParameterList*		FOdlAstNodeTemplateParameterList;
+	odl::TOdlAstNodeTemplateExpressionList*		FOdlAstNodeTemplateExpressionList;
+
+	odl::TOdlAstNodePropertyDeclarationList*    FOdlAstNodePropertyDeclarationList;
+	odl::TOdlAstNodePropertyDeclaration*		FOdlAstNodePropertyDeclaration;
 }
  
 %token UNKNOWN
@@ -56,12 +62,15 @@
 
 // rules types
 
-%type <FOdlAstNodeNamespaceDeclaration> named_declaration_list named_declaration
+%type <FOdlAstNodeNamespaceDeclaration> named_declaration_list 
+%type <FOdlAstNodeNamedDeclaration> named_declaration
 %type <FOdlAstNodeExpression> anomymous_object_declaration_or_reference
-%type <FOdlAstNode> property_declaration_list property_declaration
+%type <FOdlAstNodePropertyDeclarationList> property_declaration_list 
+%type <FOdlAstNodePropertyDeclaration>	property_declaration
 %type <FOdlAstNodeExpression> expression term factor
 %type <FOdlAstNodeValueVector> vector_value_list vector_value
-%type <FOdlAstNode> template_instanciation_parameter_list template_declaration_parameter_list
+%type <FOdlAstNodeTemplateExpressionList> template_instanciation_parameter_list
+%type <FOdlAstNodeTemplateParameterList> template_declaration_parameter_list
 
 %start odl_ast
  
@@ -78,7 +87,7 @@ named_declaration_list
 : named_declaration_list named_declaration
 {
 	odl::TOdlAstNodeNamespaceDeclaration* theNamespace = $1;
-	theNamespace->Namespace_AppendNamedDeclaration($2);
+	theNamespace->AppendNamedDeclaration($2);
 	$$ = theNamespace;
 }
 |
@@ -91,13 +100,23 @@ named_declaration_list
 named_declaration
 : IDENTIFIER TOKEN_IS expression
 {
-	odl::TOdlAstNode* namedDeclaration = new odl::TOdlAstNode();
-	namedDeclaration->SetAsNamedDeclaration($1, $3);
+	odl::TOdlAstNodeIdentifier* identifier = $1;
+	odl::TOdlAstNodeExpression* expression = $3;
+
+	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = new odl::TOdlAstNodeNamedDeclaration(identifier, expression);
+
+	// Paul(2014/12/21) hum.
+	if (expression->AstNodeType() == odl::TOdlAstNodeType::OBJECT_DECLARATION)
+	{
+		odl::TOdlAstNodeObjectDeclaration* objectDeclaration = expression->CastNode<odl::TOdlAstNodeObjectDeclaration>();
+		objectDeclaration->SetNamedDeclarationWeakRef(namedDeclaration);
+	}
+
 	$$ = namedDeclaration;
 }
 | TOKEN_NAMESPACE IDENTIFIER TOKEN_OPEN_BRACE named_declaration_list TOKEN_CLOSE_BRACE
 {
-	odl::TOdlAstNode* theNamespace = $4;
+	odl::TOdlAstNodeNamespaceDeclaration* theNamespace = $4;
 	theNamespace->SetIdentifierPointer($2);
 	$$ = theNamespace;
 }
@@ -107,7 +126,7 @@ named_declaration
 
 	odl::TOdlAstNodeNamespaceDeclaration* theNamespace = $7;
 	theNamespace->SetIdentifierPointer($2);
-	theNamespace->Namespace_SetTemplateParameterList($4);
+	theNamespace->SetTemplateParameterList($4);
 	$$ = theNamespace;
 }
 | TOKEN_NAMESPACE IDENTIFIER TOKEN_EQUALS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
@@ -119,9 +138,11 @@ named_declaration
 | TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_declaration_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
 	// object template declaration
+	odl::TOdlAstNodeTemplateObjectDeclaration* templateDeclaration = new odl::TOdlAstNodeTemplateObjectDeclaration($4, $6, $9);
+	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = new odl::TOdlAstNodeNamedDeclaration($2, templateDeclaration);
+	templateDeclaration->SetNamedDeclarationWeakRef(namedDeclaration);
 
-	odl::TOdlAstNodeTemplateObjectDeclaration* templateDeclaration = new odl::TOdlAstNodeTemplateObjectDeclaration($2, $4, $6, $9);
-	$$ = templateDeclaration;
+	$$ = namedDeclaration;
 }
 ;
 
@@ -156,25 +177,29 @@ anomymous_object_declaration_or_reference
 template_declaration_parameter_list
 : template_declaration_parameter_list TOKEN_COMMA IDENTIFIER
 {
-	odl::TOdlAstNode* templateParameterList = $1;
-	odl::TOdlAstNodeIdentifier* templateDeclarationParameter = $3;
-	templateDeclarationParameter->SetAsTemplateDeclarationParameter();
-	templateParameterList->TemplateDeclarationParameterList_AppendParameter(templateDeclarationParameter);
+	odl::TOdlAstNodeTemplateParameterList* templateParameterList = $1;
+		
+	odl::TOdlAstNodeIdentifier* identifier = $3;
+	odl::TOdlAstNodeExpression* expression = nullptr;
+	odl::TOdlAstNodeTemplateParameter* templateParameter = new odl::TOdlAstNodeTemplateParameter(identifier, expression);
+	templateParameterList->AppendTemplateParameter(templateParameter);
+
 	$$ = templateParameterList;
 }
 | IDENTIFIER
 {
-	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateDeclarationParameterList();
-	odl::TOdlAstNodeIdentifier* templateDeclarationParameter = $1;
-	templateDeclarationParameter->SetAsTemplateDeclarationParameter();
-	templateParameterList->TemplateDeclarationParameterList_AppendParameter(templateDeclarationParameter);
+	odl::TOdlAstNodeTemplateParameterList* templateParameterList = new odl::TOdlAstNodeTemplateParameterList();
+	
+	odl::TOdlAstNodeIdentifier* identifier = $1;
+	odl::TOdlAstNodeExpression* expression = nullptr;
+	odl::TOdlAstNodeTemplateParameter* templateParameter = new odl::TOdlAstNodeTemplateParameter(identifier, expression);
+
+	templateParameterList->AppendTemplateParameter(templateParameter);
 	$$ = templateParameterList;
 }
 |
 {
-	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateDeclarationParameterList();
+	odl::TOdlAstNodeTemplateParameterList* templateParameterList = new odl::TOdlAstNodeTemplateParameterList();
 	$$ = templateParameterList;
 }
 ;
@@ -182,45 +207,43 @@ template_declaration_parameter_list
 template_instanciation_parameter_list
 : template_instanciation_parameter_list TOKEN_COMMA expression
 {
-	odl::TOdlAstNode* templateParameterList = $1;
-	templateParameterList->TemplateInstanciationParameterList_AppendParameter($3);
-	$$ = templateParameterList;
+	odl::TOdlAstNodeTemplateExpressionList* templateExpressionParameterList = $1;
+	odl::TOdlAstNodeExpression* expression = $3;
+	templateExpressionParameterList->AppendTemplateExpressionParameter(expression);
+	$$ = templateExpressionParameterList;
 }
 | expression
 {
-	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateInstanciationParameterList();
-	templateParameterList->TemplateInstanciationParameterList_AppendParameter($1);
-	$$ = templateParameterList;
+	odl::TOdlAstNodeTemplateExpressionList* templateExpressionParameterList = new odl::TOdlAstNodeTemplateExpressionList();
+	templateExpressionParameterList->AppendTemplateExpressionParameter($1);
+	$$ = templateExpressionParameterList;
 }
 |
 {
-	odl::TOdlAstNode* templateParameterList = new odl::TOdlAstNode();
-	templateParameterList->SetAsTemplateInstanciationParameterList();
-	$$ = templateParameterList;
+	odl::TOdlAstNodeTemplateExpressionList* templateExpressionParameterList = new odl::TOdlAstNodeTemplateExpressionList();
+	$$ = templateExpressionParameterList;
 }
 ;
 
 property_declaration_list
 : property_declaration_list property_declaration
 {
-	odl::TOdlAstNode* propertyDeclList = $1;
-	propertyDeclList->PropertyDeclarationList_AppendPropertyDeclaration($2);
-	$$ = propertyDeclList;
+	odl::TOdlAstNodePropertyDeclarationList* propertyDeclarationList = $1;
+	odl::TOdlAstNodePropertyDeclaration* propertyDeclaration = $2;
+	propertyDeclarationList->AppendPropertyDeclaration(propertyDeclaration);
+	$$ = propertyDeclarationList;
 }
 |
 {
-	odl::TOdlAstNode* propertyListNode = new odl::TOdlAstNode();
-	propertyListNode->SetAsPropertyDeclarationList();
-	$$ = propertyListNode;
+	odl::TOdlAstNodePropertyDeclarationList* propertyDeclarationList = new odl::TOdlAstNodePropertyDeclarationList();
+	$$ = propertyDeclarationList;
 }
 ;
 
 property_declaration
 : IDENTIFIER TOKEN_EQUALS expression
 {
-	odl::TOdlAstNode* node = new odl::TOdlAstNode();
-	node->SetAsPropertyDeclaration($1, $3);
+	odl::TOdlAstNodePropertyDeclaration* node = new odl::TOdlAstNodePropertyDeclaration($1, $3);
 	$$ = node;
 }
 ;
