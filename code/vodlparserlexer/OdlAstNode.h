@@ -332,6 +332,11 @@ public:
         assert((parTypeIdentifier != nullptr) ? (parTypeIdentifier->AstNodeType() == TOdlAstNodeType::IDENTIFIER) : true);
     }
 
+    virtual ~TOdlAstNodeTypedSyntax()
+    {
+        delete FTypeIdentifierPointer;
+    }
+
     TOdlAstNodeIdentifier* TypeIdentifierPointer() const { assert(FTypeIdentifierPointer != NULL); return FTypeIdentifierPointer; }
 
     bool IsNullPtr() const
