@@ -40,20 +40,36 @@ public:
             OutputStreamAssumeValid() << currentObjectGeneratedName << " is " << currentMetaClass->Name() << std::endl;
             OutputStreamAssumeValid() << '{' << std::endl;
 
-            char const* indentation = "    ";
-            std::vector< TPropertyBase const* > const& properties = currentMetaClass->ClassProperties();
-            for (TPropertyBase const* property : properties)
+            std::vector< TMetaClassBase const* > parentTypes;
             {
-                char const* propertyName = property->Name();
-                odl::TMetaClassBase const* propertyMetaClass = property->Type();
-                char const* propertyTypeName = propertyMetaClass->Name();
-                // Paul(2014/12/24) i make no differences here between in-place field, and pointer field.
-                odl::TOdlExpression expression;
-                property->GetObjectPropertyExpression(currentObject, expression);
+                parentTypes.push_back(currentMetaClass);
+                TMetaClassBase const* parentMetaClass = currentMetaClass->ParentType();
+                while (parentMetaClass != nullptr)
+                {
+                    parentTypes.push_back(parentMetaClass);
+                    parentMetaClass = parentMetaClass->ParentType();
+                }
+            }
 
-                OutputStreamAssumeValid() << indentation << propertyName << " = ";
-                PrintPropertyExpression(expression);
-                OutputStreamAssumeValid() << std::endl;
+            char const* indentation = "    ";
+            while (!parentTypes.empty())
+            {
+                TMetaClassBase const* metaClassInHierarchy = parentTypes.back();
+                parentTypes.pop_back();
+
+                std::vector< TPropertyBase const* > const& properties = metaClassInHierarchy->ClassProperties();
+                for (TPropertyBase const* property : properties)
+                {
+                    char const* propertyName = property->Name();
+                    odl::TMetaClassBase const* propertyMetaClass = property->Type();
+                    // Paul(2014/12/24) i make no differences here between in-place field, and pointer field.
+                    odl::TOdlExpression expression;
+                    property->GetObjectPropertyExpression(currentObject, expression);
+
+                    OutputStreamAssumeValid() << indentation << propertyName << " = ";
+                    PrintPropertyExpression(expression);
+                    OutputStreamAssumeValid() << std::endl;
+                }
             }
 
             OutputStreamAssumeValid() << '}' << std::endl;

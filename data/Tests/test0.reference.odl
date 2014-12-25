@@ -1,5 +1,8 @@
 object000000 is TOdlTestClassChild
 {
+    FBool = true
+    FInteger = -7
+    FFloat = -3.21
     FString = "toto"
     FInteger = 11
     FVectorComposite = [  ]

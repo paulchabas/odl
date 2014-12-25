@@ -3,7 +3,7 @@
 
 object0 is TOdlTestClassChild
 {
-    FBool = false
+    FBool = true
     FVector = [0, 1, 2, 3]
     FInteger = 5 + 4 + 2
     FString = "toto"
@@ -18,9 +18,9 @@ object0 is TOdlTestClassChild
 
 testResult is TOdlTestResult
 {
-    // FDumpOutputFilename = "Data/Tests/test0.output.odl"
+    // FDumpOutputFilename = "Data/Tests/test0.reference.odl"
     FTestedObject = object0
-    FExpectedOutputFilename = "Data/Tests/test0.output.odl"
+    FExpectedOutputFilename = "Data/Tests/test0.reference.odl"
 }
 
 
