@@ -422,7 +422,12 @@ bool SetValue(std::map< TKey, TValue, TCompare, TAllocator >& outMap, TOdlExpres
 {
     if (parExpression.Type() == TOdlExpression::VECTOR)
     {
-        if (parExpression.ValueUnion().FValueArray.FVectorCount == 2)
+        if (parExpression.ValueUnion().FValueArray.FVectorCount == 0)
+        {
+            // Paul(2014/12/25) empty map, nothing to do.
+            return true;
+        }
+        else if (parExpression.ValueUnion().FValueArray.FVectorCount == 2)
         {
             TKey key;
             TValue value;
@@ -431,6 +436,7 @@ bool SetValue(std::map< TKey, TValue, TCompare, TAllocator >& outMap, TOdlExpres
                 if (SetValue(value, parExpression.ValueUnion().FValueArray.FVectorValues[1]))
                 {
                     outMap[key] = value;
+                    return true;
                 }
 				else
 				{
