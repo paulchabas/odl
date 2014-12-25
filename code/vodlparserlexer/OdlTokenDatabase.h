@@ -1,11 +1,8 @@
 #ifndef INCLUDED_ODL_TOKEN_DATABASE_H
 # define INCLUDED_ODL_TOKEN_DATABASE_H
 
+#include "BasicTypes.h"
 #include "OdlSingleton.h"
-
-#include <hash_map>
-#include <vector>
-#include <string>
 
 namespace odl
 {

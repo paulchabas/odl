@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\vodl\Odl.h" />
+    <ClInclude Include="..\..\code\vodl\OdlConfig.h" />
     <ClInclude Include="..\..\code\vodl\OdlDatabase.h" />
     <ClInclude Include="..\..\code\vodl\OdlExpression.h" />
     <ClInclude Include="..\..\code\vodl\OdlInterpreter.h" />

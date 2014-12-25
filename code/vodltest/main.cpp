@@ -5,7 +5,6 @@
 #undef max
 #undef min
 
-
 #include "vOdl/Odl.h"
 #include "vOdl/OdlUnitaryTest.h"
 

@@ -1,10 +1,11 @@
-
 #ifndef ODL_H
 #define ODL_H
 
 #include "vodlParserLexer/BasicTypes.h"
-#include "OdlDatabase.h"
 #include "vodlParserLexer/OdlTokenDatabase.h"
+#include "OdlConfig.h"
+#include "OdlDatabase.h"
+
 #include "OdlExpression.h"
 
 namespace odl
@@ -1085,6 +1086,13 @@ class TOdlObject
 {
 public:
     TOdlObject() {};
+
+    #ifndef ODL_ENABLE_VTABLE_INTO_ODL_OBJECT_FOR_DEBUG
+    #error "ODL_ENABLE_VTABLE_INTO_ODL_OBJECT_FOR_DEBUG is undefined."
+    #endif
+    #if ODL_ENABLE_VTABLE_INTO_ODL_OBJECT_FOR_DEBUG
+    virtual ~TOdlObject() {}
+    #endif
 
     DECLARE_METACLASS_HEADER(TOdlObject, TOdlNull)
 };
