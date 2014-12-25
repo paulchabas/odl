@@ -21,6 +21,7 @@ object000000 is TOdlTestClassChild
 
 object000001 is TOdlTestClassBase
 {
+    FBool = false
     FInteger = -7
     FFloat = -3.21
 }

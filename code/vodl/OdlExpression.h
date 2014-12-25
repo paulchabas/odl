@@ -23,6 +23,7 @@ public:
     enum TType
     {
         UNTYPED,
+        BOOLEAN,
         INTEGER,
         FLOAT,
         STRING,
@@ -33,6 +34,7 @@ public:
 
     union TValueUnion
     {
+        bool FBoolean;
         int FInteger;
         float FFloat;
         char const* FString;
@@ -52,6 +54,7 @@ public:
 
     TOdlExpression();
 	TOdlExpression(TOdlExpressionNullTag const&);
+    TOdlExpression(bool parValueBoolean);
 	TOdlExpression(int parValueInteger);
     TOdlExpression(float parFloatValue);
     TOdlExpression(char const* parString);

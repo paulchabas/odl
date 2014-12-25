@@ -141,6 +141,14 @@ private:
                 OutputStreamAssumeValid() << " ]";
             }
             break;
+        case odl::TOdlExpression::BOOLEAN:
+            {
+                if (parExpression.ValueUnion().FBoolean)
+                    OutputStreamAssumeValid() << "true";
+                else
+                    OutputStreamAssumeValid() << "false";
+            }
+            break;
         case odl::TOdlExpression::FLOAT:
             {
                 OutputStreamAssumeValid() << parExpression.ValueUnion().FFloat;
@@ -178,6 +186,7 @@ class TOdlTestClassBase : public odl::TOdlObject
     DECLARE_METACLASS_HEADER(TOdlTestClassBase, odl::TOdlObject)
 public:
     TOdlTestClassBase() :
+        FBool(false),
 		FInteger(-7),
         FFloat(-3.21f)
     {
@@ -185,12 +194,14 @@ public:
     }
 
 public:
+    bool FBool;
     i32 FInteger;
     float FFloat;
 };
 //-------------------------------------------------------------------------------
 BEGIN_METACLASS_CPP(TOdlTestClassBase)
 {
+    PROPERTYFIELD(FBool);
 	PROPERTYFIELD(FInteger)
     PROPERTYFIELD(FFloat)
 }

@@ -60,11 +60,21 @@ LINE_COMMENT "//".*\n
 						column += 7;
 						return OdlParserBase::TOKEN_NULLPTR;
 					}
-"+"               {
-                    ++column;
-					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_PLUS);
-                    return OdlParserBase::OPERATOR_PLUS;
-                  }
+"true"				{
+						column += 4;
+						val->FOdlAstNode = new odl::TOdlAstNodeValue(true);
+						return OdlParserBase::VALUE_BOOLEAN;
+					}
+"false"				{
+						column += 5;
+						val->FOdlAstNode = new odl::TOdlAstNodeValue(false);
+						return OdlParserBase::VALUE_BOOLEAN;
+					}
+"+"					{
+						++column;
+						val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_PLUS);
+						return OdlParserBase::OPERATOR_PLUS;
+					}
 "-"               {
                     ++column;
 					val->FOdlAstNode = new odl::TOdlAstNodeOperator(odl::TOdlAstNodeOperatorType::OPERATOR_MINUS);

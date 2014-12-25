@@ -222,15 +222,18 @@ extern YY_OdlParserBase_STYPE YY_OdlParserBase_LVAL;
 #define	TOKEN_NAMESPACE	268
 #define	TOKEN_TEMPLATE	269
 #define	TOKEN_NULLPTR	270
-#define	OPERATOR_PLUS	271
-#define	OPERATOR_MINUS	272
-#define	OPERATOR_MULTIPLY	273
-#define	OPERATOR_DIVIDE	274
-#define	OPERATOR_MODULO	275
-#define	VALUE_INTEGER	276
-#define	VALUE_FLOAT	277
-#define	VALUE_STRING	278
-#define	IDENTIFIER	279
+#define	TOKEN_TRUE	271
+#define	TOKEN_FALSE	272
+#define	OPERATOR_PLUS	273
+#define	OPERATOR_MINUS	274
+#define	OPERATOR_MULTIPLY	275
+#define	OPERATOR_DIVIDE	276
+#define	OPERATOR_MODULO	277
+#define	VALUE_INTEGER	278
+#define	VALUE_FLOAT	279
+#define	VALUE_STRING	280
+#define	VALUE_BOOLEAN	281
+#define	IDENTIFIER	282
 
 
 #line 143 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h"
@@ -275,7 +278,7 @@ public:
 /* static const int token ... */
 
 /* #line 182 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 279 "OdlGenParser.h"
+#line 282 "OdlGenParser.h"
 static const int UNKNOWN;
 static const int TOKEN_IS;
 static const int TOKEN_OPEN_BRACE;
@@ -289,6 +292,8 @@ static const int TOKEN_COMMA;
 static const int TOKEN_NAMESPACE;
 static const int TOKEN_TEMPLATE;
 static const int TOKEN_NULLPTR;
+static const int TOKEN_TRUE;
+static const int TOKEN_FALSE;
 static const int OPERATOR_PLUS;
 static const int OPERATOR_MINUS;
 static const int OPERATOR_MULTIPLY;
@@ -297,6 +302,7 @@ static const int OPERATOR_MODULO;
 static const int VALUE_INTEGER;
 static const int VALUE_FLOAT;
 static const int VALUE_STRING;
+static const int VALUE_BOOLEAN;
 static const int IDENTIFIER;
 
 
@@ -306,7 +312,7 @@ static const int IDENTIFIER;
 enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 
 /* #line 185 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 310 "OdlGenParser.h"
+#line 316 "OdlGenParser.h"
 	,UNKNOWN=258
 	,TOKEN_IS=259
 	,TOKEN_OPEN_BRACE=260
@@ -320,15 +326,18 @@ enum YY_OdlParserBase_ENUM_TOKEN { YY_OdlParserBase_NULL_TOKEN=0
 	,TOKEN_NAMESPACE=268
 	,TOKEN_TEMPLATE=269
 	,TOKEN_NULLPTR=270
-	,OPERATOR_PLUS=271
-	,OPERATOR_MINUS=272
-	,OPERATOR_MULTIPLY=273
-	,OPERATOR_DIVIDE=274
-	,OPERATOR_MODULO=275
-	,VALUE_INTEGER=276
-	,VALUE_FLOAT=277
-	,VALUE_STRING=278
-	,IDENTIFIER=279
+	,TOKEN_TRUE=271
+	,TOKEN_FALSE=272
+	,OPERATOR_PLUS=273
+	,OPERATOR_MINUS=274
+	,OPERATOR_MULTIPLY=275
+	,OPERATOR_DIVIDE=276
+	,OPERATOR_MODULO=277
+	,VALUE_INTEGER=278
+	,VALUE_FLOAT=279
+	,VALUE_STRING=280
+	,VALUE_BOOLEAN=281
+	,IDENTIFIER=282
 
 
 #line 185 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h"
@@ -385,5 +394,5 @@ public:
 /* END */
 
 /* #line 236 "D:\\GitHub\\odl_usb\\extern\\flexppbisonpp\\bison.h" */
-#line 389 "OdlGenParser.h"
+#line 398 "OdlGenParser.h"
 #endif

@@ -26,8 +26,15 @@ TOdlExpression::TOdlExpression(int parValueInteger) :
     FMetaClassBase(TMetaClassTraits< int >::GetMetaClassInstance())
 {
     memset(&FValueUnion, 0, sizeof(TValueUnion));
-
     FValueUnion.FInteger = parValueInteger;
+}
+//-------------------------------------------------------------------------------
+TOdlExpression::TOdlExpression(bool parValueBoolean) :
+    FType(TOdlExpression::BOOLEAN),
+    FMetaClassBase(TMetaClassTraits< bool >::GetMetaClassInstance())
+{
+    memset(&FValueUnion, 0, sizeof(TValueUnion));
+    FValueUnion.FBoolean = parValueBoolean;
 }
 //-------------------------------------------------------------------------------
 TOdlExpression::TOdlExpression(float parFloatValue) :
@@ -334,6 +341,11 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
     {
         switch (expressionType)
         {
+        case TOdlAstNodeType::VALUE_BOOLEAN:
+            {
+                return TOdlExpression(parExpression->CastNode<TOdlAstNodeValue>()->ValueBoolean());
+            }
+            break ;
         case TOdlAstNodeType::VALUE_INTEGER:
             {
                 return TOdlExpression(parExpression->CastNode<TOdlAstNodeValue>()->ValueInteger());

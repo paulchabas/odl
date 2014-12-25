@@ -9,6 +9,7 @@ END_METACLASS_CPP()
 //--------------------------------------------------------
 //********************************************************
 //--------------------------------------------------------
+DECLARE_VALUE_METACLASS(bool)
 DECLARE_VALUE_METACLASS(i32)
 DECLARE_VALUE_METACLASS(float)
 namespace
@@ -22,6 +23,7 @@ void RegisterOdlMetaClasses()
     using std::string;
 
     TOdlObject::RegisterMetaClass();
+    REGISTER_VALUE_METACLASS(bool)
 	REGISTER_VALUE_METACLASS(i32)
 	REGISTER_VALUE_METACLASS(float)
 	REGISTER_VALUE_METACLASS(string)

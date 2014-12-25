@@ -52,11 +52,14 @@
 %token TOKEN_NAMESPACE
 %token TOKEN_TEMPLATE
 %token TOKEN_NULLPTR
+%token TOKEN_TRUE
+%token TOKEN_FALSE
 
 %token <FOdlAstNodeOperator> OPERATOR_PLUS OPERATOR_MINUS OPERATOR_MULTIPLY OPERATOR_DIVIDE OPERATOR_MODULO
 %token <FOdlAstNodeValue> VALUE_INTEGER
 %token <FOdlAstNodeValue> VALUE_FLOAT
 %token <FOdlAstNodeValue> VALUE_STRING
+%token <FOdlAstNodeValue> VALUE_BOOLEAN
 %token <FOdlAstNodeIdentifier> IDENTIFIER
 %token< FOdlAstNode> TOKEN_NULLPTR
 
@@ -315,6 +318,10 @@ factor
 	$$ = $1;
 }
 | VALUE_STRING
+{
+	$$ = $1;
+}
+| VALUE_BOOLEAN
 {
 	$$ = $1;
 }

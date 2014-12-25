@@ -208,6 +208,27 @@ template<> struct TMetaClassTraits< i32 >
 		return metaClassBase;
 	}
 };
+//-------------------------------------------------------------------------------
+template<> struct TMetaClassTraits< bool > 
+{ 
+	static void ClassName(std::ostringstream& parOss)
+	{
+		parOss << "bool";
+	}
+
+	static TMetaClassBase const* GetMetaClassInstance()
+	{
+		TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP("bool");
+		assert(metaClassBase);
+		return metaClassBase;
+	}
+
+	static TMetaClassBase* CreateMetaClassInstance(char const* parMetaClassName)
+	{
+		TMetaClassBase* metaClassBase = new  TMetaClass< bool >(parMetaClassName, TMetaClassType::Value);
+		return metaClassBase;
+	}
+};
 //--------------------------------------------------------
 template<> struct TMetaClassTraits< std::string > 
 { 
@@ -526,6 +547,17 @@ inline bool SetValue(int& outInt, TOdlExpression const& parExpression)
     return false;
 }
 //-------------------------------------------------------------------------------
+inline bool SetValue(bool& outBool, TOdlExpression const& parExpression)
+{
+    if (parExpression.Type() == TOdlExpression::BOOLEAN)
+    {
+        outBool = parExpression.ValueUnion().FBoolean;
+        return true;
+    }
+    assert(false); // {TODO} invalid type
+    return false;
+}
+//-------------------------------------------------------------------------------
 inline bool SetValue(std::string& outString, TOdlExpression const& parExpression)
 {
     if (parExpression.Type() == TOdlExpression::STRING)
@@ -625,6 +657,15 @@ template <>
 struct TGetValue< int >
 {
     static void GetValue(int parValue, TOdlExpression& outExpression)
+    {
+        outExpression = TOdlExpression(parValue);
+    }
+};
+//-------------------------------------------------------------------------------
+template <>
+struct TGetValue< bool >
+{
+    static void GetValue(bool parValue, TOdlExpression& outExpression)
     {
         outExpression = TOdlExpression(parValue);
     }

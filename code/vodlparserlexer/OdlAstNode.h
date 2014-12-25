@@ -32,7 +32,8 @@ namespace TOdlAstNodeType
         TEMPLATE_OBJECT_INSTANCIATION			= 14 | TEMPLATE_MASK | VALUE_MASK,
         TEMPLATE_DECLARATION_PARAMETER          = 15,
 		TEMPLATE_DECLARATION_PARAMETER_LIST		= 16,
-		TEMPLATE_INSTANCIATION_EXPRESSION_LIST	= 17
+		TEMPLATE_INSTANCIATION_EXPRESSION_LIST	= 17,
+        VALUE_BOOLEAN                           = 18 | VALUE_MASK,
 	};
 }
 
@@ -252,7 +253,8 @@ public:
         parent_type(TOdlAstNodeType::VALUE_STRING),
         FValueString(parValueString),
         FValueInteger(0),
-        FValueFloat(0.0f)
+        FValueFloat(0.0f),
+        FValueBoolean(false)
     {
         
     }
@@ -261,7 +263,8 @@ public:
         parent_type(TOdlAstNodeType::VALUE_FLOAT),
         FValueString(),
         FValueInteger(0),
-        FValueFloat(parValueFloat)
+        FValueFloat(parValueFloat),
+        FValueBoolean(false)
     {
         
     }
@@ -270,20 +273,32 @@ public:
         parent_type(TOdlAstNodeType::VALUE_INTEGER),
         FValueString(),
         FValueInteger(parValueInteger),
-        FValueFloat(0.0f)
+        FValueFloat(0.0f),
+        FValueBoolean(false)
     {
         
     }
 
+    TOdlAstNodeValue(bool parValueBoolean) :
+        parent_type(TOdlAstNodeType::VALUE_BOOLEAN),
+        FValueString(),
+        FValueInteger(0),
+        FValueFloat(0.0f),
+        FValueBoolean(parValueBoolean)
+    {
+        
+    }
 
     int ValueInteger() const { return FValueInteger; }
     float ValueFloat() const { return FValueFloat; }
     std::string const& ValueString() const { return FValueString; }
+    bool ValueBoolean() const { return FValueBoolean; }
 
 private:
     std::string                     FValueString;
     int                             FValueInteger;
     float                           FValueFloat;
+    bool                            FValueBoolean;
 };
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------

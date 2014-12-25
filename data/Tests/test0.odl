@@ -3,6 +3,7 @@
 
 object0 is TOdlTestClassChild
 {
+    FBool = false
     FVector = [0, 1, 2, 3]
     FInteger = 5 + 4 + 2
     FString = "toto"
