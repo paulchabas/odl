@@ -20,32 +20,11 @@ public:
     {
     }
 
-    bool IsObjectKnown(odl::TOdlObject const* parObject)
-    {
-        assert(false);
-        /*TKnownObjectsAndGeneratedNames::const_iterator it = FKnownObjectsAndGeneratedNames.find(parObject);
-        if (it == FKnownObjectsAndGeneratedNames.end())
-        {
-            FKnownObjectsAndGeneratedNames[parObject] = GenerateObjectName();
-            return true;
-        }
-        else
-        {
-            return false;
-        }*/
-
-        return false;
-    }
-
-    std::string GenerateObjectName()
-    {
-        char buffer[16];
-        sprintf_s(buffer, 16, "object%06d", FGenerator++);
-        return std::string(buffer);
-    }
+    void SetCurrentOutputStream(std::ostringstream* parOutputStream) { FOutputStream = parOutputStream; }
 
     void VisitObject(TOdlObject const* parObject)
     {
+        assert(FOutputStream != nullptr);
         assert(FPendingTypedObjects.empty());
 
         TOdlObject const* currentObject = parObject;
@@ -98,6 +77,16 @@ public:
 
         assert(FPendingTypedObjects.empty());
     }
+
+private:
+    std::string GenerateObjectName()
+    {
+        char buffer[16];
+        sprintf_s(buffer, 16, "object%06d", FGenerator++);
+        return std::string(buffer);
+    }
+
+    std::ostringstream& OutputStreamAssumeValid() { assert(FOutputStream != nullptr); return *FOutputStream; }
 
     void PrintPropertyExpression(odl::TOdlExpression const& parExpression)
     {
@@ -175,206 +164,12 @@ public:
         };
     }
 
-    std::ostringstream& OutputStreamAssumeValid() { assert(FOutputStream != nullptr); return *FOutputStream; }
-
-    void SetCurrentOutputStream(std::ostringstream* parOutputStream) { FOutputStream = parOutputStream; }
-
 private:
     TKnownObjectsAndGeneratedNames FKnownObjectsAndGeneratedNames;
     std::vector< std::pair< odl::TOdlObject const*, odl::TMetaClassBase const* > > FPendingTypedObjects;
     std::ostringstream* FOutputStream;
     u32 FGenerator;
 };
-//-------------------------------------------------------------------------------
-//*******************************************************************************
-//-------------------------------------------------------------------------------
-template < typename T >
-struct TPrettyPrintField
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, T const& parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << "&:" << std::endl << "{" << std::endl;
-        if (parFlatObjectDumper.IsObjectKnown(&parFieldValue))
-            parFieldValue.FormatOutputCheck(parFlatObjectDumper);
-        if (parFieldName  != nullptr)
-            oss << "} // " << parFieldName << std::endl << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template <>
-struct TPrettyPrintField< std::string >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, std::string const& parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << ": ";
-        oss << '"' << parFieldValue << '"';
-        if (parFieldName != nullptr)
-            oss << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template <>
-struct TPrettyPrintField< float >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, float parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << ": ";
-        oss << parFieldValue;
-        if (parFieldName != nullptr)
-            oss << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template <>
-struct TPrettyPrintField< i32 >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, i32 parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << ": ";
-        oss << parFieldValue;
-        if (parFieldName != nullptr)
-            oss << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template <>
-struct TPrettyPrintField< bool >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, bool parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-        oss << parFieldName << ": " << (parFieldValue ? "true" : "false") << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template < typename TValue >
-struct TPrettyPrintField< std::vector< TValue > >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, std::vector< TValue > const& parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << ": ";
-        oss << '[';
-        for (size_t i = 0; i < parFieldValue.size(); ++i)
-        {
-            TValue const& value = parFieldValue[i];
-            
-            TPrettyPrintField<TValue> ppf;
-            ppf(parFlatObjectDumper, nullptr, value);
-
-            if (i + 1 < parFieldValue.size())
-            {
-                oss << ", ";
-            }
-        }
-        oss << "]";
-        if (parFieldName != nullptr)
-            oss << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template < typename TKey, typename TValue >
-struct TPrettyPrintField< std::map< TKey, TValue > >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, std::map< TKey, TValue > const& parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << ":  [";
-        for (std::map< TKey, TValue >::const_iterator it = parFieldValue.begin();
-             it != parFieldValue.end();
-             ++it)
-        {
-            TKey const& key = it->first;
-            TValue const& value = it->second;
-
-            oss << "[";
-            TPrettyPrintField<TKey> ppfkey;
-            ppfkey(parFlatObjectDumper, nullptr, key);
-            oss << ", ";
-            TPrettyPrintField<TValue> ppfvalue;
-            ppfvalue(parFlatObjectDumper, nullptr, value);
-            oss << "]";
-
-            if (std::next(it) != parFieldValue.end())
-            {
-                oss << ", ";
-            }
-        }
-        oss << "]" << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template < typename TKey, typename TValue >
-struct TPrettyPrintField< std::pair< TKey, TValue > >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, std::pair< TKey, TValue > const& parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << ": ";
-        
-        TKey const& key = parFieldValue.first;
-        TValue const& value = parFieldValue.second;
-        oss << "[";
-        TPrettyPrintField<TKey> ppfkey;
-        ppfkey(parFlatObjectDumper, nullptr, key);
-        oss << ", ";
-        TPrettyPrintField<TValue> ppfvalue;
-        ppfvalue(parFlatObjectDumper, nullptr, value);
-        oss << "]";
-
-        if (parFieldName != nullptr)
-            oss << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-template < typename TCustomObjectPointer >
-struct TPrettyPrintField< TCustomObjectPointer* >
-{
-    void operator () (TOdlFlatObjectDumper& parFlatObjectDumper, char const* parFieldName, TCustomObjectPointer const* parFieldValue) const
-    {
-        std::ostringstream& oss = parFlatObjectDumper.OutputStreamAssumeValid();
-
-        if (parFieldName != nullptr)
-            oss << parFieldName << "*:" << std::endl << "{" << std::endl;
-        if (parFieldValue == nullptr)
-        {
-            oss << "<nullptr>" << std::endl;
-        }
-        else
-        {
-            if (parFlatObjectDumper.IsObjectKnown(parFieldValue))
-                parFlatObjectDumper.VisitObject(parFieldValue);
-            else
-                oss << "<..endcycle..>" << std::endl;
-        }
-        if (parFieldName != nullptr)
-            oss << "} // " << parFieldName << std::endl << std::endl;
-    }
-};
-//-------------------------------------------------------------------------------
-#define PRETTY_PRINT_FIELD(ObjectDumper, Field)\
-    {                                               \
-        TPrettyPrintField<decltype(Field)> ppf;     \
-        ppf(ObjectDumper, #Field, Field);      \
-    }
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
@@ -387,12 +182,6 @@ public:
         FFloat(-3.21f)
     {
 
-    }
-
-    virtual void FormatOutputCheck(TOdlFlatObjectDumper& parFlatObjectDumper) const
-    {
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FInteger);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FFloat);
     }
 
 public:
@@ -420,29 +209,6 @@ public:
 		FTestClass2BasePointer(nullptr)
 	{
 	}
-
-    virtual void FormatOutputCheck(TOdlFlatObjectDumper& parFlatObjectDumper) const override
-    {
-        parent_type::FormatOutputCheck(parFlatObjectDumper);
-
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FInteger);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FString);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FVector);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FVectorComposite);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FMapI32ToVectorFloat);
-
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FFloatVector);
-	    PRETTY_PRINT_FIELD(parFlatObjectDumper, FFloatFloatPair);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FVectorOfObjectPointers);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FVectorOfObjectInPlace);
-	    PRETTY_PRINT_FIELD(parFlatObjectDumper, FIntStringPair);
-	    PRETTY_PRINT_FIELD(parFlatObjectDumper, FFloatFloatPairVector);
-	    PRETTY_PRINT_FIELD(parFlatObjectDumper, FFloatVectorIntVectorPair);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FObjectInPlace);
-        PRETTY_PRINT_FIELD(parFlatObjectDumper, FObjectPointer);
-	    PRETTY_PRINT_FIELD(parFlatObjectDumper, FTestClassBasePointer);
-	    PRETTY_PRINT_FIELD(parFlatObjectDumper, FTestClass2BasePointer);
-    }
 
 public:
     int FInteger;
