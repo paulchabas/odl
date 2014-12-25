@@ -11,10 +11,16 @@ END_METACLASS_CPP()
 //--------------------------------------------------------
 DECLARE_VALUE_METACLASS(i32)
 DECLARE_VALUE_METACLASS(float)
-DECLARE_VALUE_METACLASS(string)
+namespace
+{
+    using std::string;
+    DECLARE_VALUE_METACLASS(string)
+}
 //--------------------------------------------------------
 void RegisterOdlMetaClasses()
 {
+    using std::string;
+
     TOdlObject::RegisterMetaClass();
 	REGISTER_VALUE_METACLASS(i32)
 	REGISTER_VALUE_METACLASS(float)

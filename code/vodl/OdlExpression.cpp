@@ -41,7 +41,7 @@ TOdlExpression::TOdlExpression(float parFloatValue) :
 //-------------------------------------------------------------------------------
 TOdlExpression::TOdlExpression(char const* parString) :
     FType(TOdlExpression::STRING),
-    FMetaClassBase(TMetaClassTraits< odl::string >::GetMetaClassInstance())
+    FMetaClassBase(TMetaClassTraits< std::string >::GetMetaClassInstance())
 {
     memset(&FValueUnion, 0, sizeof(TValueUnion));
     FValueUnion.FString = parString;
