@@ -1,13 +1,13 @@
 
-template TemplateTest0 is TTestClass2()
+template TemplateTest0 is TOdlTestClassChild()
 {
 }
 
-template TemplateTest1 is TTestClass2(a)
+template TemplateTest1 is TOdlTestClassChild(a)
 {
 }
 
-template TemplateTest2 is TTestClass2(a, b)
+template TemplateTest2 is TOdlTestClassChild(a, b)
 {
 }
 
@@ -18,11 +18,11 @@ namespace toto
 	{
 		namespace chlobo { }
 		
-		template TemplateTest0 is TTestClass2(a, b,c)
+		template TemplateTest0 is TOdlTestClassChild(a, b,c)
 		{
 		}
 		
-		template TemplateTest1 is TTestClass2(a, b, c)
+		template TemplateTest1 is TOdlTestClassChild(a, b, c)
 		{
 		}
 		
@@ -32,16 +32,16 @@ namespace toto
 		circular_reference is circular_reference2
 		circular_reference2 is circular_reference
 
-		object0 is TTestClass2
+		object0 is TOdlTestClassChild
 		{
 		}
 
-		object1 is TTestClass
+		object1 is TOdlTestClassBase
 		{
 
 		}
 	
-		sum1 is TTestClass2
+		sum1 is TOdlTestClassChild
 		{
 			FVector = tabtab + [9]
 			FInteger = 5 + 4 + 2
@@ -60,7 +60,7 @@ namespace toto
 
 tab is [ 4, 1, 5 ] + [] + [ 0 ]
 
-sum is TTestClass2
+sum is TOdlTestClassChild
 {
 	FInteger = 5 + 4 + 2
 	FString = "toto"
@@ -68,48 +68,48 @@ sum is TTestClass2
 }
 
 
-assignVector0 is TTestClass2
+assignVector0 is TOdlTestClassChild
 {
 	FVector = [ 4, 5, 6 ]
 	FString = "toto" + "tata"
 }
 
-object0 is TTestClass2
+object0 is TOdlTestClassChild
 {
 	FObjectInPlace = object0
 	FObjectPointer = object0
-	FObjectPointer = TTestClass2
+	FObjectPointer = TOdlTestClassChild
 					 {
 						FObjectPointer = object0
 					 }
 }
 
 
-// object1 is TTestClass2
+// object1 is TOdlTestClassChild
 // {
 // 	FInteger = 1 + 2
-// 	FObjectPointer = TTestClass2
+// 	FObjectPointer = TOdlTestClassChild
 // 					 {
-//						FObjectPointer = object + TTestClass2{ FInteger = 6 + 4 + TTestClass2{ FInteger = 3 } }
+//						FObjectPointer = object + TOdlTestClassChild{ FInteger = 6 + 4 + TOdlTestClassChild{ FInteger = 3 } }
 //					 }
 //}
 
-// object2 is TTestClass2
+// object2 is TOdlTestClassChild
 // {
 //	FInteger = 2
-//	FObjectPointer = TTestClass2
+//	FObjectPointer = TOdlTestClassChild
 //					 {
 //						FObjectPointer = object
-//					 } + TTestClass2
+//					 } + TOdlTestClassChild
 //					 {
 //						FObjectPointer = object
 //					 }
 //}
 
-// object3 is TTestClass2
+// object3 is TOdlTestClassChild
 // {
 //	FInteger = 3
-//	FObjectPointer = TTestClass2{ FObjectPointer = object)
+//	FObjectPointer = TOdlTestClassChild{ FObjectPointer = object)
 // }
 
 

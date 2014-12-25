@@ -1,0 +1,26 @@
+
+
+
+object0 is TOdlTestClassChild
+{
+    FVector = [0, 1, 2, 3]
+    FInteger = 5 + 4 + 2
+    FString = "toto"
+    FObjectPointer = object0
+    FTestClassBasePointer = object0
+    FTestClass2BasePointer = nullptr
+    FIntStringPair = [ 5, "string" ]
+    FFloatFloatPairVector = [ [ 4, 3 ], [ 3, 2 ], [ 2, 1 ] ]
+    FFloatVectorIntVectorPair = [ [0, 1, 2, 3], [3, 2, 1, 0] ]
+}
+
+
+testResult is TOdlTestResult
+{
+    // FDumpOutputFilename = "Data/Tests/test0.output.odl"
+    FTestedObject = object0
+    FExpectedOutputFilename = "Data/Tests/test0.output.odl"
+}
+
+
+

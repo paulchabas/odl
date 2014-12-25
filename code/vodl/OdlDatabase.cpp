@@ -16,10 +16,13 @@ TOdlObjectDatabase::TOdlObjectDatabase()
 TOdlObjectDatabase::~TOdlObjectDatabase()
 {
 	assert(FObjectsByPaths.empty());
+    assert(FMetaClassByObjects.empty());
 }
 //--------------------------------------------------------
 void TOdlObjectDatabase::DestroyContent()
 {
+    FMetaClassByObjects.clear();
+
 	for (TObjectsByPaths::iterator it = FObjectsByPaths.begin();
 		 it != FObjectsByPaths.end();
 		 ++it)
@@ -48,10 +51,9 @@ void TOdlObjectDatabase::StoreObject(TOdlDatabasePath const& parDatabasePath, TO
             assert(false);
         }
     }
-    // = FObjectsByPaths.find(parDatabasePath);
-    //if (it == FObjectsByPaths
-    // == FObjectsByPaths
+
     FObjectsByPaths[parDatabasePath] = TObjectAndMetaClass(parObject, parMetaClassBase);
+    FMetaClassByObjects[parObject] = parMetaClassBase;
 }
 //--------------------------------------------------------
 TOdlObject* TOdlObjectDatabase::GetObject_IFP(TOdlDatabasePath const& parDatabasePath) const
@@ -76,6 +78,17 @@ TObjectAndMetaClass TOdlObjectDatabase::GetObjectAndMetaClass_IFP(TOdlDatabasePa
     }
 
     return TObjectAndMetaClass(nullptr, nullptr);
+}
+//-------------------------------------------------------------------------------
+TMetaClassBase const* TOdlObjectDatabase::GetObjectMetaClassBase_IFP(TOdlObject const* parObject) const
+{
+    TMetaClassByObjects::const_iterator it = FMetaClassByObjects.find(parObject);
+    if (it != FMetaClassByObjects.end())
+    {
+        return it->second;
+    }
+
+    return nullptr;
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************
@@ -162,8 +175,18 @@ TObjectAndMetaClass TOdlDatabase::GetObjectAndMetaClass_IFP(TOdlDatabasePath con
 {
 	return FObjectsDatabase.GetObjectAndMetaClass_IFP(parDatabasePath);
 }
-//--------------------------------------------------------
-//********************************************************
-//--------------------------------------------------------
+//-------------------------------------------------------------------------------
+void TOdlDatabase::ClearObjectDatabase()
+{
+    FObjectsDatabase.DestroyContent();
+}
+//-------------------------------------------------------------------------------
+TMetaClassBase const* TOdlDatabase::GetObjectMetaClassBase_IFP(TOdlObject const* parObject) const
+{
+    return FObjectsDatabase.GetObjectMetaClassBase_IFP(parObject);
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
 }
 

@@ -7,7 +7,6 @@
 #include "vodlParserLexer/OdlTokenDatabase.h"
 #include "OdlExpression.h"
 
-
 namespace odl
 {
 //--------------------------------------------------------
@@ -52,6 +51,8 @@ public:
 
 	void PrintContent(std::ostringstream& parOss) const;
 
+    TMetaClassType::Type MetaClassType() const { return FMetaClassType; }
+
 	// class
 	virtual TOdlObject* CreateObject() const { assert(FMetaClassType == TMetaClassType::Class); return nullptr; }
     virtual void DeleteObject(TOdlObject* parObject) const { assert(false); }
@@ -61,6 +62,8 @@ public:
 	void RegisterProperty(TPropertyBase const* parUserProperty);
 	TPropertyBase const* PropertyByName(std::string const& parPropertyName) const;
     bool IsGivenTypeCompatible(TMetaClassBase const* parMetaClassType) const;
+
+    std::vector< TPropertyBase const* > const& ClassProperties() const { return FClassProperties; }
 
 	// vector, map
 	void SetContainerKeyMetaClass(TMetaClassBase const* parKeyMetaClass);
@@ -151,17 +154,6 @@ struct TMetaClassTraits
 		assert(metaClassBase != nullptr);
 		return metaClassBase;
 	}
-
-	//static TMetaClassBase const* GetOrCreateMetaClassInstance(char const* parMetaClassName)
-	//{
-	//	TMetaClassBase const* metaClassBase = TUserClassNoPointer::GetMetaClassInstance();
-	//	if (metaClassBase == nullptr)
-	//	{
-	//		return CreateMetaClassInstance(parMetaClassName);
-	//	}
-
-	//	return metaClassBase;
-	//}
 
 	static TMetaClassBase const* GetMetaClassInstance()
 	{
@@ -597,6 +589,114 @@ inline bool SetValue(TUserClass& parUserClassInPlace, TOdlExpression const& parE
     assert(false); // invalid type
     return false;
 }
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+template < typename TUserClass >
+struct TGetValue
+{
+    static void GetValue(TUserClass const& parValue, TOdlExpression& outExpression)
+    {
+        // Paul(2014/12/24)  Sadly, but expression can't really be const typed easily, and if so, without overhead.
+        TUserClass* unconstifiedObjectPointer = const_cast<TUserClass*>(&parValue);
+        TMetaClassBase const* userClassMetaClass = TMetaClassTraits< TUserClass >::GetMetaClassInstance();
+        outExpression = TOdlExpression(unconstifiedObjectPointer, userClassMetaClass);
+    }
+};
+//-------------------------------------------------------------------------------
+template < typename TUserClass >
+struct TGetValue< TUserClass* >
+{
+    static void GetValue(TUserClass const* parValue, TOdlExpression& outExpression)
+    {
+        // Paul(2014/12/24)  Sadly, but expression can't really be const typed easily, and if so, without overhead.
+        TUserClass* unconstifiedObjectPointer = const_cast<TUserClass*>(parValue);
+        typedef odl::TRemovePointerForObjectTypeIFN< TUserClass >::TType TUserClassNoPointer;  
+        TMetaClassBase const* userClassMetaClass = TMetaClassTraits< TUserClassNoPointer >::GetMetaClassInstance();
+        outExpression = TOdlExpression(unconstifiedObjectPointer, userClassMetaClass);
+    }
+};
+//-------------------------------------------------------------------------------
+template <>
+struct TGetValue< int >
+{
+    static void GetValue(int parValue, TOdlExpression& outExpression)
+    {
+        outExpression = TOdlExpression(parValue);
+    }
+};
+//-------------------------------------------------------------------------------
+template <>
+struct TGetValue< std::string >
+{
+    static void GetValue(std::string const& parValue, TOdlExpression& outExpression)
+    {
+        char* dup = new char [parValue.length() + 1];
+        strcpy_s(dup, parValue.length() + 1, parValue.c_str());
+        outExpression = TOdlExpression(dup);
+    }
+};
+//-------------------------------------------------------------------------------
+template <>
+struct TGetValue< float >
+{
+    static void GetValue(float parValue, TOdlExpression& outExpression)
+    {
+        outExpression = TOdlExpression(parValue);
+    }
+};
+//-------------------------------------------------------------------------------
+template < typename TValue, typename TAllocator >
+struct TGetValue< std::vector< TValue, TAllocator > >
+{
+    static void GetValue(std::vector< TValue, TAllocator > const& parValue, TOdlExpression& outExpression)
+    {
+        size_t const vectorSize = parValue.size();
+        TOdlExpression* vectorExpression = new TOdlExpression[vectorSize];
+        for (size_t i = 0; i < vectorSize; ++i)
+        {
+            TGetValue< TValue >::GetValue(parValue[i], vectorExpression[i]);
+        }
+        TMetaClassBase const* vectorMetaClass = TMetaClassTraits< std::vector< TValue, TAllocator > >::GetMetaClassInstance();
+        outExpression = TOdlExpression(vectorExpression, vectorSize, vectorMetaClass);
+    }
+};
+//-------------------------------------------------------------------------------
+template < typename TKey, typename TValue, typename TCompare, typename TAllocator >
+struct TGetValue< std::map< TKey, TValue, TCompare, TAllocator > >
+{
+    static void GetValue(std::map< TKey, TValue, TCompare, TAllocator > const& parValue, TOdlExpression& outExpression)
+    {
+        size_t const mapSize = parValue.size();
+        TOdlExpression* mapExpression = new TOdlExpression[mapSize];
+
+        size_t i = 0;
+        for (std::map< TKey, TValue, TCompare, TAllocator >::const_iterator it = parValue.begin();
+             it != parValue.end();
+             ++it, ++i)
+        {
+            std::pair< TKey, TValue > const& keyValuePair = *it;
+            TGetValue< std::pair< TKey, TValue > >::GetValue(keyValuePair, mapExpression[i]);
+        }
+
+        TMetaClassBase const* mapMetaClass = TMetaClassTraits< std::map< TKey, TValue, TCompare, TAllocator > >::GetMetaClassInstance();
+        outExpression = TOdlExpression(mapExpression, mapSize, mapMetaClass);
+    }
+};
+//-------------------------------------------------------------------------------
+template < typename TKey, typename TValue >
+struct TGetValue< std::pair< TKey, TValue > >
+{
+    static void GetValue(std::pair< TKey, TValue > const& parPair, TOdlExpression& outExpression)
+    {
+        TOdlExpression* pairExpression = new TOdlExpression[2];
+        TMetaClassBase const* metaClass = TMetaClassTraits< std::pair< TKey, TValue > >::GetMetaClassInstance();
+        TGetValue<TKey>::GetValue(parPair.first, pairExpression[0]);
+        TGetValue<TValue>::GetValue(parPair.second, pairExpression[1]);
+        outExpression = TOdlExpression(pairExpression, 2, metaClass);
+    }
+};
 //--------------------------------------------------------
 //********************************************************
 //--------------------------------------------------------
@@ -620,8 +720,12 @@ public:
 	TMetaClassBase const* Type() const { return FType; }
 	char const* TypeName() const { return FType->Name(); }
 
-	template < typename TPropertyType >
-	TProperty< TPropertyType > const* TypedPropertyIfTypeCompatible(TMetaClassBase const* parRequestedType) const
+    virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const = 0;
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const = 0;
+
+protected:
+    template < typename TPropertyType >
+	TProperty< TPropertyType > const* TypedPropertyIfGivenTypeIsCompatible(TMetaClassBase const* parRequestedType) const
 	{
 		if (FType->IsGivenTypeCompatible(parRequestedType))
 		{
@@ -630,8 +734,6 @@ public:
 
 		return nullptr;
 	}
-
-    virtual bool SetObjectPropertyByExpression_ROK(TOdlObject* parObject, TOdlExpression const& parExpression) const = 0;
 
 protected:
 	size_t PropertyOffset() const { return FPropertyOffset; }
@@ -663,6 +765,16 @@ public:
 		TPropertyType& truePropertyPointer = parObject->*pointerToMember;
 		return &truePropertyPointer;
 	}
+
+    TPropertyType const* TypedPointer(TOdlObject const* parObject) const
+	{
+		typedef TPropertyType TOdlObject::*TPointerToMemberType;
+
+		size_t const propertyOffset = PropertyOffset();
+		TPointerToMemberType pointerToMember = (*((TPointerToMemberType*)&propertyOffset));
+		TPropertyType const& truePropertyPointer = parObject->*pointerToMember;
+		return &truePropertyPointer;
+	}
 };
 //-------------------------------------------------------------------------------
 // ObjectInPlace or Unmatched case.
@@ -685,7 +797,13 @@ public:
             return true;
         assert(false); // failed set object in place.
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        TPropertyType const* objectInPlace = TypedPointer(parObject);
+        TGetValue< TPropertyType >::GetValue(*objectInPlace, outExpression);
+    }
 };
 
 //-------------------------------------------------------------------------------
@@ -709,7 +827,13 @@ public:
             return true;
         assert(false); // failed set object pointer
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        TPropertyType const* const* objectPointer = TypedPointer(parObject);
+        TGetValue< TPropertyType* >::GetValue(*objectPointer, outExpression);
+    }
 };
 //--------------------------------------------------------
 template < >
@@ -731,7 +855,13 @@ public:
             return true;
         assert(false); // failed set object pointer
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        int const* intPointer = TypedPointer(parObject);
+        TGetValue<int>::GetValue(*intPointer, outExpression);
+    }
 };
 //--------------------------------------------------------
 template < >
@@ -753,7 +883,13 @@ public:
             return true;
         assert(false); // failed set float
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        float const* floatPointer = TypedPointer(parObject);
+        TGetValue<float>::GetValue(*floatPointer, outExpression);
+    }
 };
 //-------------------------------------------------------------------------------
 template < >
@@ -775,7 +911,13 @@ public:
             return true;
         assert(false); // failed set string
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        std::string const* stringPointer = TypedPointer(parObject);
+        TGetValue<std::string>::GetValue(*stringPointer, outExpression);
+    }
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
@@ -800,7 +942,13 @@ public:
             return true;
         assert(false); // set vector failed.
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        TVectorType const* vectorPointer = TypedPointer(parObject);
+        TGetValue<TVectorType>::GetValue(*vectorPointer, outExpression);
+    }
 };
 //-------------------------------------------------------------------------------
 template< typename TKey, typename TValue, typename TCompare, typename TAllocator  >
@@ -822,7 +970,13 @@ public:
         if (SetValue(*mapType, parExpression))
             return true;
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        TMapType const* mapType = TypedPointer(parObject);
+        TGetValue< TMapType >::GetValue(*mapType, outExpression);
+    }
 };
 //-------------------------------------------------------------------------------
 template < typename TFirst, typename TSecond >
@@ -845,7 +999,13 @@ public:
             return true;
         assert(false); // set pair failed.
         return false;
-    };
+    }
+
+    virtual void GetObjectPropertyExpression(TOdlObject const* parObject, TOdlExpression& outExpression) const override
+    {
+        TPairType const* pairPointer = TypedPointer(parObject);
+        TGetValue< TPairType >::GetValue(*pairPointer, outExpression);
+    }
 };
 //--------------------------------------------------------
 //********************************************************
@@ -925,10 +1085,15 @@ public:
 //--------------------------------------------------------
 //********************************************************
 //--------------------------------------------------------
-void RegisterOdlMetaClasses();
+void StartOdl();
+void EndOdl();
 //--------------------------------------------------------
 //********************************************************
 //--------------------------------------------------------
 } // namespace odl
+
+
+#include "vOdl/OdlParser.h"
+#include "vOdl/OdlInterpreter.h"
 
 #endif // ODL_H

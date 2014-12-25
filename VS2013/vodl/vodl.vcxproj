@@ -86,6 +86,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -139,6 +140,7 @@
     <ClInclude Include="..\..\code\vodl\OdlInterpreter.h" />
     <ClInclude Include="..\..\code\vodl\OdlParser.h" />
     <ClInclude Include="..\..\code\vodl\OdlTemplate.h" />
+    <ClInclude Include="..\..\code\vodl\OdlUnitaryTest.h" />
     <ClInclude Include="..\..\code\vodl\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +150,7 @@
     <ClCompile Include="..\..\code\vodl\OdlInterpreter.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlParser.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlTemplate.cpp" />
+    <ClCompile Include="..\..\code\vodl\OdlUnitaryTest.cpp" />
     <ClCompile Include="..\..\code\vodl\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>

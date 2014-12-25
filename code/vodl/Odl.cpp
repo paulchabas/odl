@@ -133,6 +133,21 @@ void TMetaClassBase::SetContainerKeyMetaClass(TMetaClassBase const* parKeyMetaCl
 	assert(FMetaClassType == TMetaClassType::Vector || FMetaClassType == TMetaClassType::Map || FMetaClassType == TMetaClassType::Pair);
 	FContainerKeyMetaClass = parKeyMetaClass;
 }
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+void StartOdl()
+{
+	CreateTokenDatabases();
+    new TOdlDatabase();
+	RegisterOdlMetaClasses();
+}
+//-------------------------------------------------------------------------------
+void EndOdl()
+{
+    TOdlDatabase::DestroyInstance();
+	DestroyTokenDatabases();
+}
 //--------------------------------------------------------
 //********************************************************
 //--------------------------------------------------------

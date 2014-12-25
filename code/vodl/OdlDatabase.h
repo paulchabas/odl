@@ -20,15 +20,19 @@ class TOdlObjectDatabase
 public:
     TOdlObjectDatabase();
     ~TOdlObjectDatabase();    
+
     void StoreObject(TOdlDatabasePath const& parDatabasePath, TOdlObject* parObject, TMetaClassBase const* parMetaClassBase);
     TOdlObject* GetObject_IFP(TOdlDatabasePath const& parDatabasePath) const;
-	TObjectAndMetaClass TOdlObjectDatabase::GetObjectAndMetaClass_IFP(TOdlDatabasePath const& parDatabasePath) const;
+	TObjectAndMetaClass GetObjectAndMetaClass_IFP(TOdlDatabasePath const& parDatabasePath) const;
+    TMetaClassBase const* GetObjectMetaClassBase_IFP(TOdlObject const* parObject) const;
 
 	void DestroyContent();
 
 private:
     typedef std::map< TOdlDatabasePath, TObjectAndMetaClass > TObjectsByPaths;
+    typedef std::map< TOdlObject const*, TMetaClassBase const* > TMetaClassByObjects;
     TObjectsByPaths FObjectsByPaths;
+    TMetaClassByObjects FMetaClassByObjects;
 };
 //-------------------------------------------------------------------------------
 class TOdlMetaClassByName : public std::map< std::string, TMetaClassBase const* >
@@ -43,6 +47,8 @@ class TOdlDatabase : public TSingleton< TOdlDatabase >
 public:
     TOdlDatabase();
 	~TOdlDatabase();
+
+    void ClearObjectDatabase();
 
     void RegisterMetaClass(TMetaClassBase const* parMetaClass);
 	TMetaClassBase const* FindRegisteredMetaClassByName_IFP(char const* parMetaClassName) const;
@@ -60,6 +66,8 @@ public:
     }
 
 	TObjectAndMetaClass GetObjectAndMetaClass_IFP(TOdlDatabasePath const& parDatabasePath) const;
+
+    TMetaClassBase const* GetObjectMetaClassBase_IFP(TOdlObject const* parObject) const;
 
 private:
     TOdlMetaClassByName FMetaClassByName;          // field-order matters: must be destroyed after FObjectsDatabase;
