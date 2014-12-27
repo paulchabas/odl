@@ -20,7 +20,8 @@ void TrueMain()
     
     odl::StartOdlTests();
     // odl::TOdlUnitaryTest("Data/Tests/test0.odl", "PropertyLoading", 1);
-    odl::TOdlUnitaryTest("Data/Tests/test1.odl", "CodingTemplate", 1);
+    odl::TOdlUnitaryTest("Data/Tests/test1.odl", "SimpleTemplateObjectParameters", 1);
+    // odl::TOdlUnitaryTest("Data/Tests/test2.odl", "SimpleTemplateNamespace", 1);
     odl::EndOdlTests();
 
 	system("pause");

@@ -140,6 +140,7 @@
     <ClInclude Include="..\..\code\vodl\OdlExpression.h" />
     <ClInclude Include="..\..\code\vodl\OdlInterpreter.h" />
     <ClInclude Include="..\..\code\vodl\OdlParser.h" />
+    <ClInclude Include="..\..\code\vodl\OdlResolveIdentifier.h" />
     <ClInclude Include="..\..\code\vodl\OdlTemplate.h" />
     <ClInclude Include="..\..\code\vodl\OdlUnitaryTest.h" />
     <ClInclude Include="..\..\code\vodl\stdafx.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="..\..\code\vodl\OdlExpression.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlInterpreter.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlParser.cpp" />
+    <ClCompile Include="..\..\code\vodl\OdlResolveIdentifier.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlTemplate.cpp" />
     <ClCompile Include="..\..\code\vodl\OdlUnitaryTest.cpp" />
     <ClCompile Include="..\..\code\vodl\stdafx.cpp">

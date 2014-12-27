@@ -1,0 +1,26 @@
+
+
+
+
+namespace templateNamespace0(b)
+{
+
+    template templateOjbect0 is TOdlTestClassBase(a, b)
+    {
+        FBool = b
+        FFloat = 55.55
+        FInteger = a
+    }
+
+    object0 is templateOjbect0(7, b)
+}
+
+
+testResult is TOdlTestResult
+{
+    FDumpOutputFilename = "Data/Tests/test2.reference.odl"
+    FTestedObject = templateNamespace0/object0
+    FExpectedOutputFilename = "Data/Tests/test2.reference.odl"
+}
+
+

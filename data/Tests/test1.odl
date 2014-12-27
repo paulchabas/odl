@@ -16,7 +16,7 @@ object0 is templateTest(7, true)
 
 testResult is TOdlTestResult
 {
-    FDumpOutputFilename = "Data/Tests/test1.reference.odl"
+    // FDumpOutputFilename = "Data/Tests/test1.reference.odl"
     FTestedObject = object0
     FExpectedOutputFilename = "Data/Tests/test1.reference.odl"
 }
