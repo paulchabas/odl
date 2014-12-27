@@ -427,9 +427,9 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
 //-------------------------------------------------------------------------------
 void TOdlAstNodeNamedDeclaration::AutoGenerateIdentifierIfNone()
 {
-    if (FIdentifier == nullptr)
+    if (FIdentifierPointer == nullptr)
     {
-        FIdentifier = AutoGenerateObjectIdentifier();
+        FIdentifierPointer = AutoGenerateObjectIdentifier();
         FAnonymousDeclaration = true;
     }
 }

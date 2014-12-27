@@ -111,17 +111,61 @@ private:
     TMetaClassBase const*       FMetaClassBase;
 };
 //-------------------------------------------------------------------------------
-typedef std::vector< TOdlAstNode const* > TTemplateDeclarations;
+class TTemplateInstanciationStack
+{
+public:
+
+    void EnterTemplateObjectInstanciation(TOdlAstNodeTemplateObjectInstanciation const* parTemplateObjectInstanciation)
+    {
+        FTemplateInstanciations.push_back(parTemplateObjectInstanciation);
+    }
+
+    void LeaveTemplateObjectInstanciation(TOdlAstNodeTemplateObjectInstanciation const* parTemplateObjectInstanciation)
+    {
+        assert(!FTemplateInstanciations.empty());
+        assert(FTemplateInstanciations.back() == parTemplateObjectInstanciation);
+        FTemplateInstanciations.pop_back();
+    }
+
+    TOdlAstNodeExpression const* FindTemplateObjectInstanciationAndExpressionByTemplateObjectDeclarationAndIndexAssumeExists(TOdlAstNodeTemplateObjectDeclaration const* parTemplateObjectDeclaration, size_t parExpressionIndex)
+    {
+        assert(!FTemplateInstanciations.empty());
+        
+        TOdlAstNodeExpression const* expressionResult = nullptr;
+
+        std::string const& searchedTemplateDeclarationName = parTemplateObjectDeclaration->IdentifierPointer()->Identifier();
+
+        for (size_t i = 0; i < FTemplateInstanciations.size(); ++i)
+        {
+            size_t const invI = FTemplateInstanciations.size() - i - 1;
+            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciation = FTemplateInstanciations[invI];
+            std::string const& templateInstanciationUsedTemplateDeclarationName = templateObjectInstanciation->TypeIdentifierPointer()->Identifier();
+            if (templateInstanciationUsedTemplateDeclarationName == searchedTemplateDeclarationName)
+            {
+                expressionResult = templateObjectInstanciation->TemplateExpressionListPointer()->ExpressionByIndex(parExpressionIndex);
+                assert(expressionResult != nullptr);
+                break ;
+            }
+        }
+
+        return expressionResult;
+    }
+
+private:
+    std::vector< TOdlAstNodeTemplateObjectInstanciation const* > FTemplateInstanciations;
+};
 //-------------------------------------------------------------------------------
 struct TEvalExpressionContext
 {
-	TEvalExpressionContext(TTemplateDeclarations& parTemplateDeclarations);
+	TEvalExpressionContext(TTemplateInstanciationStack& parTemplateDeclarations);
 
 	bool AddToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 	void RemoveToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 
+    TTemplateInstanciationStack& TemplateInstanciationStack() { return FTemplateInstanciationStack; }
+
 private:
-	std::vector< TOdlAstNode const* >& FTemplateDeclarations;
+	TTemplateInstanciationStack& FTemplateInstanciationStack;
 	std::vector< TOdlAstNode const* > FCircularReferenceCheck;
 };
 //-------------------------------------------------------------------------------
@@ -149,7 +193,7 @@ private:
 	bool FCheckResult;
 };
 //-------------------------------------------------------------------------------
-TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode const* parExpression);
+TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExpression const* parExpression);
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------

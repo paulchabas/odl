@@ -2,6 +2,7 @@
 #include "OdlExpression.h"
 
 #include "Odl.h"
+#include "OdlTemplate.h"
 #include "vOdlParserLexer/OdlTokenDatabase.h"
 
 namespace odl
@@ -323,7 +324,7 @@ TOdlExpression EvalOperationModulo(TOdlExpression& parLeft, TOdlExpression& parR
     return TOdlExpression();
 }
 //-------------------------------------------------------------------------------
-TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode const* parExpression)
+TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExpression const* parExpression)
 {
 	TScopedCheckCircularReferenceCheck scopedCheck(parContext, parExpression);
 
@@ -336,6 +337,23 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
         TOdlAstNodeNamedDeclaration const* namedDeclaration = parExpression->CastNode<TOdlAstNodeNamedDeclaration>();
         TOdlAstNodeExpression const* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
         return EvalExpression(parContext, namedDeclarationExpression);
+    }
+    else if (expressionType == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION)
+    {
+        TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciation = parExpression->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+
+        // PAUL(27/05/14 17:57:57) yuk, using debug data for processing...
+        TOdlDatabasePath const& databasePath = templateObjectInstanciation->NamedDeclarationWeakRef()->FullDatabasePath();
+
+        #ifdef ODL_ENABLE_VERBOSE_DEBUG
+		std::string forDebug1 = databasePath.ToString();
+		#endif
+
+        std::string const& templateObjectInstanciationType = GetTemplateObjectInstanciationDeclarationTypeAsString(templateObjectInstanciation);
+
+		TOdlObject* object = TOdlDatabase::Instance().GetObject(databasePath);
+		TMetaClassBase const* objectMetaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(templateObjectInstanciationType.c_str());
+		return TOdlExpression(object, objectMetaClassBase);
     }
     else if (expressionType & TOdlAstNodeType::VALUE_MASK)
     {
@@ -425,14 +443,29 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 				#endif
                
 				TOdlAstNodeNamedDeclaration const* namedDeclaration = identifierNode->ResolvedReference();
-                TOdlAstNode* namedDeclarationExpression = namedDeclaration->ExpressionPointer();
-				if (namedDeclarationExpression == nullptr)
-				{
 
-				}
+                TOdlAstNodeExpression const* searchExpression = namedDeclaration->ExpressionPointer();
 
-				assert(namedDeclarationExpression != nullptr);
-                return EvalExpression(parContext, namedDeclarationExpression);
+                // Paul(2014/12/25) Template Object Arguments resolution: 1 find the index in the declaration, 
+                // then find the expression in the corresponding template instantiation.
+                // Paul(2014/12/25) case for templates, in template declaration we search the parameter.
+                if (namedDeclaration->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER)
+                {
+                    TOdlAstNodeTemplateParameter const* templateParameter = namedDeclaration->CastNode<TOdlAstNodeTemplateParameter>();
+                    TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclaration = templateParameter->TemplateHolderWeakReference()->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+                    size_t const templateParameterIndex = templateParameter->TemplateParameterIndex();
+                        
+                    // find the good template instanciation node expression.
+                    TOdlAstNodeExpression const* templateInstanciationExpression = parContext.TemplateInstanciationStack().FindTemplateObjectInstanciationAndExpressionByTemplateObjectDeclarationAndIndexAssumeExists(templateObjectDeclaration, templateParameterIndex);
+                    searchExpression = templateInstanciationExpression;
+
+                    assert(searchExpression); // {TODO} Paul(2014/12/26)  check error for invalid parameters.
+                    // {TODO} Paul(2014/12/26) maybe type checking.
+                    // {TODO} Paul(2014/12/26) search for default expression.
+                }
+                
+				assert(searchExpression != nullptr);
+                return EvalExpression(parContext, searchExpression);
 
 			}
 			break ;
@@ -450,8 +483,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
         {
         case TOdlAstNodeOperatorType::OPERATOR_PLUS:
             {
-                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
-                TOdlAstNode const* right = operationNode->RightExpressionPointer();
+                TOdlAstNodeExpression const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNodeExpression const* right = operationNode->RightExpressionPointer();
 
                 TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
@@ -469,8 +502,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
             break ;
         case TOdlAstNodeOperatorType::OPERATOR_MINUS:
             {
-				TOdlAstNode const* left = operationNode->LeftExpressionPointer();
-                TOdlAstNode const* right = operationNode->RightExpressionPointer();
+				TOdlAstNodeExpression const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNodeExpression const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult(0);
 				if (left != nullptr)
@@ -492,8 +525,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 
         case TOdlAstNodeOperatorType::OPERATOR_MULTIPLY:
             {
-                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
-                TOdlAstNode const* right = operationNode->RightExpressionPointer();
+                TOdlAstNodeExpression const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNodeExpression const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
@@ -511,8 +544,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 
         case TOdlAstNodeOperatorType::OPERATOR_DIVIDE:
             {
-                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
-                TOdlAstNode const* right = operationNode->RightExpressionPointer();
+                TOdlAstNodeExpression const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNodeExpression const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
@@ -530,8 +563,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 
         case TOdlAstNodeOperatorType::OPERATOR_MODULO:
             {
-                TOdlAstNode const* left = operationNode->LeftExpressionPointer();
-                TOdlAstNode const* right = operationNode->RightExpressionPointer();
+                TOdlAstNodeExpression const* left = operationNode->LeftExpressionPointer();
+                TOdlAstNodeExpression const* right = operationNode->RightExpressionPointer();
 
 				TOdlExpression leftResult = EvalExpression(parContext, left);
 				if (leftResult.Type() == TOdlExpression::UNTYPED)
@@ -557,8 +590,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNode co
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-TEvalExpressionContext::TEvalExpressionContext(TTemplateDeclarations& parTemplateDeclarations) :
-	FTemplateDeclarations(parTemplateDeclarations)
+TEvalExpressionContext::TEvalExpressionContext(TTemplateInstanciationStack& parTemplateInstanciationStack) :
+	FTemplateInstanciationStack(parTemplateInstanciationStack)
 {
 
 }

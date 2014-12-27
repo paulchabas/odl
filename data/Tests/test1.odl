@@ -4,18 +4,14 @@
 
 
 
-
-
-
-
-object0 is TOdlTestClassChild
+template templateTest is TOdlTestClassBase(a, b)
 {
-    
-
-
+    FBool = b
+    FFloat = 55.55
+    FInteger = a
 }
 
-
+object0 is templateTest(7, true)
 
 
 testResult is TOdlTestResult

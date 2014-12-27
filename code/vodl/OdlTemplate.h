@@ -1,19 +1,14 @@
 #pragma once
 
-
+#include "vodlparserlexer/OdlAstNode.h"
 
 namespace odl
 {
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-class TOdlTemplate
-{
-public:
-
-private:
-
-};
+TOdlAstNodeTemplateObjectDeclaration const* GetTemplateObjectInstanciationDeclaration(TOdlAstNodeTemplateObjectInstanciation const* parTemplateObjectInstanciationNode);
+std::string const& GetTemplateObjectInstanciationDeclarationTypeAsString(TOdlAstNodeTemplateObjectInstanciation const* parTemplateObjectInstanciationNode);
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------

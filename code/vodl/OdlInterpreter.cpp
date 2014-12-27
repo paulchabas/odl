@@ -1,36 +1,16 @@
 #include "StdAfx.h"
 #include "OdlInterpreter.h"
 
-#include "OdlExpression.h"
 #include "Odl.h"
+
+#include "OdlExpression.h"
+#include "OdlTemplate.h"
 #include "vodlParserLexer/OdlAstNode.h"
 #include "OdlDatabase.h"
 
 
 namespace odl
 {
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------
-static TOdlAstNodeTemplateObjectDeclaration const* GetTemplateObjectInstanciationDeclaration(TOdlAstNode* parAstNode)
-{
-	assert(parAstNode->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION);
-    TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
-
-	TOdlAstNodeIdentifier const* typeIdentifierPointer = templateObjectInstanciationNode->TypeIdentifierPointer();
-	assert(typeIdentifierPointer != nullptr);
-	TOdlAstNodeNamedDeclaration const* resolvedNamedDeclaration = typeIdentifierPointer->ResolvedReference();
-	assert(resolvedNamedDeclaration != nullptr);
-    assert(resolvedNamedDeclaration->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION);
-
-    TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclaration = resolvedNamedDeclaration->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
-	return templateObjectDeclaration;
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------
-static std::string const& GetTemplateObjectInstanciationDeclarationTypeAsString(TOdlAstNode* parAstNode)
-{
-	TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclaration = GetTemplateObjectInstanciationDeclaration(parAstNode);
-	std::string const& objectType = templateObjectDeclaration->TypeIdentifierPointer()->Identifier();
-	return objectType;
-}
 //-------------------------------------------------------------------------------
 class TInterpretContext
 {
@@ -146,7 +126,8 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
         break ;
     case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
         {
-            // todo.
+            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+            // {TODO} Paul(2014/12/27) get the template expression and find the named reference to anything else to resolve their references.
             int a = 0;
         }
         break ;
@@ -195,7 +176,8 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
 		break ;
 	case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
 		{
-			std::string const& objectType = GetTemplateObjectInstanciationDeclarationTypeAsString(parAstNode);
+            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+			std::string const& objectType = GetTemplateObjectInstanciationDeclarationTypeAsString(templateObjectInstanciationNode);
 
 			TMetaClassBase const* objectMetaClass = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 			TOdlObject* odlObject = objectMetaClass->CreateObject();
@@ -235,12 +217,12 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
 static void EvalExpressionAndStoreProperty(TOdlObject* parObject, 
                                            TMetaClassBase const* parObjectMetaClassBase,
                                            TPropertyBase const* parPropertyBase, 
-                                           TOdlAstNode const* parExpression,
-                                           TTemplateDeclarations& parTemplateDeclarations)
+                                           TOdlAstNodeExpression const* parExpression,
+                                           TTemplateInstanciationStack& parTemplateInstanciationStack)
 {
     TMetaClassBase const* propertyMetaClassBase = parPropertyBase->Type();
 
-	TEvalExpressionContext evalExpressionContext(parTemplateDeclarations);
+	TEvalExpressionContext evalExpressionContext(parTemplateInstanciationStack);
     TOdlExpression const result = EvalExpression(evalExpressionContext, parExpression);
 
 	if (result.Type() != TOdlExpression::UNTYPED)
@@ -266,23 +248,23 @@ public:
 	TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath,
                                           TOdlObject* parCurrentObject, 
                                           TMetaClassBase const* parMetaClass,
-										  TOdlAstNode const* parTemplateInstanciationNode) :
+                                          TTemplateInstanciationStack& parTemplateInstanciationStack) :
         TInterpretContext(parDatabasePath),
         FCurrentObject(parCurrentObject),
         FMetaClassBase(parMetaClass),
-		FTemplateDeclarationNode(parTemplateInstanciationNode)
+		FTemplateInstanciationStack(parTemplateInstanciationStack)
     {
 
     }
 
     TOdlObject* CurrentObject() const { assert(FCurrentObject != nullptr); return FCurrentObject; }
     TMetaClassBase const* MetaClassBase() const { assert(FMetaClassBase != nullptr); return FMetaClassBase; }
-	TOdlAstNode const* TemplateInstanciationNode() const { return FTemplateDeclarationNode; }
+    TTemplateInstanciationStack& TemplateInstanciationNodeStack() { return FTemplateInstanciationStack; }
 
 private:
     TOdlObject*             FCurrentObject;
     TMetaClassBase const*   FMetaClassBase;
-	TOdlAstNode const*		FTemplateDeclarationNode;
+    TTemplateInstanciationStack& FTemplateInstanciationStack;
 };
 //-------------------------------------------------------------------------------
 void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContext)
@@ -327,6 +309,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 		break ;
 	case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
 		{
+            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
 			TFillObjectPropertiesInterpretContext& context = static_cast<TFillObjectPropertiesInterpretContext&>(parContext);
 
 			TOdlDatabasePath& templateInstanciationDatabaseName = parContext.DatabasePath();
@@ -334,20 +317,21 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 			std::string fordebug = templateInstanciationDatabaseName.ToString();
 			#endif
 
-			TOdlAstNodeTemplateObjectDeclaration const* templateDeclaration = GetTemplateObjectInstanciationDeclaration(parAstNode);
+			TOdlAstNodeTemplateObjectDeclaration const* templateDeclaration = GetTemplateObjectInstanciationDeclaration(templateObjectInstanciationNode);
 			#ifdef ODL_ENABLE_VERBOSE_DEBUG
 			TOdlDatabasePath templateDatabasePath = templateDeclaration->NamedDeclarationWeakRef()->FullDatabasePath();
 			std::string templateDatabasePathForDebug = templateDatabasePath.ToString();
 			#endif
 
-			std::string const& objectType = GetTemplateObjectInstanciationDeclarationTypeAsString(parAstNode);
+			std::string const& objectType = GetTemplateObjectInstanciationDeclarationTypeAsString(templateObjectInstanciationNode);
 			TOdlObject* object = TOdlDatabase::Instance().GetObject(templateInstanciationDatabaseName);
 			TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
-			TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, object, metaClassBase, parAstNode);
 
+            TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, object, metaClassBase, context.TemplateInstanciationNodeStack());
+            newContext.TemplateInstanciationNodeStack().EnterTemplateObjectInstanciation(templateObjectInstanciationNode);
 			TOdlAstNodePropertyDeclarationList* propertiesToFill = templateDeclaration->PropertyDeclarationListPointer();
-
 			VisitAst(propertiesToFill, newContext, FillObjectsProperties);
+            newContext.TemplateInstanciationNodeStack().LeaveTemplateObjectInstanciation(templateObjectInstanciationNode);
 		}
 		break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
@@ -365,7 +349,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 
 				TOdlObject* object = TOdlDatabase::Instance().GetObject(objectNamespaceAndName);
 				TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
-				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, object, metaClassBase, context.TemplateInstanciationNode());
+				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, object, metaClassBase, context.TemplateInstanciationNodeStack());
 				VisitAst(parAstNode, newContext, FillObjectsProperties);
 			}
         };
@@ -387,9 +371,8 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
             TPropertyBase const* propertyBase = objectMetaClassBase->PropertyByName(propertyName);
             if (propertyBase != nullptr)
             {
-                TOdlAstNode const* expression = propertyDeclarationNode->ExpressionPointer();
-                TTemplateDeclarations emptyTemplateDeclarations;
-                EvalExpressionAndStoreProperty(object, objectMetaClassBase, propertyBase, expression, emptyTemplateDeclarations);
+                TOdlAstNodeExpression const* expression = propertyDeclarationNode->ExpressionPointer();
+                EvalExpressionAndStoreProperty(object, objectMetaClassBase, propertyBase, expression, context.TemplateInstanciationNodeStack());
             }
             else
             {
@@ -448,6 +431,17 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
             VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
 		}
 		break;
+    case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
+        {
+            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstantiationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+            #if ODL_ENABLE_VERBOSE_DEBUG
+            std::string debug = parContext.DatabasePath().ToString();
+            #endif
+            // Paul(2014/12/23) SetFullDatabasePath for debug.
+            templateObjectInstantiationNode->NamedDeclarationWeakRef()->SetFullDatabasePath(parContext.DatabasePath());
+            VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
+        };
+        break ;
     case TOdlAstNodeType::OBJECT_DECLARATION:
         {
             TOdlAstNodeObjectDeclaration* objectDeclarationNode = parAstNode->CastNode<TOdlAstNodeObjectDeclaration>();
@@ -805,7 +799,8 @@ void InterpretAst(TOdlAstNode* parAstNode)
             
             // fill objets properties.
             assert(databasePath.empty());
-            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, nullptr, nullptr, nullptr);
+            TTemplateInstanciationStack templateInstanciationStack;
+            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, nullptr, nullptr, templateInstanciationStack);
             VisitAst(parAstNode, fillObjectsPropertiesContext, FillObjectsProperties);
         };
         break ;

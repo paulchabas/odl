@@ -1,31 +1,7 @@
-object000000 is TOdlTestClassChild
+object000000 is TOdlTestClassBase
 {
-    FBool = false
-    FInteger = -7
-    FFloat = -3.21
-    FString = ""
-    FInteger = -4
-    FVectorComposite = [  ]
-    FVector = [  ]
-    FMapI32ToVectorFloat = [  ]
-    FMapI32ToVectorString = [  ]
-    FFloatVector = [  ]
-    FFloatFloatPair = [ 0, 0 ]
-    FObjectPointer = nullptr
-    FObjectInPlace = object000001
-    FVectorOfObjectPointers = [  ]
-    FVectorOfObjectInPlace = [  ]
-    FTestClassBasePointer = nullptr
-    FTestClass2BasePointer = nullptr
-    FIntStringPair = [ 0, "" ]
-    FFloatFloatPairVector = [  ]
-    FFloatVectorIntVectorPair = [ [  ], [  ] ]
-}
-
-object000001 is TOdlTestClassBase
-{
-    FBool = false
-    FInteger = -7
-    FFloat = -3.21
+    FBool = true
+    FInteger = 7
+    FFloat = 55.55
 }
 
