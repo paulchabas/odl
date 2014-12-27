@@ -9,6 +9,8 @@ namespace odl
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+typedef std::vector< TOdlAstNodeNamedDeclaration const* > TNamedDeclarationStack;
+//-------------------------------------------------------------------------------
 class TInterpretContext
 {
 public:
@@ -17,55 +19,50 @@ public:
     {
     }
 
-    void EnterNamespace(std::string const& parNamespaceName)
+    void EnterNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
     {
-        FDatabasePath.push_back(parNamespaceName);
+        assert(parNamedDeclaration->AstNodeType() == TOdlAstNodeType::NAMESPACE ||
+               parNamedDeclaration->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION);
+
+        TOdlAstNodeIdentifier const* identifier = parNamedDeclaration->IdentifierPointer_IFP();
+        // root namespace has no name.
+        if (identifier == nullptr)
+        {
+            // intend to detect root namespace...
+            assert(FNamespaceStack.empty());
+        }
+        else
+        {
+            FDatabasePath.push_back(identifier->Identifier());
+        }
+        FNamespaceStack.push_back(parNamedDeclaration);
     }
 
     void LeaveNamespace()
     {
-        FDatabasePath.pop_back();
+        TOdlAstNodeNamedDeclaration const* namedDeclaration = FNamespaceStack.back();
+        TOdlAstNodeIdentifier const* identifier = namedDeclaration->IdentifierPointer_IFP();
+        if (identifier != nullptr)
+        {
+            assert(FDatabasePath.back() == TOdlDatabaseToken(identifier->Identifier()));
+            FDatabasePath.pop_back();
+        }
+        FNamespaceStack.pop_back();
     }
+
 
     TOdlDatabasePath& DatabasePath() { return FDatabasePath; }
     TOdlDatabasePath const& DatabasePath() const { return FDatabasePath; }
+    TNamedDeclarationStack const& NamespaceStack() const { return FNamespaceStack; }
 
 private:
+    TNamedDeclarationStack FNamespaceStack;
     TOdlDatabasePath& FDatabasePath;
 };
 //-------------------------------------------------------------------------------
-typedef void (*TAstOperationCallback)(TOdlAstNode* parAstNode, TInterpretContext& parContext);
-//-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-class TResolveValueIdentifierInterpretContext : public TInterpretContext
-{
-public:
-    TResolveValueIdentifierInterpretContext(TOdlDatabasePath& parOdlDatabasePath) :
-        TInterpretContext(parOdlDatabasePath)
-    {
-
-    }
-
-    void PushParentNode(TOdlAstNode* parParent)
-    {
-        FParents.push_back(parParent);
-    }
-
-    void PopParentNode()
-    {
-        FParents.pop_back();
-    }
-
-    std::vector< TOdlAstNode* > const& Parents() const { return FParents; }
-	
-private:
-    std::vector< TOdlAstNode* > FParents;
-};
-//-------------------------------------------------------------------------------
-//*******************************************************************************
-//-------------------------------------------------------------------------------
-TOdlAstNode const* ResolveIdentifier(TInterpretContext& parContext, TOdlAstNodeIdentifier* identifierNode);
+TOdlAstNodeNamedDeclaration const* ResolveIdentifier(TInterpretContext& parContext, TOdlAstNodeIdentifier const* identifierNode);
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
