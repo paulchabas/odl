@@ -18,9 +18,9 @@ object0 is TOdlTestClassChild
 
 testResult is TOdlTestResult
 {
-    // FDumpOutputFilename = "Data/Tests/test0.reference.odl"
+    //FDumpOutputFilename = "Data/Tests/simple_properties_loading.reference.odl"
     FTestedObject = object0
-    FExpectedOutputFilename = "Data/Tests/test0.reference.odl"
+    FExpectedOutputFilename = "Data/Tests/simple_properties_loading.reference.odl"
 }
 
 

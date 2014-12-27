@@ -19,7 +19,7 @@ void TrueMain()
     std::cout << "START PROGRAM" << std::endl;
     
     odl::StartOdlTests();
-    // odl::TOdlUnitaryTest("Data/Tests/test0.odl", "PropertyLoading", 1);
+    odl::TOdlUnitaryTest("Data/Tests/simple_properties_loading.odl", "SimplePropertiesLoading", 1);
     odl::TOdlUnitaryTest("Data/Tests/test1.odl", "SimpleTemplateObjectParameters", 1);
     // odl::TOdlUnitaryTest("Data/Tests/test2.odl", "SimpleTemplateNamespace", 1);
     odl::EndOdlTests();
