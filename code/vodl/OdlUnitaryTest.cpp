@@ -382,7 +382,7 @@ TOdlUnitaryTest::TOdlUnitaryTest(char const* parFilename, char const* parTestNam
     FTestName(parTestName),
     FVerboseLevel(parVerboseLevel)
 {
-    if (parVerboseLevel > 0)
+    if (parVerboseLevel > 1)
         std::cout << "BEGIN TEST: [" << parTestName << "]" << std::endl;
     if (FVerboseLevel > 1)
         std::cout << "* PARSING" << std::endl;
@@ -390,6 +390,12 @@ TOdlUnitaryTest::TOdlUnitaryTest(char const* parFilename, char const* parTestNam
     odl::TOdlAstNode const* odlAst = NULL;
 	odl::TOdlParser odlParser;
 	odlAst = odlParser.ParseFile(parFilename);
+
+    if (odlAst == nullptr)
+    {
+        if (FVerboseLevel > 1)
+            std::cout << "error: " << parFilename << " file not found" << std::endl;
+    }
 
     if (FVerboseLevel > 1)
     {
@@ -422,8 +428,10 @@ TOdlUnitaryTest::TOdlUnitaryTest(char const* parFilename, char const* parTestNam
     }
 
 
+    if (parVerboseLevel > 1)
+        std::cout << "END TEST:";
     if (parVerboseLevel > 0)
-        std::cout << "END TEST: [" << parTestName << "] result: " << testResultCode << std::endl;
+        std::cout << "test: " << "[" << parTestName << "] " << testResultCode << std::endl;
 }
 //-------------------------------------------------------------------------------
 TOdlUnitaryTest::~TOdlUnitaryTest()
