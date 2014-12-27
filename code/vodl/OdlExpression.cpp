@@ -452,7 +452,8 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExp
                 if (namedDeclaration->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER)
                 {
                     TOdlAstNodeTemplateParameter const* templateParameter = namedDeclaration->CastNode<TOdlAstNodeTemplateParameter>();
-                    TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclaration = templateParameter->TemplateHolderWeakReference()->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+                    TOdlAstNodeNamedDeclaration const* namedDeclaration = templateParameter->TemplateHolderWeakReference();
+                    TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclaration = namedDeclaration->ExpressionPointer()->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
                     size_t const templateParameterIndex = templateParameter->TemplateParameterIndex();
                         
                     // find the good template instanciation node expression.

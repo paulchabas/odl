@@ -436,5 +436,30 @@ void TOdlAstNodeNamedDeclaration::AutoGenerateIdentifierIfNone()
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+TOdlAstNodeNamedDeclaration::~TOdlAstNodeNamedDeclaration()
+{
+    delete FTemplateParameterListPointer;
+    delete FIdentifierPointer;
+    delete FExpressionPointer;
+}
+//-------------------------------------------------------------------------------
+void TOdlAstNodeNamedDeclaration::SetTemplateParameterListPointer(TOdlAstNodeTemplateParameterList* parTemplateParameterListPointer)
+{
+    assert(parTemplateParameterListPointer != nullptr);
+    assert(parTemplateParameterListPointer->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
+    assert(FTemplateParameterListPointer == nullptr);
+
+    FTemplateParameterListPointer = parTemplateParameterListPointer;
+
+    std::vector< TOdlAstNodeTemplateParameter* > const& templateParameterList = FTemplateParameterListPointer->TemplateParameterList();
+    for (TOdlAstNodeTemplateParameter* templateParameter : templateParameterList)
+    {
+        templateParameter->SetTemplateHolderDeclarationWeakReference(this);
+    }
+}
+
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
 
 } // namespace odl

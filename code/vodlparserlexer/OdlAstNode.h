@@ -52,9 +52,6 @@ namespace TOdlAstNodeOperatorType
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-class TOdlAstNodeIdentifier;
-class TOdlAstNodeNamedDeclaration;
-//-------------------------------------------------------------------------------
 class TOdlAstNode
 {
 public:
@@ -86,6 +83,12 @@ private:
 private:
     TOdlAstNodeType::TType          FAstNodeType;
 };
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+class TOdlAstNodeIdentifier;
+class TOdlAstNodeNamedDeclaration;
+class TOdlAstNodeTemplateParameterList;
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
@@ -144,29 +147,33 @@ class TOdlAstNodeNamedDeclaration : public TOdlAstNodeExpression
     typedef TOdlAstNodeExpression parent_type;
 public:
 
-    TOdlAstNodeNamedDeclaration(TOdlAstNodeType::TType parAstNodeType, TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeExpression* parExpression) :
+    TOdlAstNodeNamedDeclaration(TOdlAstNodeType::TType parAstNodeType, 
+                                TOdlAstNodeIdentifier* parIdentifier, 
+                                TOdlAstNodeExpression* parExpression,
+                                TOdlAstNodeTemplateParameterList* parTemplateParameterList) :
         parent_type(parAstNodeType),
         FIdentifierPointer(parIdentifier),
         FExpressionPointer(parExpression),
+        FTemplateParameterListPointer(nullptr),
         FAnonymousDeclaration(false)
     {
 
     }
 
-    TOdlAstNodeNamedDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeExpression* parExpression) :
+    TOdlAstNodeNamedDeclaration(TOdlAstNodeIdentifier* parIdentifier, 
+                                TOdlAstNodeExpression* parExpression,
+                                TOdlAstNodeTemplateParameterList* parTemplateParameterList) :
         parent_type(TOdlAstNodeType::NAMED_DECLARATION),
         FIdentifierPointer(parIdentifier),
         FExpressionPointer(parExpression),
+        FTemplateParameterListPointer(nullptr),
         FAnonymousDeclaration(false)
     {
-
+        if (parTemplateParameterList != nullptr)
+            SetTemplateParameterListPointer(parTemplateParameterList);
     }
 
-    virtual ~TOdlAstNodeNamedDeclaration()
-    {
-        delete FIdentifierPointer;
-        delete FExpressionPointer;
-    }
+    virtual ~TOdlAstNodeNamedDeclaration();
 
     void SetIdentifierPointer(TOdlAstNodeIdentifier* parIdentifierPointer)
     {
@@ -174,12 +181,16 @@ public:
         FIdentifierPointer = parIdentifierPointer;
     }
 
+    void SetTemplateParameterListPointer(TOdlAstNodeTemplateParameterList* parTemplateParameterListPointer);
+
     void AutoGenerateIdentifierIfNone();
     bool IsAnonymousDeclaration() const { return FAnonymousDeclaration; }
 
     TOdlAstNodeIdentifier* IdentifierPointer() const { assert(FIdentifierPointer != NULL); return FIdentifierPointer; }
     TOdlAstNodeIdentifier* IdentifierPointer_IFP() const { return FIdentifierPointer; }
     TOdlAstNodeExpression* ExpressionPointer() const { return FExpressionPointer; }
+    TOdlAstNodeTemplateParameterList const* TemplateParameterListPointer() const { return FTemplateParameterListPointer; }
+    
 
     void SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)
     {
@@ -188,10 +199,11 @@ public:
 	TOdlDatabasePath const& FullDatabasePath() const { return FFullDatabasePath; }
 
 private:
-    TOdlAstNodeIdentifier* FIdentifierPointer;
-    TOdlAstNodeExpression* FExpressionPointer;
-    TOdlDatabasePath	   FFullDatabasePath;
-    bool                   FAnonymousDeclaration;
+    TOdlAstNodeIdentifier*                  FIdentifierPointer;
+    TOdlAstNodeExpression*                  FExpressionPointer;
+    TOdlAstNodeTemplateParameterList*       FTemplateParameterListPointer;
+    TOdlDatabasePath	                    FFullDatabasePath;
+    bool                                    FAnonymousDeclaration;
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
@@ -202,7 +214,7 @@ class TOdlAstNodePropertyDeclaration : public TOdlAstNodeNamedDeclaration
 public:
 
     TOdlAstNodePropertyDeclaration(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeExpression* parExpression) :
-        parent_type(TOdlAstNodeType::PROPERTY_DECLARATION, parIdentifier, parExpression)
+        parent_type(TOdlAstNodeType::PROPERTY_DECLARATION, parIdentifier, parExpression, nullptr)
     {
 
     }
@@ -377,7 +389,7 @@ class TOdlAstNodeTemplateParameter : public TOdlAstNodeNamedDeclaration
     typedef TOdlAstNodeNamedDeclaration parent_type;
 public:
     TOdlAstNodeTemplateParameter(TOdlAstNodeIdentifier* parIdentifier, TOdlAstNodeExpression* parExpression) :
-        parent_type(TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER, parIdentifier, parExpression),
+        parent_type(TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER, parIdentifier, parExpression, nullptr),
         FTemplateParameterIndex(-1),
         FTemplateHolderWeakReference(nullptr)
     {
@@ -390,20 +402,18 @@ public:
         FTemplateParameterIndex = parIndex;
     }
 
-    void SetTemplateHolderDeclarationWeakReference(TOdlAstNode const* parTemplateHolderWeakReference)
+    void SetTemplateHolderDeclarationWeakReference(TOdlAstNodeNamedDeclaration const* parTemplateHolderWeakReference)
     {
-        // {TODO} Paul(2014/12/26) can hold template namespace too.
-        assert(parTemplateHolderWeakReference->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION);
         FTemplateHolderWeakReference = parTemplateHolderWeakReference;
     }
 
-    TOdlAstNode const* TemplateHolderWeakReference() const { assert(FTemplateHolderWeakReference != nullptr); return FTemplateHolderWeakReference; }
+    TOdlAstNodeNamedDeclaration const* TemplateHolderWeakReference() const { assert(FTemplateHolderWeakReference != nullptr); return FTemplateHolderWeakReference; }
 
     i32 TemplateParameterIndex() const { assert(FTemplateParameterIndex >= 0); return FTemplateParameterIndex; }
 
 private:
-    // Paul(2014/12/26) bof.
-    TOdlAstNode const* FTemplateHolderWeakReference;
+    // Paul(2014/12/26) bof: each parameters known the template holder.
+    TOdlAstNodeNamedDeclaration const* FTemplateHolderWeakReference;
     i32 FTemplateParameterIndex;
 };
 //-------------------------------------------------------------------------------
@@ -430,7 +440,6 @@ public:
     void AppendTemplateParameter(TOdlAstNodeTemplateParameter* parNamedDeclaration)
     {
         parNamedDeclaration->SetTemplateParameterIndex((i32) FTemplateParameterList.size());
-
         FTemplateParameterList.push_back(parNamedDeclaration);
     }
 
@@ -485,32 +494,18 @@ class TOdlAstNodeTemplateObjectDeclaration : public TOdlAstNodeTypedSyntax
     typedef TOdlAstNodeTypedSyntax parent_type;
 public:
 
-    TOdlAstNodeTemplateObjectDeclaration(TOdlAstNodeIdentifier* parTypeIdentifier, 
-                                         TOdlAstNodeTemplateParameterList* parTemplateParameterList, 
-                                         TOdlAstNodePropertyDeclarationList* parPropertyDeclarationList) :
+    TOdlAstNodeTemplateObjectDeclaration(TOdlAstNodeIdentifier* parTypeIdentifier, TOdlAstNodePropertyDeclarationList* parPropertyDeclarationList) :
         parent_type(TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION, parTypeIdentifier),
         FNamedDeclarationWeakRef(nullptr),
-        FTemplateParameterListPointer(parTemplateParameterList),
         FPropertyDeclarationListPointer(parPropertyDeclarationList)
     {
         assert(parTypeIdentifier != nullptr); // Paul(2014/12/21)  cannot be null in that case.
-        assert(FTemplateParameterListPointer != nullptr);
         assert(FPropertyDeclarationListPointer != nullptr);
-
-        assert(FTemplateParameterListPointer->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER_LIST);
         assert(FPropertyDeclarationListPointer->AstNodeType() == TOdlAstNodeType::PROPERTY_DECLARATION_LIST);
-
-        std::vector< TOdlAstNodeTemplateParameter* > const& templateParameterList = FTemplateParameterListPointer->TemplateParameterList();
-        for (TOdlAstNodeTemplateParameter* templateParameter : templateParameterList)
-        {
-            templateParameter->SetTemplateHolderDeclarationWeakReference(this);
-        }
-
     }
 
     virtual ~TOdlAstNodeTemplateObjectDeclaration()
     {
-        delete FTemplateParameterListPointer;
         delete FPropertyDeclarationListPointer;
     }
 
@@ -529,11 +524,14 @@ public:
     }
 
     TOdlAstNodePropertyDeclarationList* PropertyDeclarationListPointer() const { return FPropertyDeclarationListPointer; }
-    TOdlAstNodeTemplateParameterList*   TemplateParameterListPointer() const { return FTemplateParameterListPointer; }
+    TOdlAstNodeTemplateParameterList const*   TemplateParameterListPointer() const
+    { 
+        assert(FNamedDeclarationWeakRef != nullptr);
+        return FNamedDeclarationWeakRef->TemplateParameterListPointer(); 
+    }
 
 private:
     TOdlAstNodeNamedDeclaration*        FNamedDeclarationWeakRef;
-    TOdlAstNodeTemplateParameterList*   FTemplateParameterListPointer;
     TOdlAstNodePropertyDeclarationList* FPropertyDeclarationListPointer;
 };
 //-------------------------------------------------------------------------------
@@ -632,14 +630,12 @@ class TOdlAstNodeNamespaceDeclaration : public TOdlAstNodeNamedDeclaration
     typedef TOdlAstNodeNamedDeclaration parent_type;
 public:
     TOdlAstNodeNamespaceDeclaration() :
-        parent_type(TOdlAstNodeType::NAMESPACE, nullptr, nullptr),
-        FTemplateParameterListPointer(nullptr)
+        parent_type(TOdlAstNodeType::NAMESPACE, nullptr, nullptr, nullptr)
     {
     }
 
     virtual ~TOdlAstNodeNamespaceDeclaration()
     {
-        delete FTemplateParameterListPointer;
         for (TOdlAstNode* namedDeclarationNode : FNamedDeclarationList)
         {
             delete namedDeclarationNode;
@@ -656,16 +652,8 @@ public:
         FNamedDeclarationList.push_back(parDeclaration);
     }
 
-    void SetTemplateParameterList(TOdlAstNode* parTemplateArgumentListPointer)
-    {
-        FTemplateParameterListPointer = parTemplateArgumentListPointer;
-    }
-
-    TOdlAstNode const*              TemplateParameterListPointer() const { return FTemplateParameterListPointer; }
-
 private:
     std::vector< TOdlAstNodeNamedDeclaration* >     FNamedDeclarationList;
-    TOdlAstNode*                                    FTemplateParameterListPointer;
 };
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
@@ -678,7 +666,7 @@ public:
     TOdlAstNodeTemplateNamespaceInstanciation(TOdlAstNodeIdentifier* parIdentifier, 
                                               TOdlAstNodeIdentifier* parTargetTemplateNamespaceIdentifierPointer, 
                                               TOdlAstNode* parTemplateExpressionList) :
-        parent_type(TOdlAstNodeType::NAMESPACE, parIdentifier, nullptr)
+        parent_type(TOdlAstNodeType::NAMESPACE, parIdentifier, nullptr, nullptr)
     {
         assert(parTargetTemplateNamespaceIdentifierPointer != nullptr);
         assert(parTemplateExpressionList != nullptr);

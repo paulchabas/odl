@@ -115,7 +115,7 @@ named_declaration
 	}
 	else
 	{
-		namedDeclaration = new odl::TOdlAstNodeNamedDeclaration($1, $3);
+		namedDeclaration = new odl::TOdlAstNodeNamedDeclaration($1, $3, nullptr);
 	}
 
 	$$ = namedDeclaration;
@@ -132,7 +132,7 @@ named_declaration
 
 	odl::TOdlAstNodeNamespaceDeclaration* theNamespace = $7;
 	theNamespace->SetIdentifierPointer($2);
-	theNamespace->SetTemplateParameterList($4);
+	theNamespace->SetTemplateParameterListPointer($4);
 	$$ = theNamespace;
 }
 | TOKEN_NAMESPACE IDENTIFIER TOKEN_EQUALS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
@@ -144,8 +144,11 @@ named_declaration
 | TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_declaration_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
 	// object template declaration
-	odl::TOdlAstNodeTemplateObjectDeclaration* templateDeclaration = new odl::TOdlAstNodeTemplateObjectDeclaration($4, $6, $9);
-	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = new odl::TOdlAstNodeNamedDeclaration($2, templateDeclaration);
+	odl::TOdlAstNodeIdentifier* typeIndentifier = $4;
+	odl::TOdlAstNodeTemplateParameterList* templateParameterList = $6;
+
+	odl::TOdlAstNodeTemplateObjectDeclaration* templateDeclaration = new odl::TOdlAstNodeTemplateObjectDeclaration(typeIndentifier, $9);
+	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = new odl::TOdlAstNodeNamedDeclaration($2, templateDeclaration, templateParameterList);
 	templateDeclaration->SetNamedDeclarationWeakReference(namedDeclaration);
 
 	$$ = namedDeclaration;
@@ -164,7 +167,7 @@ anomymous_object_declaration_or_reference
 	// object declaration
 
 	odl::TOdlAstNodeObjectDeclaration* objectDeclaration = new odl::TOdlAstNodeObjectDeclaration($1, $3);
-	odl::TOdlAstNodeNamedDeclaration* anonymousObject = new odl::TOdlAstNodeNamedDeclaration(nullptr, objectDeclaration);
+	odl::TOdlAstNodeNamedDeclaration* anonymousObject = new odl::TOdlAstNodeNamedDeclaration(nullptr, objectDeclaration, nullptr);
 	objectDeclaration->SetNamedDeclarationWeakReference(anonymousObject);
 	$$ = anonymousObject;
 }
@@ -177,7 +180,7 @@ anomymous_object_declaration_or_reference
 
 	odl::TOdlAstNodeTemplateExpressionList* expressionList = $3;
 	odl::TOdlAstNodeTemplateObjectInstanciation* templateDeclaration = new odl::TOdlAstNodeTemplateObjectInstanciation(typeIdentifier, expressionList);
-	odl::TOdlAstNodeNamedDeclaration* anonymousObject = new odl::TOdlAstNodeNamedDeclaration(nullptr, templateDeclaration);
+	odl::TOdlAstNodeNamedDeclaration* anonymousObject = new odl::TOdlAstNodeNamedDeclaration(nullptr, templateDeclaration, nullptr);
 	templateDeclaration->SetNamedDeclarationWeakReference(anonymousObject);
 
 	$$ = anonymousObject;
