@@ -1,0 +1,33 @@
+
+
+boolTrueValueReference is true
+arrayOfInt is [ 4, 5, 6 ]
+justAnInteger is 10
+justAString is " concatened string!"
+
+
+
+object0 is TOdlTestClassChild
+{
+    FBool = boolTrueValueReference
+    FVector = [0, 1, justAnInteger, 3] + arrayOfInt
+    FInteger = 5 + 4 + 2 + justAnInteger
+    FString = "toto" + justAString
+    FObjectPointer = object0
+    FTestClassBasePointer = object0
+    FTestClass2BasePointer = nullptr
+    FIntStringPair = [ justAnInteger, justAString + justAString ]
+    FFloatFloatPairVector = [ [ 4, 3 ], [ 3, 2 ], [ 2, 1 ] ]
+    FFloatVectorIntVectorPair = [ [0, 1, 2, 3], [3, 2, 1, 0] ]
+}
+
+
+testResult is TOdlTestResult
+{
+    // FDumpOutputFilename = "Data/Tests/name_resolution.reference.odl"
+    FTestedObject = object0
+    FExpectedOutputFilename = "Data/Tests/name_resolution.reference.odl"
+}
+
+
+

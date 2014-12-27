@@ -1,0 +1,31 @@
+object000000 is TOdlTestClassChild
+{
+    FBool = true
+    FInteger = -7
+    FFloat = -3.21
+    FString = "toto concatened string!"
+    FInteger = 21
+    FVectorComposite = [  ]
+    FVector = [ 0, 1, 10, 3, 4, 5, 6 ]
+    FMapI32ToVectorFloat = [  ]
+    FMapI32ToVectorString = [  ]
+    FFloatVector = [  ]
+    FFloatFloatPair = [ 0, 0 ]
+    FObjectPointer = object000000
+    FObjectInPlace = object000001
+    FVectorOfObjectPointers = [  ]
+    FVectorOfObjectInPlace = [  ]
+    FTestClassBasePointer = object000000
+    FTestClass2BasePointer = nullptr
+    FIntStringPair = [ 10, " concatened string! concatened string!" ]
+    FFloatFloatPairVector = [ [ 4, 3 ], [ 3, 2 ], [ 2, 1 ] ]
+    FFloatVectorIntVectorPair = [ [ 0, 1, 2, 3 ], [ 3, 2, 1, 0 ] ]
+}
+
+object000001 is TOdlTestClassBase
+{
+    FBool = false
+    FInteger = -7
+    FFloat = -3.21
+}
+
