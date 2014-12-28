@@ -114,59 +114,31 @@ private:
 class TTemplateInstanciationStack
 {
 public:
+    TTemplateInstanciationStack();
 
-    void EnterTemplateObjectInstanciation(TOdlAstNodeTemplateObjectInstanciation const* parTemplateObjectInstanciation)
-    {
-        FTemplateInstanciations.push_back(parTemplateObjectInstanciation);
-    }
+    void EnterTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation);
+    void LeaveTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation);
 
-    void LeaveTemplateObjectInstanciation(TOdlAstNodeTemplateObjectInstanciation const* parTemplateObjectInstanciation)
-    {
-        assert(!FTemplateInstanciations.empty());
-        assert(FTemplateInstanciations.back() == parTemplateObjectInstanciation);
-        FTemplateInstanciations.pop_back();
-    }
-
-    TOdlAstNodeExpression const* FindTemplateObjectInstanciationAndExpressionByTemplateObjectDeclarationAndIndexAssumeExists(TOdlAstNodeTemplateObjectDeclaration const* parTemplateObjectDeclaration, size_t parExpressionIndex)
-    {
-        assert(!FTemplateInstanciations.empty());
-        
-        TOdlAstNodeExpression const* expressionResult = nullptr;
-
-        std::string const& searchedTemplateDeclarationName = parTemplateObjectDeclaration->IdentifierPointer()->Identifier();
-
-        for (size_t i = 0; i < FTemplateInstanciations.size(); ++i)
-        {
-            size_t const invI = FTemplateInstanciations.size() - i - 1;
-            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciation = FTemplateInstanciations[invI];
-            std::string const& templateInstanciationUsedTemplateDeclarationName = templateObjectInstanciation->TypeIdentifierPointer()->Identifier();
-            if (templateInstanciationUsedTemplateDeclarationName == searchedTemplateDeclarationName)
-            {
-                expressionResult = templateObjectInstanciation->TemplateExpressionListPointer()->ExpressionByIndex(parExpressionIndex);
-                assert(expressionResult != nullptr);
-                break ;
-            }
-        }
-
-        return expressionResult;
-    }
+    TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
 
 private:
-    std::vector< TOdlAstNodeTemplateObjectInstanciation const* > FTemplateInstanciations;
+    std::vector< TOdlAstNodeNamedDeclaration const* > FTemplateInstanciations;
 };
 //-------------------------------------------------------------------------------
 struct TEvalExpressionContext
 {
-	TEvalExpressionContext(TTemplateInstanciationStack& parTemplateDeclarations);
+	TEvalExpressionContext(TOdlDatabasePath const& parDatabasePath, TTemplateInstanciationStack const& parTemplateDeclarations);
 
 	bool AddToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 	void RemoveToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 
-    TTemplateInstanciationStack& TemplateInstanciationStack() { return FTemplateInstanciationStack; }
+    TTemplateInstanciationStack const& TemplateInstanciationStack() const { return FTemplateInstanciationStack; }
+    TOdlDatabasePath const& DatabasePath() const { return FDatabasePath; }
 
 private:
-	TTemplateInstanciationStack& FTemplateInstanciationStack;
+	TTemplateInstanciationStack const& FTemplateInstanciationStack;
 	std::vector< TOdlAstNode const* > FCircularReferenceCheck;
+    TOdlDatabasePath const& FDatabasePath;
 };
 //-------------------------------------------------------------------------------
 struct TScopedCheckCircularReferenceCheck

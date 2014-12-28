@@ -138,16 +138,26 @@ named_declaration
 | TOKEN_NAMESPACE IDENTIFIER TOKEN_EQUALS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_instanciation_parameter_list TOKEN_CLOSE_PARENTHESIS
 {
 	// namespace template instanciation
-	odl::TOdlAstNodeTemplateNamespaceInstanciation* theNamespace = new odl::TOdlAstNodeTemplateNamespaceInstanciation($2, $4, $6);
-	$$ = theNamespace;
+	
+	odl::TOdlAstNodeIdentifier* identifier = $2;
+	odl::TOdlAstNodeTemplateExpressionList* expressionList = $6;
+	odl::TOdlAstNodeIdentifier* targetNamespaceDeclarationIdentifier = $4;
+
+	targetNamespaceDeclarationIdentifier->SetAsReferenceToResolve();
+
+	odl::TOdlAstNodeTemplateNamespaceInstanciation* templateNamespaceInstanciation = new odl::TOdlAstNodeTemplateNamespaceInstanciation(targetNamespaceDeclarationIdentifier, expressionList);
+	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = new odl::TOdlAstNodeNamedDeclaration(identifier, templateNamespaceInstanciation, nullptr);
+	templateNamespaceInstanciation->SetNamedDeclarationWeakReference(namedDeclaration);
+
+	$$ = namedDeclaration;
 }
 | TOKEN_TEMPLATE IDENTIFIER TOKEN_IS IDENTIFIER TOKEN_OPEN_PARENTHESIS template_declaration_parameter_list TOKEN_CLOSE_PARENTHESIS TOKEN_OPEN_BRACE property_declaration_list TOKEN_CLOSE_BRACE
 {
 	// object template declaration
-	odl::TOdlAstNodeIdentifier* typeIndentifier = $4;
+	odl::TOdlAstNodeIdentifier* typeIdentifier = $4;
 	odl::TOdlAstNodeTemplateParameterList* templateParameterList = $6;
 
-	odl::TOdlAstNodeTemplateObjectDeclaration* templateDeclaration = new odl::TOdlAstNodeTemplateObjectDeclaration(typeIndentifier, $9);
+	odl::TOdlAstNodeTemplateObjectDeclaration* templateDeclaration = new odl::TOdlAstNodeTemplateObjectDeclaration(typeIdentifier, $9);
 	odl::TOdlAstNodeNamedDeclaration* namedDeclaration = new odl::TOdlAstNodeNamedDeclaration($2, templateDeclaration, templateParameterList);
 	templateDeclaration->SetNamedDeclarationWeakReference(namedDeclaration);
 

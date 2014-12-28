@@ -11,7 +11,6 @@ namespace odl
 namespace TOdlAstNodeType
 {
     static const int VALUE_MASK = 0x80000000;
-    static const int TEMPLATE_MASK = 0x20000000;
 
 	enum TType
 	{
@@ -28,12 +27,13 @@ namespace TOdlAstNodeType
 		NAMED_DECLARATION						= 10,
         OPERATION								= 11,
 		VALUE_VECTOR							= 12 | VALUE_MASK,
-        TEMPLATE_OBJECT_DECLARATION				= 13 | TEMPLATE_MASK,
-        TEMPLATE_OBJECT_INSTANCIATION			= 14 | TEMPLATE_MASK | VALUE_MASK,
-        TEMPLATE_DECLARATION_PARAMETER          = 15,
-		TEMPLATE_DECLARATION_PARAMETER_LIST		= 16,
-		TEMPLATE_INSTANCIATION_EXPRESSION_LIST	= 17,
-        VALUE_BOOLEAN                           = 18 | VALUE_MASK,
+        TEMPLATE_OBJECT_DECLARATION				= 13,
+        TEMPLATE_OBJECT_INSTANCIATION			= 14 | VALUE_MASK,
+        TEMPLATE_NAMESPACE_INSTANCIATION        = 15,
+        TEMPLATE_DECLARATION_PARAMETER          = 16,
+		TEMPLATE_DECLARATION_PARAMETER_LIST		= 17,
+		TEMPLATE_INSTANCIATION_EXPRESSION_LIST	= 18,
+        VALUE_BOOLEAN                           = 19 | VALUE_MASK,
 	};
 }
 
@@ -123,12 +123,12 @@ public:
 
     std::string const& Identifier() const { return FIdentifier; }
     
-    void ResolveReference(TOdlAstNodeNamedDeclaration const* parNodeReference)
+    void ResolveReference(TOdlAstNodeNamedDeclaration* parNodeReference)
     {
         FResolvedReferenceWeak = parNodeReference;
     }
 
-    TOdlAstNodeNamedDeclaration const* ResolvedReference() const { return FResolvedReferenceWeak; }
+    TOdlAstNodeNamedDeclaration* ResolvedReference() const { return FResolvedReferenceWeak; }
 
     void SetAsReferenceToResolve() { FIsReferenceToResolve = true; }
     bool IsReferenceToResolve() const { return FIsReferenceToResolve; }
@@ -136,7 +136,7 @@ public:
 private:
     std::string FIdentifier;
     // {TODO} Paul(2014/12/23)  make a reference type to resolve.
-    TOdlAstNodeNamedDeclaration const* FResolvedReferenceWeak;
+    TOdlAstNodeNamedDeclaration* FResolvedReferenceWeak;
     bool FIsReferenceToResolve;
 };
 //-------------------------------------------------------------------------------
@@ -185,6 +185,7 @@ public:
 
     void AutoGenerateIdentifierIfNone();
     bool IsAnonymousDeclaration() const { return FAnonymousDeclaration; }
+    bool IsTemplate() const { return FTemplateParameterListPointer != nullptr; }
 
     TOdlAstNodeIdentifier* IdentifierPointer() const { assert(FIdentifierPointer != NULL); return FIdentifierPointer; }
     TOdlAstNodeIdentifier* IdentifierPointer_IFP() const { return FIdentifierPointer; }
@@ -196,6 +197,7 @@ public:
     {
         FFullDatabasePath = parFullDatabasePath;
     }
+
 	TOdlDatabasePath const& FullDatabasePath() const { return FFullDatabasePath; }
 
 private:
@@ -659,14 +661,13 @@ private:
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
-class TOdlAstNodeTemplateNamespaceInstanciation : public TOdlAstNodeNamedDeclaration
+class TOdlAstNodeTemplateNamespaceInstanciation : public TOdlAstNodeExpression
 {
-    typedef TOdlAstNodeNamedDeclaration parent_type;
+    typedef TOdlAstNodeExpression parent_type;
 public:
-    TOdlAstNodeTemplateNamespaceInstanciation(TOdlAstNodeIdentifier* parIdentifier, 
-                                              TOdlAstNodeIdentifier* parTargetTemplateNamespaceIdentifierPointer, 
-                                              TOdlAstNode* parTemplateExpressionList) :
-        parent_type(TOdlAstNodeType::NAMESPACE, parIdentifier, nullptr, nullptr)
+    TOdlAstNodeTemplateNamespaceInstanciation(TOdlAstNodeIdentifier* parTargetTemplateNamespaceIdentifierPointer, 
+                                              TOdlAstNodeTemplateExpressionList* parTemplateExpressionList) :
+        parent_type(TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION)
     {
         assert(parTargetTemplateNamespaceIdentifierPointer != nullptr);
         assert(parTemplateExpressionList != nullptr);
@@ -684,9 +685,19 @@ public:
         delete FTemplateExpressionListPointer;
     }
 
+    void SetNamedDeclarationWeakReference(TOdlAstNodeNamedDeclaration const* parNamedDeclarationWeakReference)
+    {
+        FNamedDeclarationWeakReference = parNamedDeclarationWeakReference;
+    }
+
+    TOdlAstNodeNamedDeclaration const* NamedDeclarationWeakReference() const { return FNamedDeclarationWeakReference; }
+    TOdlAstNodeIdentifier* TargetTemplateNamespaceIdentifierPointer() const { return FTargetTemplateNamespaceIdentifierPointer; }
+    TOdlAstNodeTemplateExpressionList const* TemplateExpressionListPointer() const { return FTemplateExpressionListPointer; }
+
 private:
     TOdlAstNodeIdentifier* FTargetTemplateNamespaceIdentifierPointer;
-    TOdlAstNode* FTemplateExpressionListPointer;
+    TOdlAstNodeTemplateExpressionList* FTemplateExpressionListPointer;
+    TOdlAstNodeNamedDeclaration const* FNamedDeclarationWeakReference;
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************

@@ -1,7 +1,7 @@
 object000000 is TOdlTestClassBase
 {
     FBool = true
-    FInteger = 7
-    FFloat = 55.55
+    FInteger = 8888
+    FFloat = 4445
 }
 

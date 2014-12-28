@@ -342,10 +342,9 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExp
     {
         TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciation = parExpression->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
 
-        // PAUL(27/05/14 17:57:57) yuk, using debug data for processing...
         TOdlDatabasePath const& databasePath = templateObjectInstanciation->NamedDeclarationWeakRef()->FullDatabasePath();
 
-        #ifdef ODL_ENABLE_VERBOSE_DEBUG
+        #if ODL_ENABLE_VERBOSE_DEBUG
 		std::string forDebug1 = databasePath.ToString();
 		#endif
 
@@ -393,12 +392,11 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExp
                 TOdlAstNodeObjectDeclaration const* objectDeclarationNode = parExpression->CastNode<TOdlAstNodeObjectDeclaration>();
 				if (!objectDeclarationNode->IsNullPtr())
 				{
-					// PAUL(27/05/14 17:57:57) yuk, using debug data for processing...
 					TOdlDatabasePath const& databasePath = objectDeclarationNode->NamedDeclarationWeakRef()->FullDatabasePath();
 
 					std::string const& objectType = objectDeclarationNode->TypeIdentifierPointer()->Identifier();
 
-					#ifdef ODL_ENABLE_VERBOSE_DEBUG
+					#if ODL_ENABLE_VERBOSE_DEBUG
 					std::string forDebug1 = databasePath.ToString();
 					#endif
 
@@ -446,23 +444,32 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExp
 
                 TOdlAstNodeExpression const* searchExpression = namedDeclaration->ExpressionPointer();
 
-                // Paul(2014/12/25) Template Object Arguments resolution: 1 find the index in the declaration, 
-                // then find the expression in the corresponding template instantiation.
                 // Paul(2014/12/25) case for templates, in template declaration we search the parameter.
                 if (namedDeclaration->AstNodeType() == TOdlAstNodeType::TEMPLATE_DECLARATION_PARAMETER)
                 {
+                    // Paul(2014/12/25) Template Object Arguments resolution: 
+                    // 1) get the index of the parameter in the declaration 
+                    // 2) get the same index expression in the corresponding template instantiation.
+
                     TOdlAstNodeTemplateParameter const* templateParameter = namedDeclaration->CastNode<TOdlAstNodeTemplateParameter>();
-                    TOdlAstNodeNamedDeclaration const* namedDeclaration = templateParameter->TemplateHolderWeakReference();
-                    TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclaration = namedDeclaration->ExpressionPointer()->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
                     size_t const templateParameterIndex = templateParameter->TemplateParameterIndex();
+                    TOdlAstNodeNamedDeclaration const* templatedNamedDeclaration = templateParameter->TemplateHolderWeakReference();
                         
                     // find the good template instanciation node expression.
-                    TOdlAstNodeExpression const* templateInstanciationExpression = parContext.TemplateInstanciationStack().FindTemplateObjectInstanciationAndExpressionByTemplateObjectDeclarationAndIndexAssumeExists(templateObjectDeclaration, templateParameterIndex);
+                    TOdlAstNodeExpression const* templateInstanciationExpression = parContext.TemplateInstanciationStack().FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(templatedNamedDeclaration, templateParameterIndex);
                     searchExpression = templateInstanciationExpression;
 
                     assert(searchExpression); // {TODO} Paul(2014/12/26)  check error for invalid parameters.
                     // {TODO} Paul(2014/12/26) maybe type checking.
                     // {TODO} Paul(2014/12/26) search for default expression.
+                }
+                else if (searchExpression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION)
+                {
+                    TOdlDatabasePath const& databasePath = parContext.DatabasePath();
+                    #if ODL_ENABLE_VERBOSE_DEBUG
+                    std::string const currentDatabasePath = databasePath.ToString();
+                    #endif
+                    int a = 0;
                 }
                 
 				assert(searchExpression != nullptr);
@@ -591,8 +598,9 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExp
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-TEvalExpressionContext::TEvalExpressionContext(TTemplateInstanciationStack& parTemplateInstanciationStack) :
-	FTemplateInstanciationStack(parTemplateInstanciationStack)
+TEvalExpressionContext::TEvalExpressionContext(TOdlDatabasePath const& parDatabasePath, TTemplateInstanciationStack const& parTemplateInstanciationStack) :
+	FTemplateInstanciationStack(parTemplateInstanciationStack),
+    FDatabasePath(parDatabasePath)
 {
 
 }
@@ -616,6 +624,105 @@ void TEvalExpressionContext::RemoveToCircularReferenceCheck(TOdlAstNode const* p
 {
 	assert(FCircularReferenceCheck.back() == parAstNode);
 	FCircularReferenceCheck.pop_back();
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+TTemplateInstanciationStack::TTemplateInstanciationStack()
+{
+
+}
+//-------------------------------------------------------------------------------
+void TTemplateInstanciationStack::EnterTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation)
+{
+#if ODL_ENABLE_VERBOSE_DEBUG
+    TOdlAstNodeExpression const* expression = parTemplateObjectInstanciation->ExpressionPointer();
+    assert(expression != nullptr);
+    assert(expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION || expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION);
+#endif
+    FTemplateInstanciations.push_back(parTemplateObjectInstanciation);
+}
+//-------------------------------------------------------------------------------
+void TTemplateInstanciationStack::LeaveTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation)
+{
+#if ODL_ENABLE_VERBOSE_DEBUG
+    TOdlAstNodeExpression const* expression = parTemplateObjectInstanciation->ExpressionPointer();
+    assert(expression != nullptr);
+    assert(expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION || expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION);
+#endif
+
+    assert(!FTemplateInstanciations.empty());
+    assert(FTemplateInstanciations.back() == parTemplateObjectInstanciation);
+    FTemplateInstanciations.pop_back();
+}
+//-------------------------------------------------------------------------------
+TOdlAstNodeExpression const* TTemplateInstanciationStack::FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const
+{
+    assert(!FTemplateInstanciations.empty());
+
+    std::string const& searchedTemplateDeclarationName = parNamedDeclarationOfTemplateDeclaration->IdentifierPointer()->Identifier();
+
+    TOdlAstNodeNamedDeclaration const* searchedTemplateInstanciationNode = nullptr;
+    for (size_t i = 0; i < FTemplateInstanciations.size(); ++i)
+    {
+        size_t const invI = FTemplateInstanciations.size() - i - 1;
+        TOdlAstNodeNamedDeclaration const* templateInstanciationNamedDeclarationCandidate = FTemplateInstanciations[invI];
+
+        // Paul(2014/12/27) template object node.
+        // {TODO} Paul(2014/12/27)  check for template value.
+        TOdlAstNodeExpression const* templateInstanciationExpression = templateInstanciationNamedDeclarationCandidate->ExpressionPointer();
+        if (templateInstanciationExpression != nullptr &&
+            templateInstanciationExpression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION)
+        {
+            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciation = templateInstanciationExpression->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+            std::string const& templateInstanciationCandidateTemplateDeclarationName = templateObjectInstanciation->TypeIdentifierPointer()->Identifier();
+            if (templateInstanciationCandidateTemplateDeclarationName == searchedTemplateDeclarationName)
+            {
+                searchedTemplateInstanciationNode = templateInstanciationNamedDeclarationCandidate;
+                break;
+            }
+        }
+        else if (templateInstanciationExpression != nullptr &&
+            templateInstanciationExpression->AstNodeType() == TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION)
+        {
+            TOdlAstNodeTemplateNamespaceInstanciation const* templateNamespaceInstanciation = templateInstanciationExpression->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
+            std::string const& templateInstanciationCandidateTemplateDeclarationName = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer()->Identifier();
+            if (templateInstanciationCandidateTemplateDeclarationName == searchedTemplateDeclarationName)
+            {
+                searchedTemplateInstanciationNode = templateInstanciationNamedDeclarationCandidate;
+                break;
+            }
+        }
+        else
+        {
+            assert(false);
+            break;
+        }
+    }
+
+    assert(searchedTemplateInstanciationNode); // cannot resove template name...
+
+    TOdlAstNodeTemplateExpressionList const* templateInstanciationExpressionList = nullptr;
+    TOdlAstNodeExpression const* templateInstanciationExpression = searchedTemplateInstanciationNode->ExpressionPointer();
+    if (templateInstanciationExpression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION)
+    {
+        TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciation = templateInstanciationExpression->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+        templateInstanciationExpressionList = templateObjectInstanciation->TemplateExpressionListPointer();
+    }
+    else if (templateInstanciationExpression->AstNodeType() == TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION)
+    {
+        TOdlAstNodeTemplateNamespaceInstanciation const* templateNamespaceInstanciation = templateInstanciationExpression->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
+        templateInstanciationExpressionList = templateNamespaceInstanciation->TemplateExpressionListPointer();
+    }
+    else
+    {
+        assert(false);
+    }
+    assert(templateInstanciationExpressionList != nullptr);
+
+    TOdlAstNodeExpression const* expressionResult = templateInstanciationExpressionList->ExpressionByIndex(parExpressionIndex);
+    assert(expressionResult != nullptr);
+    return expressionResult;
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************

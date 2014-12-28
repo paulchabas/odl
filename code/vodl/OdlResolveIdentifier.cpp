@@ -8,14 +8,139 @@ namespace odl
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-TOdlAstNodeNamedDeclaration const* ResolveIdentifier(TInterpretContext& parContext, TOdlAstNodeIdentifier const* identifierNode)
+static TOdlAstNodeNamedDeclaration* FindTemplateParameter(TOdlAstNodeTemplateParameterList const* templateParameterListPointer, 
+                                                          std::string const& identifierToResolve)
 {
-    TOdlAstNodeNamedDeclaration const* foundReference = nullptr;
+    TOdlAstNodeNamedDeclaration* foundReference = nullptr;
+
+    std::vector< TOdlAstNodeTemplateParameter* > const& templateParameters = templateParameterListPointer->TemplateParameterList();
+    for (size_t i = 0; i < templateParameters.size(); ++i)
+    {
+        TOdlAstNodeTemplateParameter* templateParameter = templateParameters[i];
+        std::string const& parameterName = templateParameter->IdentifierPointer()->Identifier();
+        if (parameterName == identifierToResolve)
+        {
+            foundReference = templateParameter;
+            break;
+        }
+    }	
+
+    return foundReference;
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TInterpretContext const& parContext,
+                                                              TOdlAstNodeNamedDeclaration const* parNamespaceCandidate,
+                                                              std::string const& parIdentifierToResolve,
+                                                              bool parSearchInTemplateParameters)
+{
+    TOdlAstNodeNamedDeclaration* foundReference = nullptr;
+
+    if (parNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
+    {
+        if (parSearchInTemplateParameters)
+        {
+            TOdlAstNodeExpression const* expression = parNamespaceCandidate->ExpressionPointer();
+            if (expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION)
+            {
+                #if ODL_ENABLE_VERBOSE_DEBUG
+                TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclarationNode = expression->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+                std::string const& pathDebug = parContext.DatabasePath().ToString();
+                #endif
+
+                TOdlAstNodeTemplateParameterList const* templateParameterListPointer = parNamespaceCandidate->TemplateParameterListPointer();
+                foundReference = FindTemplateParameter(templateParameterListPointer, parIdentifierToResolve);
+            }
+        }
+    }
+    else if (parNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
+    {
+        TOdlAstNodeNamespaceDeclaration const* typedNamespaceCandidate = parNamespaceCandidate->CastNode<TOdlAstNodeNamespaceDeclaration>();
+        #if ODL_ENABLE_VERBOSE_DEBUG
+        std::string pathDebug = parContext.DatabasePath().ToString();
+        #endif
+
+        // search in namespace content first.
+        std::vector< TOdlAstNodeNamedDeclaration* > const& namespaceContent = typedNamespaceCandidate->NamespaceContent();
+        for (size_t j = 0; j < namespaceContent.size(); ++j)
+        {
+            TOdlAstNodeNamedDeclaration* candidateNode = namespaceContent[j];
+
+            std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
+            if (declarationIdentifier == parIdentifierToResolve)
+            {
+                foundReference = candidateNode;
+                break;
+            }
+        }
+
+        // search in template namespace parameter if possible.
+        if (foundReference == nullptr)
+        {
+            if (parSearchInTemplateParameters)
+            {
+                TOdlAstNodeTemplateParameterList const* templateParameterListPointer = typedNamespaceCandidate->TemplateParameterListPointer();
+                TOdlAstNodeNamedDeclaration* result = FindTemplateParameter(templateParameterListPointer, parIdentifierToResolve);
+                if (result != nullptr)
+                {
+                    foundReference = result;
+                }
+            }
+        }
+    }
+    
+    return foundReference;
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+TOdlAstNodeNamedDeclaration const* FindNamespace(TNamedDeclarationStack const& parParentNamespaces, std::string const& parRootNamespaceToFind)
+{
+    TOdlAstNodeNamedDeclaration const* rootNamespace = nullptr;
+
+    size_t const parentNamespaceCount = parParentNamespaces.size();
+    for (size_t i = 0; i < parentNamespaceCount; ++i)
+    {
+        size_t const invI = parentNamespaceCount - i - 1;
+        TOdlAstNodeNamedDeclaration const* rootNamespaceCandidate = parParentNamespaces[invI];
+
+        if (rootNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
+        {
+            TOdlAstNodeNamespaceDeclaration const* typedRootNamespaceCandidate = rootNamespaceCandidate->CastNode<TOdlAstNodeNamespaceDeclaration>();
+            
+            std::vector< TOdlAstNodeNamedDeclaration* > const& rootNamespaceContent = typedRootNamespaceCandidate->NamespaceContent();
+            for (size_t j = 0; j < rootNamespaceContent.size(); ++j)
+            {
+                TOdlAstNodeNamedDeclaration* namedDeclarationNode = rootNamespaceContent[j];
+                std::string const& namedDeclarationName = namedDeclarationNode->IdentifierPointer()->Identifier();
+
+                if (namedDeclarationName == parRootNamespaceToFind)
+                {
+                    rootNamespace = rootNamespaceCandidate;
+                    goto rootNamespaceDone;
+                }
+            }
+        }
+    }
+
+rootNamespaceDone:
+    return rootNamespace;
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
+TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TOdlAstNodeIdentifier const* identifierNode)
+{
+    TOdlAstNodeNamedDeclaration* foundReference = nullptr;
 
     TNamedDeclarationStack const& parentNamespaces = parContext.NamespaceStack();
     size_t const parentNamespaceCount = parentNamespaces.size();
-
     std::string const& fullIdentifierToResolve = identifierNode->Identifier();
+
+    #if ODL_ENABLE_VERBOSE_DEBUG
+    std::string fullIdentifierToResolveForDebug = parContext.DatabasePath().ToString();
+    #endif
 
     TOdlDatabasePath searchedNameSpaceDatabasePath(fullIdentifierToResolve.c_str());
     if (searchedNameSpaceDatabasePath.size() <= 1)
@@ -23,185 +148,61 @@ TOdlAstNodeNamedDeclaration const* ResolveIdentifier(TInterpretContext& parConte
         // research name resolution in parent namespaces recursively
         std::string const& identifierToResolve = searchedNameSpaceDatabasePath.back().ToString();
 
-        for (size_t i = 0; i < parentNamespaceCount && (foundReference == nullptr); ++i)
+        for (size_t i = 0; i < parentNamespaceCount; ++i)
         {
             size_t const invI = parentNamespaceCount - i - 1;
-
             TOdlAstNodeNamedDeclaration const* namespaceCandidate = parentNamespaces[invI];
-
-            // PAUL(14/10/2014) property filled in case of namespace.
-            if (namespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
-            {
-                TOdlAstNodeExpression const* expression = namespaceCandidate->ExpressionPointer();
-                if (expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION)
-                {
-                    TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclarationNode = expression->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
-
-                    std::vector< TOdlAstNodeTemplateParameter* > const& templateParameters = templateObjectDeclarationNode->TemplateParameterListPointer()->TemplateParameterList();
-                    for (size_t i = 0; i < templateParameters.size(); ++i)
-                    {
-                        TOdlAstNodeTemplateParameter const* templateParameter = templateParameters[i];
-                        std::string const& parameterName = templateParameter->IdentifierPointer()->Identifier();
-                        if (parameterName == identifierToResolve)
-                        {
-    #if ODL_ENABLE_VERBOSE_DEBUG
-                            std::string pathDebug = parContext.DatabasePath().ToString();
-    #endif
-                            foundReference = templateParameter;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (namespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
-            {
-                TOdlAstNodeNamespaceDeclaration const* typedNamespaceCandidate = namespaceCandidate->CastNode<TOdlAstNodeNamespaceDeclaration>();
-                std::vector< TOdlAstNodeNamedDeclaration* > const& namespaceContent = typedNamespaceCandidate->NamespaceContent();
-                for (size_t j = 0; j < namespaceContent.size(); ++j)
-                {
-                    TOdlAstNodeNamedDeclaration* candidateNode = namespaceContent[j];
-                    if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
-                    {
-                        std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
-                        if (declarationIdentifier == identifierToResolve)
-                        {
-#if ODL_ENABLE_VERBOSE_DEBUG
-                            std::string pathDebug = parContext.DatabasePath().ToString();
-#endif
-                            foundReference = candidateNode;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+            foundReference = FindIdentifierInNamespace(parContext, namespaceCandidate, identifierToResolve, true);
+            if (foundReference != nullptr)
+                break ;
+        }	
     }
     else
     {
         // research in one namespace
         // 1) search root namespace
-        std::string const rootNamespaceToFind = searchedNameSpaceDatabasePath[0].ToString();
-        TOdlAstNode const* rootNamespace = nullptr;
-        {
-            for (size_t i = 0; i < parentNamespaceCount; ++i)
-            {
-                size_t const invI = parentNamespaceCount - i - 1;
-                TOdlAstNode const* rootNamespaceCandidate = parentNamespaces[invI];
-
-                if (rootNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
-                {
-                    TOdlAstNodeNamespaceDeclaration const* typedRootNamespaceCandidate = rootNamespaceCandidate->CastNode<TOdlAstNodeNamespaceDeclaration>();
-                    std::vector< TOdlAstNodeNamedDeclaration* > const& rootNamespaceContent = typedRootNamespaceCandidate->NamespaceContent();
-                    for (size_t j = 0; j < rootNamespaceContent.size(); ++j)
-                    {
-                        TOdlAstNodeNamedDeclaration* namedDeclarationNode = rootNamespaceContent[j];
-                        std::string const& namedDeclarationName = namedDeclarationNode->IdentifierPointer()->Identifier();
-
-                        if (namedDeclarationName == rootNamespaceToFind)
-                        {
-                            rootNamespace = rootNamespaceCandidate;
-                            goto rootNamespaceDone;
-                        }
-                    }
-                }
-                //else
-                //{
-                //    // {TODO} Paul(2014/12/21) est-ce que c'est une erreur ou pas ? gerer correctement les named values.
-                //    assert(false);
-                //}
-            }
-        rootNamespaceDone:
-            int a = 0;
-        }
-
+        std::string const& rootNamespaceToFind = searchedNameSpaceDatabasePath[0].ToString();
+        TOdlAstNodeNamedDeclaration const* rootNamespace = FindNamespace(parentNamespaces, rootNamespaceToFind);
+        assert(rootNamespace != nullptr); // path not completed.
         if (rootNamespace != nullptr)
         {
             // 2) search childs namespace of root namespace.
-            TOdlAstNode const* childNamespace = rootNamespace;
+            TOdlAstNodeNamedDeclaration const* childNamespace = rootNamespace;
             {
                 for (int i = 0; i < (int)searchedNameSpaceDatabasePath.size() - 1; ++i)
                 {
                     std::string const& searchedChildNamespace = searchedNameSpaceDatabasePath[i].ToString();
 
-                    bool childNamespaceFound = false;
+                    TOdlAstNodeNamedDeclaration const* nextChildNamespace = FindIdentifierInNamespace(parContext, childNamespace, searchedChildNamespace, false);
+                    assert(nextChildNamespace != nullptr);
 
-                    if (childNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE)
+                    // check for template namespace 
+                    TOdlAstNodeExpression const* namedDeclarationExpression = nextChildNamespace->ExpressionPointer();
+                    if (namedDeclarationExpression != nullptr && namedDeclarationExpression->AstNodeType() == TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION)
                     {
-                        TOdlAstNodeNamespaceDeclaration const* childNamespaceDeclaration = childNamespace->CastNode<TOdlAstNodeNamespaceDeclaration>();
-                        std::vector< TOdlAstNodeNamedDeclaration* > const& childNamespaceContent = childNamespaceDeclaration->NamespaceContent();
-                        for (size_t j = 0; j < childNamespaceContent.size(); ++j)
-                        {
-                            TOdlAstNodeNamedDeclaration* candidateNamespace = childNamespaceContent[j];
-                            if (candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE ||
-                                candidateNamespace->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
-                            {
-                                std::string const& namedDeclarationIdentifier = candidateNamespace->IdentifierPointer()->Identifier();
-                                if (namedDeclarationIdentifier == searchedChildNamespace)
-                                {
-                                    childNamespace = candidateNamespace;
-                                    childNamespaceFound = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // {TODO} Paul(2014/12/21)  checker si c'est une erreur... gerer correctement les named values et namespace.
-                        assert(false);
+                        TOdlAstNodeTemplateNamespaceInstanciation const* templateNamespaceInstanciation = namedDeclarationExpression->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
+
+                        TOdlAstNodeIdentifier const* targetNamespaceDeclarationIdentifier = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer();
+                        TOdlAstNodeNamedDeclaration const* templateNamespaceDeclaration = ResolveIdentifier(parContext, targetNamespaceDeclarationIdentifier);
+                        nextChildNamespace = templateNamespaceDeclaration;
                     }
 
-                    if (!childNamespaceFound)
-                        assert(false); // cannot find tutu in namespace tata for example: toto/tata/tutu/object
+                    childNamespace = nextChildNamespace;
                 }
             }
 
+            assert(childNamespace != nullptr); // path not found.
             if (childNamespace != nullptr)
             {
                 // 3) search for the final named value and resolve.
-                TOdlAstNode const* finalNamespace = childNamespace;
+                TOdlAstNodeNamedDeclaration const* finalNamespace = childNamespace;
                 std::string const& identifierToResolve = searchedNameSpaceDatabasePath.back().ToString();
-
-                if (finalNamespace->AstNodeType() == TOdlAstNodeType::NAMESPACE)
-                {
-                    TOdlAstNodeNamespaceDeclaration const* typedFinalNamespace = finalNamespace->CastNode<TOdlAstNodeNamespaceDeclaration>();
-                    std::vector< TOdlAstNodeNamedDeclaration* > const& namespaceContent = typedFinalNamespace->NamespaceContent();
-                    for (size_t j = 0; j < namespaceContent.size(); ++j)
-                    {
-                        TOdlAstNodeNamedDeclaration* candidateNode = namespaceContent[j];
-                        std::string const& declarationIdentifier = candidateNode->IdentifierPointer()->Identifier();
-                        if (candidateNode->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION ||
-                            candidateNode->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION)
-                        {
-                            if (identifierToResolve == declarationIdentifier)
-                            {
-#if ODL_ENABLE_VERBOSE_DEBUG
-                                std::string pathDebug = parContext.DatabasePath().ToString();
-#endif
-                                foundReference = candidateNode;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // {TODO} Paul(2014/12/21)  check named value et namespace... est-ce que c'est une erreur ou pas ?
-                    assert(false);
-                }
-
+                foundReference = FindIdentifierInNamespace(parContext, finalNamespace, identifierToResolve, false);
             }
-            else
-            {
-                assert(false); // namespace not found.
-            }
-        }
-        else
-        {
-            // unrecognized namespace
-            assert(false);
         }
     }
+
+    assert(foundReference != nullptr); // reference not resolved.
 
     return foundReference;
 }
