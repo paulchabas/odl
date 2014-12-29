@@ -33,9 +33,6 @@ public:
     TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
 
 private:
-    TNamedDeclarationStack FTemplateInstanciations;
-
-private:
     TNamedDeclarationStack FStaticNamespaceStack;         // static declaration stack, used for identifier resolution in scopes.
     TOdlDatabasePath& FDatabasePath;
     TNamedDeclarationStack& FDynamicNamespaceStack; // template instanciation stack to get the final OdlDatabase::Instance().GetObject address.
