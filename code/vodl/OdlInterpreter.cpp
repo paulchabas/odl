@@ -108,7 +108,7 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
     case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
         {
             TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
-            // {TODO} Paul(2014/12/27) get the template expression and find the named reference to anything else to resolve their references.
+            // {TODO} Paul(2014/12/27) get the template expressions parameters defaults parameters and resolve the named reference and expression.
             int a = 0;
         }
         break ;
