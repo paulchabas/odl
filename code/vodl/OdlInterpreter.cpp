@@ -246,25 +246,22 @@ struct TFillObjectPropertiesInterpretContext : public TInterpretContext
 public:
 
 	TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath,
+                                          TTemplateInstanciationStack& parTemplateInstanciationStack,
                                           TOdlObject* parCurrentObject, 
-                                          TMetaClassBase const* parMetaClass,
-                                          TTemplateInstanciationStack& parTemplateInstanciationStack) :
-        TInterpretContext(parDatabasePath),
+                                          TMetaClassBase const* parMetaClass) :
+        TInterpretContext(parDatabasePath, parTemplateInstanciationStack),
         FCurrentObject(parCurrentObject),
-        FMetaClassBase(parMetaClass),
-		FTemplateInstanciationStack(parTemplateInstanciationStack)
+        FMetaClassBase(parMetaClass)
     {
 
     }
 
     TOdlObject* CurrentObject() const { assert(FCurrentObject != nullptr); return FCurrentObject; }
     TMetaClassBase const* MetaClassBase() const { assert(FMetaClassBase != nullptr); return FMetaClassBase; }
-    TTemplateInstanciationStack& TemplateInstanciationNodeStack() { return FTemplateInstanciationStack; }
 
 private:
     TOdlObject*             FCurrentObject;
     TMetaClassBase const*   FMetaClassBase;
-    TTemplateInstanciationStack& FTemplateInstanciationStack;
 };
 //-------------------------------------------------------------------------------
 static bool IsTemplateInstanciationNamedDeclaration(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
@@ -356,7 +353,10 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 			TOdlObject* object = TOdlDatabase::Instance().GetObject(templateInstanciationDatabaseName);
 			TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 
-            TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, object, metaClassBase, context.TemplateInstanciationNodeStack());
+            TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, 
+                                                             context.TemplateInstanciationNodeStack(),
+                                                             object, 
+                                                             metaClassBase);
             
 			TOdlAstNodePropertyDeclarationList* propertiesToFill = templateDeclaration->PropertyDeclarationListPointer();
             FillObjectsProperties(propertiesToFill, newContext);
@@ -391,7 +391,10 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 
 				TOdlObject* object = TOdlDatabase::Instance().GetObject(objectNamespaceAndName);
 				TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
-				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, object, metaClassBase, context.TemplateInstanciationNodeStack());
+				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, 
+                                                                 context.TemplateInstanciationNodeStack(),
+                                                                 object, 
+                                                                 metaClassBase);
 				VisitAst(parAstNode, newContext, FillObjectsProperties);
 			}
         };
@@ -499,7 +502,8 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 static void AutoNameAnomymousObjectDeclarations(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
-    TInterpretContext context(databasePath);
+    TTemplateInstanciationStack templateInstanciationStack;
+    TInterpretContext context(databasePath, templateInstanciationStack);
     VisitAst(parAstNode, context, AutoNameAnomymousObjectDeclaration);
 }
 //-------------------------------------------------------------------------------
@@ -577,7 +581,8 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 static void ResolveValueIdentifiers(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
-    TInterpretContext context(databasePath);
+    TTemplateInstanciationStack templateInstanciationStack;
+    TInterpretContext context(databasePath, templateInstanciationStack);
     ResolveValueIdentifier(parAstNode, context);
 }
 //-------------------------------------------------------------------------------
@@ -599,13 +604,14 @@ void InterpretAst(TOdlAstNode* parAstNode)
         {
             // create objets
             TOdlDatabasePath databasePath;
-            TInterpretContext InstanciateObjectContext(databasePath);
+            TTemplateInstanciationStack templateInstanciationStack;
+            TInterpretContext InstanciateObjectContext(databasePath, templateInstanciationStack);
             VisitAst(parAstNode, InstanciateObjectContext, InstanciateObjects);
             
             // fill objets properties.
             assert(databasePath.empty());
-            TTemplateInstanciationStack templateInstanciationStack;
-            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, nullptr, nullptr, templateInstanciationStack);
+            assert(templateInstanciationStack.Empty());
+            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, templateInstanciationStack, nullptr, nullptr);
             VisitAst(parAstNode, fillObjectsPropertiesContext, FillObjectsProperties);
         };
         break ;

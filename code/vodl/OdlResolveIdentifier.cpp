@@ -11,6 +11,7 @@ namespace odl
 static TOdlAstNodeNamedDeclaration* FindTemplateParameter(TOdlAstNodeTemplateParameterList const* templateParameterListPointer, 
                                                           std::string const& identifierToResolve)
 {
+    assert(templateParameterListPointer != nullptr);
     TOdlAstNodeNamedDeclaration* foundReference = nullptr;
 
     std::vector< TOdlAstNodeTemplateParameter* > const& templateParameters = templateParameterListPointer->TemplateParameterList();
@@ -52,6 +53,10 @@ static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TInterpretContext 
                 TOdlAstNodeTemplateParameterList const* templateParameterListPointer = parNamespaceCandidate->TemplateParameterListPointer();
                 foundReference = FindTemplateParameter(templateParameterListPointer, parIdentifierToResolve);
             }
+            else if (expression->AstNodeType())
+            {
+                int a = 0;
+            }
         }
     }
     else if (parNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
@@ -81,10 +86,18 @@ static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TInterpretContext 
             if (parSearchInTemplateParameters)
             {
                 TOdlAstNodeTemplateParameterList const* templateParameterListPointer = typedNamespaceCandidate->TemplateParameterListPointer();
-                TOdlAstNodeNamedDeclaration* result = FindTemplateParameter(templateParameterListPointer, parIdentifierToResolve);
-                if (result != nullptr)
+                if (templateParameterListPointer != nullptr)
                 {
-                    foundReference = result;
+                    TOdlAstNodeNamedDeclaration* result = FindTemplateParameter(templateParameterListPointer, parIdentifierToResolve);
+                    if (result != nullptr)
+                    {
+                        foundReference = result;
+                    }
+                }
+                else
+                {
+                    assert(typedNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE);
+                    assert(!typedNamespaceCandidate->IsTemplate());
                 }
             }
         }
@@ -134,12 +147,13 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
 {
     TOdlAstNodeNamedDeclaration* foundReference = nullptr;
 
-    TNamedDeclarationStack const& parentNamespaces = parContext.NamespaceStack();
+    TNamedDeclarationStack const& parentNamespaces = parContext.StaticNamespaceStack();
+
     size_t const parentNamespaceCount = parentNamespaces.size();
     std::string const& fullIdentifierToResolve = identifierNode->Identifier();
 
     #if ODL_ENABLE_VERBOSE_DEBUG
-    std::string fullIdentifierToResolveForDebug = parContext.DatabasePath().ToString();
+    std::string debug0 = parContext.DatabasePath().ToString();
     #endif
 
     TOdlDatabasePath searchedNameSpaceDatabasePath(fullIdentifierToResolve.c_str());
@@ -183,6 +197,11 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
                         TOdlAstNodeTemplateNamespaceInstanciation const* templateNamespaceInstanciation = namedDeclarationExpression->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
 
                         TOdlAstNodeIdentifier const* targetNamespaceDeclarationIdentifier = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer();
+
+                        // {TODO} Paul(2014/12/29) HERE: use the real database storage context maybe instead of the static declaration paths...
+                        //// Paul(2014/12/28)  unifier... X(
+                        //TInterpretContext newContext(parContext.DatabasePath(), parC
+
                         TOdlAstNodeNamedDeclaration const* templateNamespaceDeclaration = ResolveIdentifier(parContext, targetNamespaceDeclarationIdentifier);
                         nextChildNamespace = templateNamespaceDeclaration;
                     }

@@ -3,6 +3,7 @@
 
 
 #include "vodlParserLexer/OdlAstNode.h"
+#include "OdlResolveIdentifier.h"
 
 namespace odl
 {
@@ -109,20 +110,6 @@ private:
     TOdlExpression::TType		FType;
     TValueUnion                 FValueUnion;
     TMetaClassBase const*       FMetaClassBase;
-};
-//-------------------------------------------------------------------------------
-class TTemplateInstanciationStack
-{
-public:
-    TTemplateInstanciationStack();
-
-    void EnterTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation);
-    void LeaveTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation);
-
-    TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
-
-private:
-    std::vector< TOdlAstNodeNamedDeclaration const* > FTemplateInstanciations;
 };
 //-------------------------------------------------------------------------------
 struct TEvalExpressionContext

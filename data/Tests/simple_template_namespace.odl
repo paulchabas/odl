@@ -19,7 +19,7 @@ namespace templateNamespaceInstanciation = templateNamespace0(true)
 
 testResult is TOdlTestResult
 {
-    FDumpOutputFilename = "Data/Tests/simple_template_namespace.reference.odl"
+    // FDumpOutputFilename = "Data/Tests/simple_template_namespace.reference.odl"
     FTestedObject = templateNamespaceInstanciation/object0
     FExpectedOutputFilename = "Data/Tests/simple_template_namespace.reference.odl"
 }
