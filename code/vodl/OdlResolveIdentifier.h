@@ -38,6 +38,24 @@ public:
         return FStack[parIndex];
     }
 
+    std::string ToDatabasePathString() const
+    {
+        std::ostringstream oss;
+        for (size_t i = 0; i < FStack.size(); ++i)
+        {
+            TOdlAstNodeNamedDeclaration const* namedDeclaration = FStack[i];
+            TOdlAstNodeIdentifier const* identifier = namedDeclaration->IdentifierPointer_IFP();
+            if (identifier != nullptr)
+            {
+                oss << identifier->Identifier();
+                if (i + 1 < FStack.size())
+                    oss << '/';
+            }
+        }
+
+        return oss.str();
+    }
+
 private:
     std::vector< TOdlAstNodeNamedDeclaration const* > FStack;
 };
