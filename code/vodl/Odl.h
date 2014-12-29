@@ -72,7 +72,7 @@ private:
 	std::vector< TPropertyBase const* > FClassProperties;
 	TMetaClassBase const* FContainerKeyMetaClass;
 	TMetaClassBase const* FContainerValueMetaClass;
-    TMetaClassBase const* FParentType; // todo: multiple inheritance.
+    TMetaClassBase const* FParentType; // {TODO}: multiple inheritance.
 };
 //--------------------------------------------------------
 //********************************************************

@@ -525,7 +525,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
                 foundReference = ResolveIdentifier(parContext, identifierNode);
                 if (foundReference == nullptr)
                 {
-                    assert(false); // todo: identifiant inconnu.
+                    assert(false); // {TODO}: error: unkown identifier.
                 }
                 else
                 {
