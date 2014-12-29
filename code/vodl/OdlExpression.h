@@ -114,18 +114,18 @@ private:
 //-------------------------------------------------------------------------------
 struct TEvalExpressionContext
 {
-	TEvalExpressionContext(TOdlDatabasePath const& parDatabasePath, TTemplateInstanciationStack const& parTemplateDeclarations);
+	TEvalExpressionContext(TInterpretContext& parInterpretContext);
 
 	bool AddToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 	void RemoveToCircularReferenceCheck(TOdlAstNode const* parAstNode);
 
-    TTemplateInstanciationStack const& TemplateInstanciationStack() const { return FTemplateInstanciationStack; }
-    TOdlDatabasePath const& DatabasePath() const { return FDatabasePath; }
+    TInterpretContext const& InterpretContext() const { return FInterpretContext; }
+
+    TOdlDatabasePath const& DatabasePath() const { return FInterpretContext.DatabasePath(); }
 
 private:
-	TTemplateInstanciationStack const& FTemplateInstanciationStack;
 	std::vector< TOdlAstNode const* > FCircularReferenceCheck;
-    TOdlDatabasePath const& FDatabasePath;
+    TInterpretContext& FInterpretContext;
 };
 //-------------------------------------------------------------------------------
 struct TScopedCheckCircularReferenceCheck

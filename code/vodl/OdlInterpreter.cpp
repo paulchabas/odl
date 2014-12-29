@@ -217,12 +217,11 @@ static void EvalExpressionAndStoreProperty(TOdlObject* parObject,
                                            TMetaClassBase const* parObjectMetaClassBase,
                                            TPropertyBase const* parPropertyBase, 
                                            TOdlAstNodeExpression const* parExpression,
-                                           TOdlDatabasePath const& parDatabasePath,
-                                           TTemplateInstanciationStack& parTemplateInstanciationStack)
+                                           TInterpretContext& parInterpretContext)
 {
     TMetaClassBase const* propertyMetaClassBase = parPropertyBase->Type();
 
-	TEvalExpressionContext evalExpressionContext(parDatabasePath, parTemplateInstanciationStack);
+	TEvalExpressionContext evalExpressionContext(parInterpretContext);
     TOdlExpression const result = EvalExpression(evalExpressionContext, parExpression);
 
 	if (result.Type() != TOdlExpression::UNTYPED)
@@ -246,10 +245,10 @@ struct TFillObjectPropertiesInterpretContext : public TInterpretContext
 public:
 
 	TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath,
-                                          TTemplateInstanciationStack& parTemplateInstanciationStack,
+                                          TNamedDeclarationStack& parDynamicNamespaceStack,
                                           TOdlObject* parCurrentObject, 
                                           TMetaClassBase const* parMetaClass) :
-        TInterpretContext(parDatabasePath, parTemplateInstanciationStack),
+        TInterpretContext(parDatabasePath, parDynamicNamespaceStack),
         FCurrentObject(parCurrentObject),
         FMetaClassBase(parMetaClass)
     {
@@ -354,7 +353,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 			TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 
             TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, 
-                                                             context.TemplateInstanciationNodeStack(),
+                                                             context.DynamicNamespaceStack(),
                                                              object, 
                                                              metaClassBase);
             
@@ -392,7 +391,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 				TOdlObject* object = TOdlDatabase::Instance().GetObject(objectNamespaceAndName);
 				TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, 
-                                                                 context.TemplateInstanciationNodeStack(),
+                                                                 context.DynamicNamespaceStack(),
                                                                  object, 
                                                                  metaClassBase);
 				VisitAst(parAstNode, newContext, FillObjectsProperties);
@@ -421,8 +420,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
                                                objectMetaClassBase, 
                                                propertyBase, 
                                                expression,
-                                               context.DatabasePath(),
-                                               context.TemplateInstanciationNodeStack());
+                                               context);
             }
             else
             {
@@ -502,8 +500,8 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 static void AutoNameAnomymousObjectDeclarations(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
-    TTemplateInstanciationStack templateInstanciationStack;
-    TInterpretContext context(databasePath, templateInstanciationStack);
+    TNamedDeclarationStack dynamicNamespaceStack;
+    TInterpretContext context(databasePath, dynamicNamespaceStack);
     VisitAst(parAstNode, context, AutoNameAnomymousObjectDeclaration);
 }
 //-------------------------------------------------------------------------------
@@ -581,8 +579,8 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 static void ResolveValueIdentifiers(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
-    TTemplateInstanciationStack templateInstanciationStack;
-    TInterpretContext context(databasePath, templateInstanciationStack);
+    TNamedDeclarationStack dynamicNamespaceStack;
+    TInterpretContext context(databasePath, dynamicNamespaceStack);
     ResolveValueIdentifier(parAstNode, context);
 }
 //-------------------------------------------------------------------------------
@@ -604,14 +602,14 @@ void InterpretAst(TOdlAstNode* parAstNode)
         {
             // create objets
             TOdlDatabasePath databasePath;
-            TTemplateInstanciationStack templateInstanciationStack;
-            TInterpretContext InstanciateObjectContext(databasePath, templateInstanciationStack);
+            TNamedDeclarationStack dynamicNamespaceStack;
+            TInterpretContext InstanciateObjectContext(databasePath, dynamicNamespaceStack);
             VisitAst(parAstNode, InstanciateObjectContext, InstanciateObjects);
             
             // fill objets properties.
             assert(databasePath.empty());
-            assert(templateInstanciationStack.Empty());
-            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, templateInstanciationStack, nullptr, nullptr);
+            assert(dynamicNamespaceStack.empty());
+            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, dynamicNamespaceStack, nullptr, nullptr);
             VisitAst(parAstNode, fillObjectsPropertiesContext, FillObjectsProperties);
         };
         break ;

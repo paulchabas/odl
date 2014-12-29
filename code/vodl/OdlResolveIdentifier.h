@@ -11,33 +11,12 @@ namespace odl
 //-------------------------------------------------------------------------------
 typedef std::vector< TOdlAstNodeNamedDeclaration const* > TNamedDeclarationStack;
 //-------------------------------------------------------------------------------
-class TTemplateInstanciationStack
-{
-public:
-    TTemplateInstanciationStack();
-
-    void EnterTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation);
-    void LeaveTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation);
-
-    TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
-
-    bool Empty() const { return FTemplateInstanciations.empty(); }
-
-    // Paul(2014/12/28)  rename/concept -> 
-    // 1) path statique -> recherche de parametres ou d'autre objets
-    // 2) path interprete.
-    TNamedDeclarationStack const& TemplateInstanciations() const { return FTemplateInstanciations; }
-
-private:
-    TNamedDeclarationStack FTemplateInstanciations;
-};
-//-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
 class TInterpretContext
 {
 public:
-    TInterpretContext(TOdlDatabasePath& parDatabasePath, TTemplateInstanciationStack& parTemplateInstanciationStack);
+    TInterpretContext(TOdlDatabasePath& parDatabasePath, TNamedDeclarationStack& parDynamicNamespaceStack);
 
     void EnterNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
     void LeaveNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
@@ -48,15 +27,18 @@ public:
     TOdlDatabasePath& DatabasePath() { return FDatabasePath; }
     TOdlDatabasePath const& DatabasePath() const { return FDatabasePath; }
     
-    TNamedDeclarationStack const& StaticNamespaceStack() const { return FNamespaceStack; }
-    TNamedDeclarationStack const& DynamicNamespaceStack() const { return FTemplateInstanciationStack.TemplateInstanciations(); }
+    TNamedDeclarationStack& StaticNamespaceStack() { return FStaticNamespaceStack; }
+    TNamedDeclarationStack& DynamicNamespaceStack() { return FDynamicNamespaceStack; }
 
-    TTemplateInstanciationStack& TemplateInstanciationNodeStack() { return FTemplateInstanciationStack; }
-    
+    TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
+
 private:
-    TNamedDeclarationStack FNamespaceStack;
+    TNamedDeclarationStack FTemplateInstanciations;
+
+private:
+    TNamedDeclarationStack FStaticNamespaceStack;         // static declaration stack, used for identifier resolution in scopes.
     TOdlDatabasePath& FDatabasePath;
-    TTemplateInstanciationStack& FTemplateInstanciationStack;
+    TNamedDeclarationStack& FDynamicNamespaceStack; // template instanciation stack to get the final OdlDatabase::Instance().GetObject address.
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
