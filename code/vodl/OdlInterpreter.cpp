@@ -108,13 +108,23 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
     case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
         {
             TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
-            // {TODO} Paul(2014/12/27) get the template expressions parameters defaults parameters and resolve the named reference and expression.
-            int a = 0;
+            TOdlAstNodeTemplateExpressionList const* templateExpressionListPointer = templateObjectInstanciationNode->TemplateExpressionListPointer();
+            std::vector< TOdlAstNodeExpression* > const& templateParameterExpressions =templateExpressionListPointer->TemplateParametersExpressionList();
+            for (TOdlAstNodeExpression* expression : templateParameterExpressions)
+            {
+                (*parCallback)(expression, parContext);
+            }
         }
         break ;
     case TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION:
         {
-            int a = 0;
+            TOdlAstNodeTemplateNamespaceInstanciation const* templateNamespaceInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
+            TOdlAstNodeTemplateExpressionList const* templateExpressionListPointer = templateNamespaceInstanciationNode->TemplateExpressionListPointer();
+            std::vector< TOdlAstNodeExpression* > const& templateParameterExpressions =templateExpressionListPointer->TemplateParametersExpressionList();
+            for (TOdlAstNodeExpression* expression : templateParameterExpressions)
+            {
+                (*parCallback)(expression, parContext);
+            }
         }
         break ;
     default:
@@ -125,10 +135,6 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
 //-------------------------------------------------------------------------------
 static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parContext)
 {
-    #if ODL_ENABLE_VERBOSE_DEBUG
-	std::string currentDatabaseNamefordebug = parContext.DatabasePath().ToString();
-	#endif
-
     TOdlAstNodeType::TType nodeType = parAstNode->AstNodeType();
     switch (nodeType)
     {
@@ -157,14 +163,15 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
             TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
 			std::string const& objectType = GetTemplateObjectInstanciationDeclarationTypeAsString(templateObjectInstanciationNode);
 
-            TOdlDatabasePath const& objectNamespaceAndName = parContext.DatabasePath();
-            
-            // Paul(2014/12/28) Instanciation database path, to get the object back.
-            templateObjectInstanciationNode->NamedDeclarationWeakRef()->SetFullDatabasePath(objectNamespaceAndName);
+            TOdlNamedDeclarationStack const& staticNamespaceStack = parContext.StaticNamespaceStack();
+            #if ODL_ENABLE_VERBOSE_DEBUG
+            std::string debug = staticNamespaceStack.ToDatabasePathString();
+            #endif
+            templateObjectInstanciationNode->NamedDeclarationWeakRef()->SetFullDatabasePath(staticNamespaceStack);
 
 			TMetaClassBase const* objectMetaClass = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 			TOdlObject* odlObject = objectMetaClass->CreateObject();
-			TOdlDatabase::Instance().StoreObject(objectNamespaceAndName, odlObject, objectMetaClass);
+			TOdlDatabase::Instance().StoreObject(staticNamespaceStack.ToDatabasePath(), odlObject, objectMetaClass);
 		}
 		break ;
     case TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION:
@@ -173,10 +180,10 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
 			std::string fordebug = parContext.DatabasePath().ToString();
 			#endif
             TOdlAstNodeTemplateNamespaceInstanciation* templateNamespaceInstanciation = parAstNode->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
-            TOdlAstNodeNamedDeclaration* templateNamespaceNamedDeclaration = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer()->ResolvedReference();
+            TOdlAstNodeNamedDeclaration const* templateNamespaceNamedDeclaration = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer()->ResolvedReference();
             assert(templateNamespaceNamedDeclaration != nullptr);
 
-            TOdlAstNodeNamespaceDeclaration* templateNamespaceNamespaceDeclaration = templateNamespaceNamedDeclaration->CastNode<TOdlAstNodeNamespaceDeclaration>();
+            TOdlAstNodeNamespaceDeclaration const* templateNamespaceNamespaceDeclaration = templateNamespaceNamedDeclaration->CastNode<TOdlAstNodeNamespaceDeclaration>();
 
             std::vector< TOdlAstNodeNamedDeclaration* > const& namedDeclarations = templateNamespaceNamespaceDeclaration->NamespaceContent();
 		    for (size_t i = 0; i < namedDeclarations.size(); ++i)
@@ -195,12 +202,13 @@ static void InstanciateObjects(TOdlAstNode* parAstNode, TInterpretContext& parCo
 				TMetaClassBase const* objectMetaClass = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 				TOdlObject* odlObject = objectMetaClass->CreateObject();
             
-				TOdlDatabasePath const& objectNamespaceAndName = parContext.DatabasePath();
+                TOdlNamedDeclarationStack const& staticNamespaceStack = parContext.StaticNamespaceStack();
+                #if ODL_ENABLE_VERBOSE_DEBUG
+                std::string debug = staticNamespaceStack.ToDatabasePathString();
+                #endif
+                objectDeclarationNode->NamedDeclarationWeakRef()->SetFullDatabasePath(staticNamespaceStack);
 
-                // Paul(2014/12/28) Instanciation database path, to get the object back.
-                objectDeclarationNode->NamedDeclarationWeakRef()->SetFullDatabasePath(objectNamespaceAndName);
-
-				TOdlDatabase::Instance().StoreObject(objectNamespaceAndName, odlObject, objectMetaClass);
+				TOdlDatabase::Instance().StoreObject(staticNamespaceStack.ToDatabasePath(), odlObject, objectMetaClass);
 				VisitAst(parAstNode, parContext, InstanciateObjects);
 			}
         }
@@ -366,8 +374,8 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
     case TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION:
         {
             TOdlAstNodeTemplateNamespaceInstanciation* templateNamespaceInstanciation = parAstNode->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
-            TOdlAstNodeNamedDeclaration* templateNamespaceDeclarationNamedDeclarationNode = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer()->ResolvedReference();
-            TOdlAstNodeNamespaceDeclaration* templateNamespaceDeclaration = templateNamespaceDeclarationNamedDeclarationNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
+            TOdlAstNodeNamedDeclaration const* templateNamespaceDeclarationNamedDeclarationNode = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer()->ResolvedReference();
+            TOdlAstNodeNamespaceDeclaration const* templateNamespaceDeclaration = templateNamespaceDeclarationNamedDeclarationNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
             
             std::vector< TOdlAstNodeNamedDeclaration* > const& namedDeclarations = templateNamespaceDeclaration->NamespaceContent();
 		    for (size_t i = 0; i < namedDeclarations.size(); ++i)
@@ -464,18 +472,12 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 	case TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION:
 		{
             TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclarationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
-            #if ODL_ENABLE_VERBOSE_DEBUG
-            std::string debug = parContext.DatabasePath().ToString();
-            #endif
             VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
 		}
 		break;
     case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
         {
             TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstantiationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
-            #if ODL_ENABLE_VERBOSE_DEBUG
-            std::string debug = parContext.DatabasePath().ToString();
-            #endif
             VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
         };
         break ;
@@ -485,11 +487,6 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
            
             if (!objectDeclarationNode->IsNullPtr())
             {
-                TOdlAstNodeNamedDeclaration* objectDeclarationNamedObject = objectDeclarationNode->NamedDeclarationWeakRef();
-                std::string const& objectName = objectDeclarationNamedObject->IdentifierPointer()->Identifier();
-                #if ODL_ENABLE_VERBOSE_DEBUG
-                std::string debug = parContext.DatabasePath().ToString();
-                #endif
                 VisitAst(parAstNode, parContext, AutoNameAnomymousObjectDeclaration);
             }
         }
@@ -559,7 +556,7 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 
 			ResolveValueIdentifier(templateObjectInstanciationNode->TypeIdentifierPointer(), parContext);
 
-			std::vector< TOdlAstNodeExpression* > const& templateParameters = templateObjectInstanciationNode->TemplateExpressionListPointer()->TemplateExpressionParameterList();
+			std::vector< TOdlAstNodeExpression* > const& templateParameters = templateObjectInstanciationNode->TemplateExpressionListPointer()->TemplateParametersExpressionList();
 			for (size_t i = 0; i < templateParameters.size(); ++i)
 			{
 				TOdlAstNodeExpression* templateParameter = templateParameters[i];
@@ -570,8 +567,9 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
     case TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION:
         {
             TOdlAstNodeTemplateNamespaceInstanciation* templateNamespaceInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
-            TOdlAstNodeIdentifier* targetNamespaceIdentifier = templateNamespaceInstanciationNode->TargetTemplateNamespaceIdentifierPointer();
-            ResolveValueIdentifier(targetNamespaceIdentifier, parContext);
+            TOdlAstNodeIdentifier const* targetNamespaceIdentifier = templateNamespaceInstanciationNode->TargetTemplateNamespaceIdentifierPointer();
+            assert(!targetNamespaceIdentifier->IsReferenceToResolve());
+            VisitAst(templateNamespaceInstanciationNode, parContext, ResolveValueIdentifier);
         }
         break ;
     default:
@@ -579,6 +577,65 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
         break ;
     };
 }
+//-------------------------------------------------------------------------------
+void ResolveTemplateDeclarationIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parContext)
+{
+    TOdlAstNodeType::TType nodeType = parAstNode->AstNodeType();
+    switch (nodeType)
+    {
+    case TOdlAstNodeType::NAMESPACE:
+        {
+            TOdlAstNodeNamespaceDeclaration const* namespaceDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamespaceDeclaration>();
+            VisitAst(parAstNode, parContext, ResolveTemplateDeclarationIdentifier);
+        };
+        break ;
+	case TOdlAstNodeType::NAMED_DECLARATION:
+		{
+            TOdlAstNodeNamedDeclaration const* namedDeclarationNode = parAstNode->CastNode<TOdlAstNodeNamedDeclaration>();
+            VisitAst(parAstNode, parContext, ResolveTemplateDeclarationIdentifier);
+		}
+		break;
+	case TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION:
+		{
+            TOdlAstNodeTemplateObjectDeclaration const* namedDeclarationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
+            VisitAst(parAstNode, parContext, ResolveTemplateDeclarationIdentifier);
+		}
+		break ;
+	case TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION:
+		{
+            TOdlAstNodeTemplateObjectInstanciation const* templateObjectInstanciationNode = parAstNode->CastNode<TOdlAstNodeTemplateObjectInstanciation>();
+
+            TOdlNamedDeclarationStack const& staticNamespaceStack = parContext.StaticNamespaceStack();
+            #if ODL_ENABLE_VERBOSE_DEBUG
+            std::string debug = staticNamespaceStack.ToDatabasePathString();
+            #endif
+
+            TOdlAstNodeIdentifier* typeIdentifier = templateObjectInstanciationNode->TypeIdentifierPointer();
+            TOdlAstNodeNamedDeclaration const* namedDeclaration = parContext.FindTemplateDeclarationNamedDeclarationFromTemplateInstanceTargetIdentifier(typeIdentifier);
+            assert(namedDeclaration != nullptr);
+            typeIdentifier->ResolveReference(namedDeclaration);
+		}
+		break ;
+    case TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION:
+        {
+        	TOdlAstNodeTemplateNamespaceInstanciation* templateNamespaceInstanciation = parAstNode->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
+            
+            TOdlNamedDeclarationStack const& staticNamespaceStack = parContext.StaticNamespaceStack();
+            #if ODL_ENABLE_VERBOSE_DEBUG
+            std::string debug = staticNamespaceStack.ToDatabasePathString();
+            #endif
+
+            TOdlAstNodeIdentifier* targetTemplateNamespaceDeclarationIdentifier = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer();
+            TOdlAstNodeNamedDeclaration const* namedDeclaration = parContext.FindTemplateDeclarationNamedDeclarationFromTemplateInstanceTargetIdentifier(targetTemplateNamespaceDeclarationIdentifier);
+            targetTemplateNamespaceDeclarationIdentifier->ResolveReference(namedDeclaration);
+
+        }
+        break;
+    default:
+        VisitAst(parAstNode, parContext, ResolveTemplateDeclarationIdentifier);
+        break;
+    };
+};
 //-------------------------------------------------------------------------------
 static void ResolveValueIdentifiers(TOdlAstNode* parAstNode)
 {
@@ -589,10 +646,22 @@ static void ResolveValueIdentifiers(TOdlAstNode* parAstNode)
     ResolveValueIdentifier(parAstNode, context);
 }
 //-------------------------------------------------------------------------------
+void ResolveTemplateDeclarationIdentifiers(TOdlAstNode* parAstNode)
+{
+    TOdlDatabasePath databasePath;
+    TOdlNamedDeclarationStack staticNamespaceStack;
+    TOdlNamedDeclarationStack dynamicNamespaceStack;
+    TInterpretContext context(databasePath, staticNamespaceStack, dynamicNamespaceStack);
+    ResolveTemplateDeclarationIdentifier(parAstNode, context);
+}
+//-------------------------------------------------------------------------------
 void PostProcessAst(TOdlAstNode* parRootNode)
 {
     // auto name
     AutoNameAnomymousObjectDeclarations(parRootNode);
+
+    //
+    ResolveTemplateDeclarationIdentifiers(parRootNode);
 
     // link named value nodes... box ?
     ResolveValueIdentifiers(parRootNode);

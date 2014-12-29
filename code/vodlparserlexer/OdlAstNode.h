@@ -70,6 +70,7 @@ public:
         return FStack[parIndex];
     }
 
+    TOdlDatabasePath ToDatabasePath() const;
     std::string ToDatabasePathString() const;
 
 private:
@@ -149,12 +150,15 @@ public:
 
     std::string const& Identifier() const { return FIdentifier; }
     
-    void ResolveReference(TOdlAstNodeNamedDeclaration* parNodeReference)
+    void ResolveReference(TOdlAstNodeNamedDeclaration const* parNodeReference)
     {
+        assert(parNodeReference != nullptr);
+        assert(FIsReferenceToResolve);
         FResolvedReferenceWeak = parNodeReference;
+        FIsReferenceToResolve = false;
     }
 
-    TOdlAstNodeNamedDeclaration* ResolvedReference() const { return FResolvedReferenceWeak; }
+    TOdlAstNodeNamedDeclaration const* ResolvedReference() const { assert(!FIsReferenceToResolve); assert(FResolvedReferenceWeak != nullptr); return FResolvedReferenceWeak; }
 
     void SetAsReferenceToResolve() { FIsReferenceToResolve = true; }
     bool IsReferenceToResolve() const { return FIsReferenceToResolve; }
@@ -162,7 +166,7 @@ public:
 private:
     std::string FIdentifier;
     // {TODO} Paul(2014/12/23)  make a reference type to resolve.
-    TOdlAstNodeNamedDeclaration* FResolvedReferenceWeak;
+    TOdlAstNodeNamedDeclaration const* FResolvedReferenceWeak;
     bool FIsReferenceToResolve;
 };
 //-------------------------------------------------------------------------------
@@ -219,18 +223,20 @@ public:
     TOdlAstNodeTemplateParameterList const* TemplateParameterListPointer() const { return FTemplateParameterListPointer; }
     
 
-    void SetFullDatabasePath(TOdlDatabasePath const& parFullDatabasePath)
+    void SetFullDatabasePath(TOdlNamedDeclarationStack const& parFullDatabasePath)
     {
         FFullDatabasePath = parFullDatabasePath;
     }
 
-	TOdlDatabasePath const& FullDatabasePath() const { return FFullDatabasePath; }
+    TOdlNamedDeclarationStack const& StaticDatabasePath() const { return FFullDatabasePath; }
+
+	TOdlDatabasePath FullDatabasePath() const { return FFullDatabasePath.ToDatabasePath(); }
 
 private:
     TOdlAstNodeIdentifier*                  FIdentifierPointer;
     TOdlAstNodeExpression*                  FExpressionPointer;
     TOdlAstNodeTemplateParameterList*       FTemplateParameterListPointer;
-    TOdlDatabasePath	                    FFullDatabasePath;
+    TOdlNamedDeclarationStack	            FFullDatabasePath;
     bool                                    FAnonymousDeclaration;
 };
 //-------------------------------------------------------------------------------
@@ -491,7 +497,7 @@ public:
 
     virtual ~TOdlAstNodeTemplateExpressionList()
     {
-        for (TOdlAstNodeExpression* expression : FTemplateExpressionParameterList)
+        for (TOdlAstNodeExpression* expression : FTemplateParametersExpressionList)
         {
             delete expression;
         }
@@ -499,20 +505,20 @@ public:
 
     void AppendTemplateExpressionParameter(TOdlAstNodeExpression* parExpression)
     {
-        FTemplateExpressionParameterList.push_back(parExpression);
+        FTemplateParametersExpressionList.push_back(parExpression);
     }
 
-    std::vector< TOdlAstNodeExpression* > const& TemplateExpressionParameterList() const { return FTemplateExpressionParameterList; }
+    std::vector< TOdlAstNodeExpression* > const& TemplateParametersExpressionList() const { return FTemplateParametersExpressionList; }
 
     TOdlAstNodeExpression const* ExpressionByIndex(size_t parIndex) const
     {
-        assert(!FTemplateExpressionParameterList.empty());
-        assert(parIndex < FTemplateExpressionParameterList.size()); // Paul(2014/12/27) ERROR not enough parameters
-        return FTemplateExpressionParameterList[parIndex];
+        assert(!FTemplateParametersExpressionList.empty());
+        assert(parIndex < FTemplateParametersExpressionList.size()); // Paul(2014/12/27) ERROR not enough parameters
+        return FTemplateParametersExpressionList[parIndex];
     }
 
 private:
-    std::vector< TOdlAstNodeExpression* >   FTemplateExpressionParameterList;
+    std::vector< TOdlAstNodeExpression* >   FTemplateParametersExpressionList;
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************

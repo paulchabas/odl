@@ -3,32 +3,34 @@
 
 testResult is TOdlTestResult
 {
-    FDumpOutputFilename = "Data/Tests/simple_template_namespace.reference.odl"
+    FDumpOutputFilename = "Data/Tests/one_recursion_template_namespace.reference.odl"
     FTestedObject = templateNamespaceInstanciation/toto/object0
-    FExpectedOutputFilename = "Data/Tests/simple_template_namespace.reference.odl"
+    FExpectedOutputFilename = "Data/Tests/one_recursion_template_namespace.reference.odl"
 }
 
 
 namespace templateUberNameSpace(c)
 {
+    namespace titi = templateNamespace0(c * 8, false)
 
-    namespace templateNamespace0(b)
+    namespace templateNamespace0(b, d)
     {
+        object1 is templateObject0(7777, b - 1)
 
         template templateObject0 is TOdlTestClassBase(a, b)
         {
-            FBool = b
+            FBool = d
             FFloat = a / 2 + 1
-            FInteger = a
+            FInteger = b
         }
 
         object0 is templateObject0(8888, b)
     }
 
-    namespace toto = templateNamespace0(c)
+    namespace toto = templateNamespace0(c * 4, false)
 }
 
-namespace templateNamespaceInstanciation = templateUberNameSpace(true)
+namespace templateNamespaceInstanciation = templateUberNameSpace(2)
 
 
 

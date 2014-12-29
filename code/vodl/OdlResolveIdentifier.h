@@ -28,7 +28,9 @@ public:
     TOdlNamedDeclarationStack& StaticNamespaceStack() { return FStaticNamespaceStack; }
     TOdlNamedDeclarationStack& DynamicNamespaceStack() { return FDynamicNamespaceStack; }
 
-    TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
+    TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplateDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
+    
+    TOdlAstNodeNamedDeclaration const* FindTemplateDeclarationNamedDeclarationFromTemplateInstanceTargetIdentifier(TOdlAstNodeIdentifier const* parSearchedTemplateDeclarationIdentifier) const;
 
 private:
     TOdlDatabasePath& FDatabasePath;

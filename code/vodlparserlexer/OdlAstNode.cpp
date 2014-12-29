@@ -61,7 +61,7 @@ void TOdlAstNode::PrettyPrintWithIndentLevel(std::ostringstream& parOss, int par
             TOdlAstNodeTemplateExpressionList const* that = CastNode<TOdlAstNodeTemplateExpressionList>();
             parOss << '(';
             bool printComma = false;
-            for (TOdlAstNodeExpression const* parameter : that->TemplateExpressionParameterList())
+            for (TOdlAstNodeExpression const* parameter : that->TemplateParametersExpressionList())
             {
                 if (printComma)
                     parOss << ", ";
@@ -494,6 +494,22 @@ std::string TOdlNamedDeclarationStack::ToDatabasePathString() const
     }
 
     return oss.str();
+}
+//-------------------------------------------------------------------------------
+TOdlDatabasePath TOdlNamedDeclarationStack::ToDatabasePath() const
+{
+    TOdlDatabasePath databasePathResult;
+    for (size_t i = 0; i < FStack.size(); ++i)
+    {
+        TOdlAstNodeNamedDeclaration const* namedDeclaration = FStack[i];
+        TOdlAstNodeIdentifier const* identifier = namedDeclaration->IdentifierPointer_IFP();
+        if (identifier != nullptr)
+        {
+            databasePathResult.push_back(identifier->Identifier());
+        }
+    }
+
+    return databasePathResult;
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************

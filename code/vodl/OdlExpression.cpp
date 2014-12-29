@@ -456,7 +456,7 @@ TOdlExpression EvalExpression(TEvalExpressionContext& parContext, TOdlAstNodeExp
                     TOdlAstNodeNamedDeclaration const* templatedNamedDeclaration = templateParameter->TemplateHolderWeakReference();
                         
                     // find the good template instanciation node expression.
-                    TOdlAstNodeExpression const* templateInstanciationExpression = parContext.InterpretContext().FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(templatedNamedDeclaration, templateParameterIndex);
+                    TOdlAstNodeExpression const* templateInstanciationExpression = parContext.InterpretContext().FindTemplateInstanciationExpressionFromTemplateDeclarationAndParameterIndexAssumeExists(templatedNamedDeclaration, templateParameterIndex);
                     searchExpression = templateInstanciationExpression;
 
                     assert(searchExpression); // {TODO} Paul(2014/12/26)  check error for invalid parameters.

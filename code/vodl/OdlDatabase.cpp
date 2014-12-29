@@ -39,8 +39,11 @@ void TOdlObjectDatabase::DestroyContent()
 void TOdlObjectDatabase::StoreObject(TOdlDatabasePath const& parDatabasePath, TOdlObject* parObject, TMetaClassBase const* parMetaClassBase)
 {
     assert(parMetaClassBase != nullptr);
+    assert(!parDatabasePath.empty());
     
+    #if ODL_ENABLE_VERBOSE_DEBUG
 	std::string forDebug = parDatabasePath.ToString();
+    #endif
 
     TObjectsByPaths::iterator it = FObjectsByPaths.lower_bound(parDatabasePath);
     if (it != FObjectsByPaths.end())
@@ -52,7 +55,7 @@ void TOdlObjectDatabase::StoreObject(TOdlDatabasePath const& parDatabasePath, TO
         }
     }
 
-    FObjectsByPaths[parDatabasePath] = TObjectAndMetaClass(parObject, parMetaClassBase);
+    FObjectsByPaths.insert(it, std::pair< TOdlDatabasePath, TObjectAndMetaClass >(parDatabasePath, TObjectAndMetaClass(parObject, parMetaClassBase)));
     FMetaClassByObjects[parObject] = parMetaClassBase;
 }
 //--------------------------------------------------------

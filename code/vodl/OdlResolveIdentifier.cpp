@@ -31,8 +31,7 @@ static TOdlAstNodeNamedDeclaration* FindTemplateParameter(TOdlAstNodeTemplatePar
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TInterpretContext const& parContext,
-                                                              TOdlAstNodeNamedDeclaration const* parNamespaceCandidate,
+static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TOdlAstNodeNamedDeclaration const* parNamespaceCandidate,
                                                               std::string const& parIdentifierToResolve,
                                                               bool parSearchInTemplateParameters)
 {
@@ -47,13 +46,12 @@ static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TInterpretContext 
             {
                 #if ODL_ENABLE_VERBOSE_DEBUG
                 TOdlAstNodeTemplateObjectDeclaration const* templateObjectDeclarationNode = expression->CastNode<TOdlAstNodeTemplateObjectDeclaration>();
-                std::string const& pathDebug = parContext.DatabasePath().ToString();
                 #endif
 
                 TOdlAstNodeTemplateParameterList const* templateParameterListPointer = parNamespaceCandidate->TemplateParameterListPointer();
                 foundReference = FindTemplateParameter(templateParameterListPointer, parIdentifierToResolve);
             }
-            else if (expression->AstNodeType())
+            else
             {
                 int a = 0;
             }
@@ -62,10 +60,6 @@ static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TInterpretContext 
     else if (parNamespaceCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
     {
         TOdlAstNodeNamespaceDeclaration const* typedNamespaceCandidate = parNamespaceCandidate->CastNode<TOdlAstNodeNamespaceDeclaration>();
-        #if ODL_ENABLE_VERBOSE_DEBUG
-        std::string pathDebug = parContext.DatabasePath().ToString();
-        #endif
-
         // search in namespace content first.
         std::vector< TOdlAstNodeNamedDeclaration* > const& namespaceContent = typedNamespaceCandidate->NamespaceContent();
         for (size_t j = 0; j < namespaceContent.size(); ++j)
@@ -166,7 +160,7 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
         {
             size_t const invI = parentNamespaceCount - i - 1;
             TOdlAstNodeNamedDeclaration const* namespaceCandidate = parentNamespaces[invI];
-            foundReference = FindIdentifierInNamespace(parContext, namespaceCandidate, identifierToResolve, true);
+            foundReference = FindIdentifierInNamespace(namespaceCandidate, identifierToResolve, true);
             if (foundReference != nullptr)
                 break ;
         }	
@@ -187,7 +181,7 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
                 {
                     std::string const& searchedChildNamespace = searchedNameSpaceDatabasePath[i].ToString();
 
-                    TOdlAstNodeNamedDeclaration const* nextChildNamespace = FindIdentifierInNamespace(parContext, childNamespace, searchedChildNamespace, false);
+                    TOdlAstNodeNamedDeclaration const* nextChildNamespace = FindIdentifierInNamespace(childNamespace, searchedChildNamespace, false);
                     assert(nextChildNamespace != nullptr);
 
                     // check for template namespace 
@@ -197,18 +191,7 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
                         TOdlAstNodeTemplateNamespaceInstanciation const* templateNamespaceInstanciation = namedDeclarationExpression->CastNode<TOdlAstNodeTemplateNamespaceInstanciation>();
 
                         TOdlAstNodeIdentifier const* targetNamespaceDeclarationIdentifier = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer();
-
-                        #if ODL_ENABLE_VERBOSE_DEBUG
-                        std::string staticPath = parContext.StaticNamespaceStack().ToDatabasePathString();
-                        std::string dynamicPath = parContext.DynamicNamespaceStack().ToDatabasePathString();
-                        #endif
-
-
-                        // {TODO} Paul(2014/12/29) HERE: use the real database storage context maybe instead of the static declaration paths...
-                        //// Paul(2014/12/28)  unifier... X(
-                        //TInterpretContext newContext(parContext.DatabasePath(), parC
-
-                        TOdlAstNodeNamedDeclaration const* templateNamespaceDeclaration = ResolveIdentifier(parContext, targetNamespaceDeclarationIdentifier);
+                        TOdlAstNodeNamedDeclaration const* templateNamespaceDeclaration = targetNamespaceDeclarationIdentifier->ResolvedReference();
                         nextChildNamespace = templateNamespaceDeclaration;
                     }
 
@@ -222,7 +205,7 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
                 // 3) search for the final named value and resolve.
                 TOdlAstNodeNamedDeclaration const* finalNamespace = childNamespace;
                 std::string const& identifierToResolve = searchedNameSpaceDatabasePath.back().ToString();
-                foundReference = FindIdentifierInNamespace(parContext, finalNamespace, identifierToResolve, false);
+                foundReference = FindIdentifierInNamespace(finalNamespace, identifierToResolve, false);
             }
         }
     }
@@ -294,7 +277,7 @@ void TInterpretContext::LeaveTemplateObjectInstanciation(TOdlAstNodeNamedDeclara
     FDynamicNamespaceStack.Pop(parTemplateObjectInstanciation);
 }
 //-------------------------------------------------------------------------------
-TOdlAstNodeExpression const* TInterpretContext::FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const
+TOdlAstNodeExpression const* TInterpretContext::FindTemplateInstanciationExpressionFromTemplateDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const
 {
     assert(!FDynamicNamespaceStack.Empty());
 
@@ -361,6 +344,39 @@ TOdlAstNodeExpression const* TInterpretContext::FindTemplateInstanciationExpress
     TOdlAstNodeExpression const* expressionResult = templateInstanciationExpressionList->ExpressionByIndex(parExpressionIndex);
     assert(expressionResult != nullptr);
     return expressionResult;
+}
+//-------------------------------------------------------------------------------
+TOdlAstNodeNamedDeclaration const* TInterpretContext::FindTemplateDeclarationNamedDeclarationFromTemplateInstanceTargetIdentifier(TOdlAstNodeIdentifier const* parSearchedTemplateDeclarationIdentifier) const
+{
+    std::string const& searchedTemplateDeclarationName = parSearchedTemplateDeclarationIdentifier->Identifier();
+
+    size_t const namespaceCount = FStaticNamespaceStack.Size();
+    for (size_t i = 0; i < namespaceCount; ++i)
+    {
+        size_t const invI = namespaceCount - i - 1;
+        TOdlAstNodeNamedDeclaration const* namedDeclarationCandidate = FStaticNamespaceStack[invI];
+        TOdlAstNodeIdentifier const* namedDeclarationCandidateIdentifier = namedDeclarationCandidate->IdentifierPointer_IFP();
+
+        if (namedDeclarationCandidate->AstNodeType() == TOdlAstNodeType::NAMESPACE)
+        {
+            TOdlAstNodeNamedDeclaration const* result = FindIdentifierInNamespace(namedDeclarationCandidate, searchedTemplateDeclarationName, false);
+            if (result != nullptr)
+                return result;
+        }
+        else if (namedDeclarationCandidate->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION)
+        {
+            TOdlAstNodeExpression const* expressionPointer = namedDeclarationCandidate->ExpressionPointer();
+            if (expressionPointer->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION)
+            {
+                if (namedDeclarationCandidateIdentifier->Identifier() == searchedTemplateDeclarationName)
+                {
+                    return namedDeclarationCandidate;
+                }
+            }
+        }
+    }
+
+    return nullptr;
 }
 //-------------------------------------------------------------------------------
 //*******************************************************************************
