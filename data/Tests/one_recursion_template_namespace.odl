@@ -1,0 +1,34 @@
+
+
+
+testResult is TOdlTestResult
+{
+    FDumpOutputFilename = "Data/Tests/simple_template_namespace.reference.odl"
+    FTestedObject = templateNamespaceInstanciation/toto/object0
+    FExpectedOutputFilename = "Data/Tests/simple_template_namespace.reference.odl"
+}
+
+
+namespace templateUberNameSpace(c)
+{
+
+    namespace templateNamespace0(b)
+    {
+
+        template templateObject0 is TOdlTestClassBase(a, b)
+        {
+            FBool = b
+            FFloat = a / 2 + 1
+            FInteger = a
+        }
+
+        object0 is templateObject0(8888, b)
+    }
+
+    namespace toto = templateNamespace0(c)
+}
+
+namespace templateNamespaceInstanciation = templateUberNameSpace(true)
+
+
+
