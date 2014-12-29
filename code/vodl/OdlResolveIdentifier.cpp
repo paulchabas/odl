@@ -108,7 +108,7 @@ static TOdlAstNodeNamedDeclaration* FindIdentifierInNamespace(TInterpretContext 
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-TOdlAstNodeNamedDeclaration const* FindNamespace(TNamedDeclarationStack const& parParentNamespaces, std::string const& parRootNamespaceToFind)
+TOdlAstNodeNamedDeclaration const* FindNamespace(TOdlNamedDeclarationStack const& parParentNamespaces, std::string const& parRootNamespaceToFind)
 {
     TOdlAstNodeNamedDeclaration const* rootNamespace = nullptr;
 
@@ -147,7 +147,7 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
 {
     TOdlAstNodeNamedDeclaration* foundReference = nullptr;
 
-    TNamedDeclarationStack const& parentNamespaces = parContext.StaticNamespaceStack();
+    TOdlNamedDeclarationStack const& parentNamespaces = parContext.StaticNamespaceStack();
 
     size_t const parentNamespaceCount = parentNamespaces.Size();
     std::string const& fullIdentifierToResolve = identifierNode->Identifier();
@@ -198,6 +198,12 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
 
                         TOdlAstNodeIdentifier const* targetNamespaceDeclarationIdentifier = templateNamespaceInstanciation->TargetTemplateNamespaceIdentifierPointer();
 
+                        #if ODL_ENABLE_VERBOSE_DEBUG
+                        std::string staticPath = parContext.StaticNamespaceStack().ToDatabasePathString();
+                        std::string dynamicPath = parContext.DynamicNamespaceStack().ToDatabasePathString();
+                        #endif
+
+
                         // {TODO} Paul(2014/12/29) HERE: use the real database storage context maybe instead of the static declaration paths...
                         //// Paul(2014/12/28)  unifier... X(
                         //TInterpretContext newContext(parContext.DatabasePath(), parC
@@ -229,8 +235,8 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
 //*******************************************************************************
 //-------------------------------------------------------------------------------
 TInterpretContext::TInterpretContext(TOdlDatabasePath& parDatabasePath, 
-                                     TNamedDeclarationStack& parStaticNamespaceStack,
-                                     TNamedDeclarationStack& parDynamicNamespaceStack) :
+                                     TOdlNamedDeclarationStack& parStaticNamespaceStack,
+                                     TOdlNamedDeclarationStack& parDynamicNamespaceStack) :
     FDatabasePath(parDatabasePath),
     FStaticNamespaceStack(parStaticNamespaceStack),
     FDynamicNamespaceStack(parDynamicNamespaceStack)

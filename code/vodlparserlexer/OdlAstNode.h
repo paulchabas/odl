@@ -36,7 +36,7 @@ namespace TOdlAstNodeType
         VALUE_BOOLEAN                           = 19 | VALUE_MASK,
 	};
 }
-
+//-------------------------------------------------------------------------------
 namespace TOdlAstNodeOperatorType
 {
     enum TType
@@ -49,6 +49,32 @@ namespace TOdlAstNodeOperatorType
         OPERATOR_MODULO,
     };
 }
+//-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+class TOdlAstNodeNamedDeclaration;
+//-------------------------------------------------------------------------------
+class TOdlNamedDeclarationStack
+{
+public:
+    TOdlNamedDeclarationStack();
+
+    void Push(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
+    void Pop(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
+
+    bool Empty() const { return FStack.empty(); }
+    size_t Size() const { return FStack.size(); }
+
+    TOdlAstNodeNamedDeclaration const* operator [] (int parIndex) const
+    {
+        return FStack[parIndex];
+    }
+
+    std::string ToDatabasePathString() const;
+
+private:
+    std::vector< TOdlAstNodeNamedDeclaration const* > FStack;
+};
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------

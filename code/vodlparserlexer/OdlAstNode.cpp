@@ -461,5 +461,41 @@ void TOdlAstNodeNamedDeclaration::SetTemplateParameterListPointer(TOdlAstNodeTem
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
+TOdlNamedDeclarationStack::TOdlNamedDeclarationStack()
+{
 
+}
+//-------------------------------------------------------------------------------
+void TOdlNamedDeclarationStack::Push(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
+{
+    FStack.push_back(parNamedDeclaration);
+}
+//-------------------------------------------------------------------------------
+void TOdlNamedDeclarationStack::Pop(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
+{
+    assert(!FStack.empty());
+    assert(FStack.back() == parNamedDeclaration);
+    FStack.pop_back();
+}
+//-------------------------------------------------------------------------------
+std::string TOdlNamedDeclarationStack::ToDatabasePathString() const
+{
+    std::ostringstream oss;
+    for (size_t i = 0; i < FStack.size(); ++i)
+    {
+        TOdlAstNodeNamedDeclaration const* namedDeclaration = FStack[i];
+        TOdlAstNodeIdentifier const* identifier = namedDeclaration->IdentifierPointer_IFP();
+        if (identifier != nullptr)
+        {
+            oss << identifier->Identifier();
+            if (i + 1 < FStack.size())
+                oss << '/';
+        }
+    }
+
+    return oss.str();
+}
+//-------------------------------------------------------------------------------
+//*******************************************************************************
+//-------------------------------------------------------------------------------
 } // namespace odl

@@ -245,8 +245,8 @@ struct TFillObjectPropertiesInterpretContext : public TInterpretContext
 public:
 
 	TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath,
-                                          TNamedDeclarationStack& parStaticNamespaceStack,
-                                          TNamedDeclarationStack& parDynamicNamespaceStack,
+                                          TOdlNamedDeclarationStack& parStaticNamespaceStack,
+                                          TOdlNamedDeclarationStack& parDynamicNamespaceStack,
                                           TOdlObject* parCurrentObject, 
                                           TMetaClassBase const* parMetaClass) :
         TInterpretContext(parDatabasePath, parStaticNamespaceStack, parDynamicNamespaceStack),
@@ -503,8 +503,8 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 static void AutoNameAnomymousObjectDeclarations(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
-    TNamedDeclarationStack staticNamespaceStack;
-    TNamedDeclarationStack dynamicNamespaceStack;
+    TOdlNamedDeclarationStack staticNamespaceStack;
+    TOdlNamedDeclarationStack dynamicNamespaceStack;
     TInterpretContext context(databasePath, staticNamespaceStack, dynamicNamespaceStack);
     VisitAst(parAstNode, context, AutoNameAnomymousObjectDeclaration);
 }
@@ -583,8 +583,8 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 static void ResolveValueIdentifiers(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
-    TNamedDeclarationStack staticNamespaceStack;
-    TNamedDeclarationStack dynamicNamespaceStack;
+    TOdlNamedDeclarationStack staticNamespaceStack;
+    TOdlNamedDeclarationStack dynamicNamespaceStack;
     TInterpretContext context(databasePath, staticNamespaceStack, dynamicNamespaceStack);
     ResolveValueIdentifier(parAstNode, context);
 }
@@ -607,8 +607,8 @@ void InterpretAst(TOdlAstNode* parAstNode)
         {
             // create objets
             TOdlDatabasePath databasePath;
-            TNamedDeclarationStack staticNamespaceStack;
-            TNamedDeclarationStack dynamicNamespaceStack;
+            TOdlNamedDeclarationStack staticNamespaceStack;
+            TOdlNamedDeclarationStack dynamicNamespaceStack;
             TInterpretContext InstanciateObjectContext(databasePath, staticNamespaceStack, dynamicNamespaceStack);
             VisitAst(parAstNode, InstanciateObjectContext, InstanciateObjects);
             

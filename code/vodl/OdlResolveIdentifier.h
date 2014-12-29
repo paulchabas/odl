@@ -9,65 +9,12 @@ namespace odl
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-class TNamedDeclarationStack
-{
-public:
-    TNamedDeclarationStack()
-    {
-
-    }
-
-    void Push(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
-    {
-        FStack.push_back(parNamedDeclaration);
-    }
-
-    void Pop(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
-    {
-        assert(!FStack.empty());
-        assert(FStack.back() == parNamedDeclaration);
-        FStack.pop_back();
-    }
-
-    bool Empty() const { return FStack.empty(); }
-
-    size_t Size() const { return FStack.size(); }
-
-    TOdlAstNodeNamedDeclaration const* operator [] (int parIndex) const
-    {
-        return FStack[parIndex];
-    }
-
-    std::string ToDatabasePathString() const
-    {
-        std::ostringstream oss;
-        for (size_t i = 0; i < FStack.size(); ++i)
-        {
-            TOdlAstNodeNamedDeclaration const* namedDeclaration = FStack[i];
-            TOdlAstNodeIdentifier const* identifier = namedDeclaration->IdentifierPointer_IFP();
-            if (identifier != nullptr)
-            {
-                oss << identifier->Identifier();
-                if (i + 1 < FStack.size())
-                    oss << '/';
-            }
-        }
-
-        return oss.str();
-    }
-
-private:
-    std::vector< TOdlAstNodeNamedDeclaration const* > FStack;
-};
-//-------------------------------------------------------------------------------
-//*******************************************************************************
-//-------------------------------------------------------------------------------
 class TInterpretContext
 {
 public:
     TInterpretContext(TOdlDatabasePath& parDatabasePath,
-                      TNamedDeclarationStack& parStaticNamespaceStack,
-                      TNamedDeclarationStack& parDynamicNamespaceStack);
+                      TOdlNamedDeclarationStack& parStaticNamespaceStack,
+                      TOdlNamedDeclarationStack& parDynamicNamespaceStack);
 
     void EnterNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
     void LeaveNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
@@ -78,15 +25,15 @@ public:
     TOdlDatabasePath& DatabasePath() { return FDatabasePath; }
     TOdlDatabasePath const& DatabasePath() const { return FDatabasePath; }
     
-    TNamedDeclarationStack& StaticNamespaceStack() { return FStaticNamespaceStack; }
-    TNamedDeclarationStack& DynamicNamespaceStack() { return FDynamicNamespaceStack; }
+    TOdlNamedDeclarationStack& StaticNamespaceStack() { return FStaticNamespaceStack; }
+    TOdlNamedDeclarationStack& DynamicNamespaceStack() { return FDynamicNamespaceStack; }
 
     TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
 
 private:
     TOdlDatabasePath& FDatabasePath;
-    TNamedDeclarationStack& FStaticNamespaceStack;  // static declaration stack, used for identifier resolution in scopes.
-    TNamedDeclarationStack& FDynamicNamespaceStack; // template instanciation stack to get the final OdlDatabase::Instance().GetObject address.
+    TOdlNamedDeclarationStack& FStaticNamespaceStack;  // static declaration stack, used for identifier resolution in scopes.
+    TOdlNamedDeclarationStack& FDynamicNamespaceStack; // template instanciation stack to get the final OdlDatabase::Instance().GetObject address.
 };
 //-------------------------------------------------------------------------------
 //*******************************************************************************
