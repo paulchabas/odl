@@ -82,7 +82,7 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
                 TOdlAstNode* namedDeclaration = namedDeclarations[i];
                 (*parCallback)(namedDeclaration, parContext);
             }
-            parContext.LeaveNamespace();
+            parContext.LeaveNamespace(namespaceDeclarationNode);
         }
         break ;
 	case TOdlAstNodeType::NAMED_DECLARATION:
@@ -95,7 +95,7 @@ void VisitAst(TOdlAstNode* parAstNode, TInterpretContext& parContext, TAstOperat
             parContext.EnterNamespace(namedDeclarationNode);
 			TOdlAstNode* expression = namedDeclarationNode->ExpressionPointer();
 			(*parCallback)(expression, parContext);
-            parContext.LeaveNamespace();
+            parContext.LeaveNamespace(namedDeclarationNode);
         }
 		break ;
     case TOdlAstNodeType::TEMPLATE_OBJECT_DECLARATION:
@@ -295,7 +295,7 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
                 bool const isTemplateInstanciationNamedDeclaration = IsTemplateInstanciationNamedDeclaration(namespaceDeclarationNode);
                 context.EnterNamespace(namespaceDeclarationNode);
                 if (isTemplateInstanciationNamedDeclaration)
-                    context.TemplateInstanciationNodeStack().EnterTemplateObjectInstanciation(namespaceDeclarationNode);
+                    context.EnterTemplateObjectInstanciation(namespaceDeclarationNode);
                 std::vector< TOdlAstNodeNamedDeclaration* > const& namedDeclarations = namespaceDeclarationNode->NamespaceContent();
 		        for (size_t i = 0; i < namedDeclarations.size(); ++i)
                 {
@@ -303,8 +303,8 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
                     FillObjectsProperties(namedDeclaration, parContext);
                 }
                 if (isTemplateInstanciationNamedDeclaration)
-                    context.TemplateInstanciationNodeStack().LeaveTemplateObjectInstanciation(namespaceDeclarationNode);
-                context.LeaveNamespace();
+                    context.LeaveTemplateObjectInstanciation(namespaceDeclarationNode);
+                context.LeaveNamespace(namespaceDeclarationNode);
             }
         }
         break ;
@@ -317,12 +317,12 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
                 context.EnterNamespace(namedDeclarationNode);
                 bool const isTemplateInstanciationNamedDeclaration = IsTemplateInstanciationNamedDeclaration(namedDeclarationNode);
                 if (isTemplateInstanciationNamedDeclaration)
-                    context.TemplateInstanciationNodeStack().EnterTemplateObjectInstanciation(namedDeclarationNode);
+                    context.EnterTemplateObjectInstanciation(namedDeclarationNode);
                 TOdlAstNode* expression = namedDeclarationNode->ExpressionPointer();
                 FillObjectsProperties(expression, parContext);
                 if (isTemplateInstanciationNamedDeclaration)
-                    context.TemplateInstanciationNodeStack().LeaveTemplateObjectInstanciation(namedDeclarationNode);
-                context.LeaveNamespace();
+                    context.LeaveTemplateObjectInstanciation(namedDeclarationNode);
+                context.LeaveNamespace(namedDeclarationNode);
             }
         }
         break ;
