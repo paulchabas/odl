@@ -614,8 +614,8 @@ void InterpretAst(TOdlAstNode* parAstNode)
             
             // fill objets properties.
             assert(databasePath.empty());
-            assert(staticNamespaceStack.empty());
-            assert(dynamicNamespaceStack.empty());
+            assert(staticNamespaceStack.Empty());
+            assert(dynamicNamespaceStack.Empty());
             TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, staticNamespaceStack, dynamicNamespaceStack, nullptr, nullptr);
             VisitAst(parAstNode, fillObjectsPropertiesContext, FillObjectsProperties);
         };

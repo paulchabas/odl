@@ -9,7 +9,38 @@ namespace odl
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-typedef std::vector< TOdlAstNodeNamedDeclaration const* > TNamedDeclarationStack;
+class TNamedDeclarationStack
+{
+public:
+    TNamedDeclarationStack()
+    {
+
+    }
+
+    void Push(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
+    {
+        FStack.push_back(parNamedDeclaration);
+    }
+
+    void Pop(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
+    {
+        assert(!FStack.empty());
+        assert(FStack.back() == parNamedDeclaration);
+        FStack.pop_back();
+    }
+
+    bool Empty() const { return FStack.empty(); }
+
+    size_t Size() const { return FStack.size(); }
+
+    TOdlAstNodeNamedDeclaration const* operator [] (int parIndex) const
+    {
+        return FStack[parIndex];
+    }
+
+private:
+    std::vector< TOdlAstNodeNamedDeclaration const* > FStack;
+};
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------

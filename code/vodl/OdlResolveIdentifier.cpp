@@ -112,7 +112,7 @@ TOdlAstNodeNamedDeclaration const* FindNamespace(TNamedDeclarationStack const& p
 {
     TOdlAstNodeNamedDeclaration const* rootNamespace = nullptr;
 
-    size_t const parentNamespaceCount = parParentNamespaces.size();
+    size_t const parentNamespaceCount = parParentNamespaces.Size();
     for (size_t i = 0; i < parentNamespaceCount; ++i)
     {
         size_t const invI = parentNamespaceCount - i - 1;
@@ -149,7 +149,7 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
 
     TNamedDeclarationStack const& parentNamespaces = parContext.StaticNamespaceStack();
 
-    size_t const parentNamespaceCount = parentNamespaces.size();
+    size_t const parentNamespaceCount = parentNamespaces.Size();
     std::string const& fullIdentifierToResolve = identifierNode->Identifier();
 
     #if ODL_ENABLE_VERBOSE_DEBUG
@@ -248,26 +248,24 @@ void TInterpretContext::EnterNamespace(TOdlAstNodeNamedDeclaration const* parNam
     if (identifier == nullptr)
     {
         // intend to detect root namespace...
-        assert(FStaticNamespaceStack.empty());
+        assert(FStaticNamespaceStack.Empty());
     }
     else
     {
         FDatabasePath.push_back(identifier->Identifier());
     }
-    FStaticNamespaceStack.push_back(parNamedDeclaration);
+    FStaticNamespaceStack.Push(parNamedDeclaration);
 }
 //-------------------------------------------------------------------------------
 void TInterpretContext::LeaveNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
 {
-    TOdlAstNodeNamedDeclaration const* namedDeclaration = FStaticNamespaceStack.back();
-    assert(namedDeclaration == parNamedDeclaration);
-    TOdlAstNodeIdentifier const* identifier = namedDeclaration->IdentifierPointer_IFP();
+    TOdlAstNodeIdentifier const* identifier = parNamedDeclaration->IdentifierPointer_IFP();
     if (identifier != nullptr)
     {
         assert(FDatabasePath.back() == TOdlDatabaseToken(identifier->Identifier()));
         FDatabasePath.pop_back();
     }
-    FStaticNamespaceStack.pop_back();
+    FStaticNamespaceStack.Pop(parNamedDeclaration);
 }
 //-------------------------------------------------------------------------------
 void TInterpretContext::EnterTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation)
@@ -277,7 +275,7 @@ void TInterpretContext::EnterTemplateObjectInstanciation(TOdlAstNodeNamedDeclara
     assert(expression != nullptr);
     assert(expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION || expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION);
 #endif
-    FDynamicNamespaceStack.push_back(parTemplateObjectInstanciation);
+    FDynamicNamespaceStack.Push(parTemplateObjectInstanciation);
 }
 //-------------------------------------------------------------------------------
 void TInterpretContext::LeaveTemplateObjectInstanciation(TOdlAstNodeNamedDeclaration const* parTemplateObjectInstanciation)
@@ -287,22 +285,19 @@ void TInterpretContext::LeaveTemplateObjectInstanciation(TOdlAstNodeNamedDeclara
     assert(expression != nullptr);
     assert(expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_OBJECT_INSTANCIATION || expression->AstNodeType() == TOdlAstNodeType::TEMPLATE_NAMESPACE_INSTANCIATION);
     #endif
-
-    assert(!FDynamicNamespaceStack.empty());
-    assert(FDynamicNamespaceStack.back() == parTemplateObjectInstanciation);
-    FDynamicNamespaceStack.pop_back();
+    FDynamicNamespaceStack.Pop(parTemplateObjectInstanciation);
 }
 //-------------------------------------------------------------------------------
 TOdlAstNodeExpression const* TInterpretContext::FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const
 {
-    assert(!FDynamicNamespaceStack.empty());
+    assert(!FDynamicNamespaceStack.Empty());
 
     std::string const& searchedTemplateDeclarationName = parNamedDeclarationOfTemplateDeclaration->IdentifierPointer()->Identifier();
 
     TOdlAstNodeNamedDeclaration const* searchedTemplateInstanciationNode = nullptr;
-    for (size_t i = 0; i < FDynamicNamespaceStack.size(); ++i)
+    for (size_t i = 0; i < FDynamicNamespaceStack.Size(); ++i)
     {
-        size_t const invI = FDynamicNamespaceStack.size() - i - 1;
+        size_t const invI = FDynamicNamespaceStack.Size() - i - 1;
         TOdlAstNodeNamedDeclaration const* templateInstanciationNamedDeclarationCandidate = FDynamicNamespaceStack[invI];
 
         // Paul(2014/12/27) template object node.
