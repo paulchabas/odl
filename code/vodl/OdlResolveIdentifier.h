@@ -16,7 +16,9 @@ typedef std::vector< TOdlAstNodeNamedDeclaration const* > TNamedDeclarationStack
 class TInterpretContext
 {
 public:
-    TInterpretContext(TOdlDatabasePath& parDatabasePath, TNamedDeclarationStack& parDynamicNamespaceStack);
+    TInterpretContext(TOdlDatabasePath& parDatabasePath,
+                      TNamedDeclarationStack& parStaticNamespaceStack,
+                      TNamedDeclarationStack& parDynamicNamespaceStack);
 
     void EnterNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
     void LeaveNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration);
@@ -33,8 +35,8 @@ public:
     TOdlAstNodeExpression const* FindTemplateInstanciationExpressionFromTemplatetDeclarationAndParameterIndexAssumeExists(TOdlAstNodeNamedDeclaration const* parNamedDeclarationOfTemplateDeclaration, size_t parExpressionIndex) const;
 
 private:
-    TNamedDeclarationStack FStaticNamespaceStack;         // static declaration stack, used for identifier resolution in scopes.
     TOdlDatabasePath& FDatabasePath;
+    TNamedDeclarationStack& FStaticNamespaceStack;  // static declaration stack, used for identifier resolution in scopes.
     TNamedDeclarationStack& FDynamicNamespaceStack; // template instanciation stack to get the final OdlDatabase::Instance().GetObject address.
 };
 //-------------------------------------------------------------------------------

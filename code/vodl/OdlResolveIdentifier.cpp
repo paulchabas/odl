@@ -228,8 +228,11 @@ TOdlAstNodeNamedDeclaration* ResolveIdentifier(TInterpretContext& parContext, TO
 //-------------------------------------------------------------------------------
 //*******************************************************************************
 //-------------------------------------------------------------------------------
-TInterpretContext::TInterpretContext(TOdlDatabasePath& parDatabasePath, TNamedDeclarationStack& parDynamicNamespaceStack) :
+TInterpretContext::TInterpretContext(TOdlDatabasePath& parDatabasePath, 
+                                     TNamedDeclarationStack& parStaticNamespaceStack,
+                                     TNamedDeclarationStack& parDynamicNamespaceStack) :
     FDatabasePath(parDatabasePath),
+    FStaticNamespaceStack(parStaticNamespaceStack),
     FDynamicNamespaceStack(parDynamicNamespaceStack)
 {
 
@@ -238,7 +241,7 @@ TInterpretContext::TInterpretContext(TOdlDatabasePath& parDatabasePath, TNamedDe
 void TInterpretContext::EnterNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
 {
     assert(parNamedDeclaration->AstNodeType() == TOdlAstNodeType::NAMESPACE ||
-        parNamedDeclaration->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION);
+           parNamedDeclaration->AstNodeType() == TOdlAstNodeType::NAMED_DECLARATION);
 
     TOdlAstNodeIdentifier const* identifier = parNamedDeclaration->IdentifierPointer_IFP();
     // root namespace has no name.
@@ -253,7 +256,7 @@ void TInterpretContext::EnterNamespace(TOdlAstNodeNamedDeclaration const* parNam
     }
     FStaticNamespaceStack.push_back(parNamedDeclaration);
 }
-
+//-------------------------------------------------------------------------------
 void TInterpretContext::LeaveNamespace(TOdlAstNodeNamedDeclaration const* parNamedDeclaration)
 {
     TOdlAstNodeNamedDeclaration const* namedDeclaration = FStaticNamespaceStack.back();

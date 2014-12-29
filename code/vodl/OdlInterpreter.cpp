@@ -245,10 +245,11 @@ struct TFillObjectPropertiesInterpretContext : public TInterpretContext
 public:
 
 	TFillObjectPropertiesInterpretContext(TOdlDatabasePath& parDatabasePath,
+                                          TNamedDeclarationStack& parStaticNamespaceStack,
                                           TNamedDeclarationStack& parDynamicNamespaceStack,
                                           TOdlObject* parCurrentObject, 
                                           TMetaClassBase const* parMetaClass) :
-        TInterpretContext(parDatabasePath, parDynamicNamespaceStack),
+        TInterpretContext(parDatabasePath, parStaticNamespaceStack, parDynamicNamespaceStack),
         FCurrentObject(parCurrentObject),
         FMetaClassBase(parMetaClass)
     {
@@ -352,7 +353,8 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 			TOdlObject* object = TOdlDatabase::Instance().GetObject(templateInstanciationDatabaseName);
 			TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
 
-            TFillObjectPropertiesInterpretContext newContext(templateInstanciationDatabaseName, 
+            TFillObjectPropertiesInterpretContext newContext(context.DatabasePath(), 
+                                                             context.StaticNamespaceStack(),
                                                              context.DynamicNamespaceStack(),
                                                              object, 
                                                              metaClassBase);
@@ -390,7 +392,8 @@ void FillObjectsProperties(TOdlAstNode* parAstNode, TInterpretContext& parContex
 
 				TOdlObject* object = TOdlDatabase::Instance().GetObject(objectNamespaceAndName);
 				TMetaClassBase const* metaClassBase = TOdlDatabase::Instance().FindRegisteredMetaClassByName_IFP(objectType.c_str());
-				TFillObjectPropertiesInterpretContext newContext(objectNamespaceAndName, 
+				TFillObjectPropertiesInterpretContext newContext(context.DatabasePath(),
+                                                                 context.StaticNamespaceStack(),
                                                                  context.DynamicNamespaceStack(),
                                                                  object, 
                                                                  metaClassBase);
@@ -500,8 +503,9 @@ void AutoNameAnomymousObjectDeclaration(TOdlAstNode* parAstNode, TInterpretConte
 static void AutoNameAnomymousObjectDeclarations(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
+    TNamedDeclarationStack staticNamespaceStack;
     TNamedDeclarationStack dynamicNamespaceStack;
-    TInterpretContext context(databasePath, dynamicNamespaceStack);
+    TInterpretContext context(databasePath, staticNamespaceStack, dynamicNamespaceStack);
     VisitAst(parAstNode, context, AutoNameAnomymousObjectDeclaration);
 }
 //-------------------------------------------------------------------------------
@@ -579,8 +583,9 @@ void ResolveValueIdentifier(TOdlAstNode* parAstNode, TInterpretContext& parConte
 static void ResolveValueIdentifiers(TOdlAstNode* parAstNode)
 {
     TOdlDatabasePath databasePath;
+    TNamedDeclarationStack staticNamespaceStack;
     TNamedDeclarationStack dynamicNamespaceStack;
-    TInterpretContext context(databasePath, dynamicNamespaceStack);
+    TInterpretContext context(databasePath, staticNamespaceStack, dynamicNamespaceStack);
     ResolveValueIdentifier(parAstNode, context);
 }
 //-------------------------------------------------------------------------------
@@ -602,14 +607,16 @@ void InterpretAst(TOdlAstNode* parAstNode)
         {
             // create objets
             TOdlDatabasePath databasePath;
+            TNamedDeclarationStack staticNamespaceStack;
             TNamedDeclarationStack dynamicNamespaceStack;
-            TInterpretContext InstanciateObjectContext(databasePath, dynamicNamespaceStack);
+            TInterpretContext InstanciateObjectContext(databasePath, staticNamespaceStack, dynamicNamespaceStack);
             VisitAst(parAstNode, InstanciateObjectContext, InstanciateObjects);
             
             // fill objets properties.
             assert(databasePath.empty());
+            assert(staticNamespaceStack.empty());
             assert(dynamicNamespaceStack.empty());
-            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, dynamicNamespaceStack, nullptr, nullptr);
+            TFillObjectPropertiesInterpretContext fillObjectsPropertiesContext(databasePath, staticNamespaceStack, dynamicNamespaceStack, nullptr, nullptr);
             VisitAst(parAstNode, fillObjectsPropertiesContext, FillObjectsProperties);
         };
         break ;
