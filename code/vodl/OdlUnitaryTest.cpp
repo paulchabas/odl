@@ -294,6 +294,8 @@ public:
 
     }
 
+    bool IsDumpOutputFilenameValid() const { return !FDumpOutputFilename.empty(); }
+
     bool CheckTestResult(u32 parVerboseLevel)
     {
         std::ostringstream oss;
@@ -307,7 +309,7 @@ public:
 
         std::string result = oss.str();
 
-        if (!FDumpOutputFilename.empty())
+        if (IsDumpOutputFilenameValid())
         {
             std::ofstream outputStream(FDumpOutputFilename.c_str());
             outputStream << result;
@@ -414,7 +416,7 @@ TOdlUnitaryTest::TOdlUnitaryTest(char const* parFilename, char const* parTestNam
         odlParser.InterpretAst();
     }
 
-    char const* testResultCode = "[KO]";
+    std::string testResultCode = "[KO]";
     if (odlAst != nullptr)
     {
         if (FVerboseLevel > 1)
@@ -424,6 +426,8 @@ TOdlUnitaryTest::TOdlUnitaryTest(char const* parFilename, char const* parTestNam
         {
             if (testResultObject->CheckTestResult(parVerboseLevel))
                 testResultCode = "[OK]";
+            if (testResultObject->IsDumpOutputFilenameValid())
+                testResultCode += " {output file has been overriden}";
         }
     }
 
